@@ -1,12 +1,26 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getAppDashboardUrl, getAppUrl } from '@/lib/app-url';
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
-  const response = NextResponse.redirect(`${origin}${redirectTo}`);
+
+  const appUrl = getAppUrl();
+  let redirectTarget: string;
+  if (redirectTo.startsWith('http')) {
+    redirectTarget = redirectTo;
+  } else if (appUrl) {
+    redirectTarget = `${appUrl}${redirectTo.startsWith('/') ? '' : '/'}${redirectTo}`;
+  } else {
+    redirectTarget = redirectTo === '/dashboard'
+      ? `${request.nextUrl.origin}${getAppDashboardUrl()}`
+      : `${request.nextUrl.origin}${redirectTo}`;
+  }
+
+  const response = NextResponse.redirect(redirectTarget);
 
   if (code) {
     const supabase = createServerClient(
@@ -30,5 +44,5 @@ export async function GET(request: NextRequest) {
       return response;
     }
   }
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  return NextResponse.redirect(`${request.nextUrl.origin}/login?error=auth`);
 }

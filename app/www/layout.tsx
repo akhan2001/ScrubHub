@@ -1,4 +1,4 @@
-export default function AuthResetLayout({
+export default function WWWLayout({
   children,
 }: {
   children: React.ReactNode;

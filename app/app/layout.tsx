@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-export default function MainLayout({
+export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;

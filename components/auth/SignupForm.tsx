@@ -13,7 +13,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   'User already registered': 'An account with this email already exists.',
 };
 
-export function SignupForm() {
+type SignupFormProps = {
+  defaultRedirectTo?: string;
+};
+
+export function SignupForm({ defaultRedirectTo = '/dashboard' }: SignupFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -41,7 +45,7 @@ export function SignupForm() {
     }
     if (data.session) {
       setSuccess('signed_in');
-      router.push('/dashboard');
+      router.push(defaultRedirectTo);
       router.refresh();
     } else {
       setSuccess('confirm');

@@ -15,7 +15,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   'Invalid login credentials': 'Invalid email or password. Please try again.',
 };
 
-export function LoginForm() {
+type LoginFormProps = {
+  defaultRedirectTo?: string;
+};
+
+export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +28,7 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectTo = searchParams.get('redirectTo') ?? defaultRedirectTo;
 
   useEffect(() => {
     const err = searchParams.get('error');

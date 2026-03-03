@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
 import { getAuthUser } from '@/server/auth/get-auth-user';
 import { redirect } from 'next/navigation';
+import { getAppDashboardUrl } from '@/lib/app-url';
 
 export default async function ForgotPasswordPage() {
   const user = await getAuthUser();
-  if (user) redirect('/dashboard');
+  if (user) redirect(getAppDashboardUrl());
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getAuthUser } from '@/server/auth/get-auth-user';
 import { Button } from '@/components/ui/button';
+import { getWwwLoginUrl, getWwwSignupUrl } from '@/lib/app-url';
 
 export async function Header() {
   const user = await getAuthUser();
@@ -29,10 +30,10 @@ export async function Header() {
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/login">Login</Link>
+                <Link href={getWwwLoginUrl()}>Login</Link>
               </Button>
               <Button variant="default" size="sm" asChild>
-                <Link href="/signup">Sign up</Link>
+                <Link href={getWwwSignupUrl()}>Sign up</Link>
               </Button>
             </>
           )}
