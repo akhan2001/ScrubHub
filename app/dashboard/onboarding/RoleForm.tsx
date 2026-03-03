@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { updateProfileRole } from '@/actions/auth';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import type { AppRole } from '@/types/database';
 
 export function RoleForm({
@@ -35,16 +38,21 @@ export function RoleForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-sm">
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 p-2 rounded">
+        <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
           {error}
         </p>
       )}
-      <div>
-        <label className="block text-sm font-medium mb-2">Role</label>
+      <div className="space-y-2">
+        <Label htmlFor="role">Role</Label>
         <select
+          id="role"
           value={role}
           onChange={(e) => setRole(e.target.value as AppRole)}
-          className="w-full rounded border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
+          className={cn(
+            "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
+            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none",
+            "disabled:cursor-not-allowed disabled:opacity-50"
+          )}
         >
           {roles.map((r) => (
             <option key={r} value={r}>
@@ -53,13 +61,9 @@ export function RoleForm({
           ))}
         </select>
       </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2 font-medium hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={loading}>
         {loading ? 'Saving…' : 'Save role'}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -1,17 +1,15 @@
-import Link from 'next/link';
 import { SignupForm } from '@/components/auth/SignupForm';
+import { AuthPanel } from '@/components/auth/AuthPanel';
+import { getAuthUser } from '@/server/auth/get-auth-user';
+import { redirect } from 'next/navigation';
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  const user = await getAuthUser();
+  if (user) redirect('/dashboard');
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <h1 className="text-2xl font-semibold mb-6">Create a ScrubHub account</h1>
+    <AuthPanel mode="signup">
       <SignupForm />
-      <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-        Already have an account?{' '}
-        <Link href="/login" className="font-medium text-zinc-900 dark:text-zinc-100 underline">
-          Sign in
-        </Link>
-      </p>
-    </div>
+    </AuthPanel>
   );
 }

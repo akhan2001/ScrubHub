@@ -7,9 +7,9 @@ export default async function ListingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-6">Listings</h1>
+      <h1 className="text-2xl font-semibold mb-6 text-foreground">Listings</h1>
       {!listings.length ? (
-        <p className="text-zinc-600 dark:text-zinc-400">No published listings yet.</p>
+        <p className="text-muted-foreground">No published listings yet.</p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {listings.map((listing) => (

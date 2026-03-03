@@ -8,8 +8,8 @@ export default async function OnboardingPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold mb-2">Choose your role</h1>
-      <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+      <h1 className="text-xl font-semibold mb-2 text-foreground">Choose your role</h1>
+      <p className="text-muted-foreground mb-6">
         Select how you want to use ScrubHub. Landlords can create and manage listings.
       </p>
       <RoleForm currentRole={session.role as AppRole} roles={ROLES} />
