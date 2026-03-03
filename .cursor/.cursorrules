@@ -1,0 +1,399 @@
+# ScrubHub Cursor Rules
+
+Use this file for project-wide AI and team conventions. You can add more sections (e.g. testing, security, deployment) at any time.
+
+---
+
+# Overview
+
+ScrubHub is a multi-tenant SaaS platform for property management. It connects landlords, cleaners, maintenance staff, and tenants in one system. The focus is operational control. Listings, tasks, turnovers, payments, and communication live in a single workflow.
+
+---
+
+# 1. Architecture Rules
+
+## 1.1 Layered Structure (Mandatory)
+
+Every feature follows this structure:
+
+```
+src/
+├── app/
+│   └── (features)/
+│       └── landlord/
+│           └── listings/
+│               ├── page.tsx              # Rendering only
+│               ├── loading.tsx
+│               ├── error.tsx
+│               └── components/
+│                   └── listings-table.tsx
+│
+├── server/
+│   ├── services/
+│   │   └── listings.service.ts
+│   ├── repositories/
+│   │   └── listings.repository.ts
+│   ├── guards/
+│   │   └── require-role.ts
+│   └── auth/
+│       └── get-auth-user.ts
+│
+├── lib/
+│   └── supabase/
+│       ├── client.ts
+│       ├── server.ts
+│       └── types.ts
+```
+
+---
+
+## 1.2 Page Rules (Critical)
+
+### Pages must:
+
+* Render UI
+* Call services
+* Perform redirects only
+
+### Pages must NOT:
+
+* Call Supabase directly
+* Query tables
+* Perform role checks
+* Contain business rules
+
+Bad:
+
+```ts
+const { data: profile } = await supabase.from('profiles')...
+```
+
+Correct:
+
+```ts
+const listings = await getLandlordListings(user.id)
+```
+
+---
+
+## 1.3 Auth & Role Enforcement
+
+### All role checks must live in `/server/guards`
+
+Example:
+
+`server/guards/require-role.ts`
+
+```ts
+export async function requireRole(role: UserRole) {
+  const user = await getAuthUser()
+  if (!user) redirect('/login')
+
+  if (user.role !== role) redirect('/dashboard')
+
+  return user
+}
+```
+
+Page usage:
+
+```ts
+export default async function LandlordListingsPage() {
+  const user = await requireRole('landlord')
+  const listings = await getLandlordListings(user.id)
+
+  return <ListingsTable listings={listings} />
+}
+```
+
+---
+
+## 1.4 Repository Pattern (Database Isolation)
+
+All Supabase queries go inside `/server/repositories`.
+
+Example:
+
+`listings.repository.ts`
+
+```ts
+export async function fetchListingsByUser(userId: string) {
+  const supabase = await createServerClient()
+
+  const { data, error } = await supabase
+    .from('listings')
+    .select('id, title, status, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data
+}
+```
+
+Pages never see `.from()` calls.
+
+---
+
+## 1.5 Service Layer (Business Logic)
+
+Services orchestrate repositories.
+
+Example:
+
+`listings.service.ts`
+
+```ts
+export async function getLandlordListings(userId: string) {
+  return fetchListingsByUser(userId)
+}
+```
+
+If business rules grow later, they go here.
+
+---
+
+## 1.6 Supabase Usage Rules
+
+* Client-side Supabase only for realtime or optimistic UI.
+* Server-side Supabase only in repositories.
+* Never import Supabase directly in:
+
+  * `page.tsx`
+  * UI components
+  * hooks
+
+Allowed locations:
+
+* `/server/repositories`
+* `/server/auth`
+
+---
+
+## 1.7 Feature Isolation
+
+Each feature must be isolated:
+
+```
+(features)/customers/
+(features)/operations/
+(features)/financials/
+(features)/ai/
+```
+
+Shared code only if:
+
+* Used by 2+ features
+* Truly cross-domain
+
+Avoid dumping logic into `/lib`.
+
+---
+
+## 1.8 API Route Rules
+
+API routes:
+
+```
+src/app/api/[feature]/route.ts
+```
+
+Must:
+
+1. Validate with Zod
+2. Call service
+3. Return typed response
+
+Must NOT:
+
+* Contain raw Supabase queries
+* Contain business rules
+
+---
+
+## 1.9 Type Organization
+
+```
+types/
+├── database.types.ts
+├── user.types.ts
+├── listing.types.ts
+```
+
+Rules:
+
+* No inline anonymous types in services
+* Export explicit return types
+* Never use `any`
+
+---
+
+## 1.10 AI Tool Rules (Strict)
+
+Already good, but clarified:
+
+* Tools remain stateless
+* No global caches
+* No direct DB access
+* All external calls happen inside tool body
+* Tools do not mutate app state
+
+---
+
+## 1.11 Naming Conventions
+
+* Files: kebab-case
+* Components: PascalCase
+* Services: `*.service.ts`
+* Repositories: `*.repository.ts`
+* Guards: `require-*.ts`
+* Hooks: `use-*.ts`
+
+---
+
+## 1.12 What to Refactor Immediately
+
+The pattern below must be removed everywhere:
+
+```ts
+const supabase = await createClient()
+await supabase.from(...)
+```
+
+Replace with:
+
+* `requireRole()`
+* Service call
+* Repository call
+
+No exceptions.
+
+---
+
+## 1.13 Enforcement Rules for Cursor
+
+When modifying code:
+
+* If a page contains `.from(` → move it to repository.
+* If a page checks `profile.role` → move to guard.
+* If Supabase appears in a component → refactor.
+* If logic > 20 lines in page → extract to service.
+
+---
+
+## 1.14 Clean Page Example
+
+Final version of your landlord page:
+
+```ts
+import { requireRole } from '@/server/guards/require-role'
+import { getLandlordListings } from '@/server/services/listings.service'
+import { ListingsTable } from './components/listings-table'
+
+export default async function LandlordListingsPage() {
+  const user = await requireRole('landlord')
+  const listings = await getLandlordListings(user.id)
+
+  return <ListingsTable listings={listings} />
+}
+```
+
+---
+
+# 2. Coding Standards (Supabase Studio–aligned)
+
+ScrubHub follows conventions inspired by Supabase Studio: clear directory roles, thin pages, separated data and UI state, and consistent patterns for API and types. The stack is Next.js (App Router), Supabase (Auth + Postgres), and TypeScript.
+
+## 2.1 Directory structure
+
+| Path | Purpose |
+|------|--------|
+| **`app/`** | App Router: routes, layouts, `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`. Route groups e.g. `(auth)`, `(features)` for organization. |
+| **`app/api/`** | API routes: validate with Zod, call services, return typed responses. Use auth wrapper for protected routes. |
+| **`components/`** | All React UI. Prefer co-locating feature components under the feature (e.g. `app/dashboard/landlord/listings/components/`). |
+| **`components/layout/`** | Shared shell: Header, Footer, nav. |
+| **`components/ui/`** | Shared, reusable primitives (buttons, inputs, cards, modals). |
+| **`server/`** | Backend logic: `services/`, `repositories/`, `guards/`, `auth/`. No UI. |
+| **`lib/`** | Pure utilities: Supabase client/server, helpers, constants. No business logic. |
+| **`types/`** | Global TS types: database shapes, API, forms. Prefer explicit types; no `any`. |
+| **`actions/`** | Server Actions (e.g. form submit) that call services/repositories. |
+| **`hooks/`** | React hooks: auth, URL state, domain-specific (e.g. `use-listings`). |
+| **`supabase/`** | Migrations, config (e.g. `config.toml` for local). |
+
+When adding client state at scale: consider a dedicated `state/` (e.g. Valtio) for shared UI state and keep server state in services/repositories (or future React Query in a `data/` layer).
+
+## 2.2 TypeScript
+
+* Strict mode. No `any`; use `unknown` and narrow, or proper types from `types/`.
+* Prefer `interface` for object shapes; `type` for unions, tuples, mapped types.
+* Export explicit return types from server functions, services, and repositories.
+* Use `satisfies` when you need inference but want to check a shape (e.g. config objects).
+* Prefer types from `types/*` (and from repository/service return types) over inline anonymous types in app code.
+
+## 2.3 Frontend (App Router + React)
+
+* **Pages**: One route per `page.tsx`. Pages render UI, call services/guards, and perform redirects only. No Supabase calls, no role checks, no business rules in the page file.
+* **Layouts**: `layout.tsx` defines shell and nested layout (e.g. dashboard sidebar). Use for shared structure and auth/role-aware nav.
+* **Server vs Client**: Prefer Server Components. Use Client Components (`'use client'`) only for interactivity, forms with client state, or browser APIs. Mark client boundary at top of file.
+* **Navigation**: `next/link` for links; `next/navigation` for `useRouter`, `redirect`, `notFound`.
+* **Forms**: Prefer native `<form>` and Server Actions that call services; use React Hook Form + Zod in `components/` when you need complex client-side validation or multi-step flows.
+* **Loading/errors**: Use `loading.tsx` and `error.tsx` per route or segment; avoid blocking the whole app.
+
+## 2.4 Components
+
+* **Layouts** (`components/layout/`): Header, Footer, nav. Shared across app or by section.
+* **Feature components**: Co-locate under the feature (e.g. `app/.../listings/components/listings-table.tsx`). May include `*.constants.ts`, `*.utils.ts`, `*.types.ts` next to the component.
+* **UI** (`components/ui/`): Shared primitives (Button, Input, Card, Modal). Reusable across features; no feature-specific logic.
+* **Convention**: One main component per file; co-locate only when tightly coupled. Prefer Tailwind for styling; avoid inline styles except for dynamic values.
+
+## 2.5 State and data
+
+* **Server state**: Fetched in services/repositories; pages (or layouts) call services and pass data to components. No `.from()` in pages or UI.
+* **Client/UI state**: `useState` for local component state. For shared UI state across many components, consider a small store (e.g. Valtio in `state/`) later.
+* **URL state**: Use `nuqs` (or similar) for filters, search, pagination so state is shareable and back/forward works.
+* **No fetch in loops**: Batch or use a single query with filters. Keep Server Component trees small; push data fetching into services.
+
+## 2.6 API routes
+
+* **Location**: `app/api/[feature]/route.ts` (or `route.ts` under a segment).
+* **Must**: Validate input with Zod; call service (or repository only when no business logic); return typed JSON and correct status codes.
+* **Must NOT**: Contain raw Supabase queries or business rules; those live in repositories and services.
+* **Auth**: Protect sensitive routes (e.g. `apiWrapper`-style with auth check); never bypass auth for sensitive operations.
+
+## 2.7 Hooks
+
+* **Location**: `hooks/` (e.g. `hooks/use-auth.ts`, `hooks/use-listings.ts`). Group by domain or concern (auth, UI, forms) in subfolders if needed.
+* **Role**: Encapsulate reusable logic (auth, permissions, URL state, debounce, etc.). Hooks must NOT call Supabase directly; they call services or accept data from parents.
+* **Naming**: `use-*.ts` or `use*.ts`; hook name `useXxx`.
+
+## 2.8 Styling and formatting
+
+* **CSS**: Prefer Tailwind. Add plain CSS/SCSS only for third-party overrides (e.g. Monaco, complex grid) or theme-specific globals.
+* **Formatting**: Match ESLint/Prettier (double quotes for JSX attributes, consistent string quotes). Trailing commas in multiline. Max line length 100–120; break long lines.
+* **Theme**: If supporting dark/light, use a single source (e.g. `next-themes` or CSS variables) and keep theme tokens in one place.
+
+## 2.9 Accessibility
+
+* Semantic HTML: `<button>`, `<nav>`, `<main>`, `<section>`, headings in order.
+* Form inputs: Associated `<label>` (by `id`/`htmlFor` or wrapping).
+* Use `aria-*` only when semantic HTML is not enough (live regions, expanded state).
+* Focus: Ensure focus order and visible focus styles; avoid removing focus without reason.
+
+## 2.10 Dates and time
+
+* Treat timestamps as UTC. Store and send ISO strings; use `.toISOString()` for API and logs.
+* For display, format in user’s locale or with a shared formatter (e.g. `dayjs.utc()` for parsing, then format for UI).
+
+## 2.11 Best practices (summary)
+
+* **Pages**: Thin; compose from layouts + feature components; guard with `requireRole` or auth; no Supabase, no role checks, no business logic in the page.
+* **Data**: All async/DB access via repositories; orchestration in services; pages call services only.
+* **Components**: Layouts vs feature vs ui; co-locate constants/utils/types; prefer Tailwind.
+* **API routes**: Validate (Zod), call service, return typed response; use auth wrapper for protected routes.
+* **Types**: Prefer types from `types/` and from service/repository return types; no inline anonymous types in services; never `any`.
+
+---
+
+# 3. Adding More Rules
+
+You can add more top-level sections (e.g. `# 4. Testing`, `# 5. Security`, `# 6. Deployment`) in this file. Keep each section focused and use the same format: clear heading, short bullets or numbered rules, and code examples where they help.
