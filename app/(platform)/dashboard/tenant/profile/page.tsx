@@ -27,9 +27,6 @@ export default async function TenantProfilePage() {
             <p className="text-muted-foreground">Email</p>
             <p className="font-medium text-foreground">{profile?.email ?? 'Unknown'}</p>
           </div>
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/onboarding">Update role or verification details</Link>
-          </Button>
         </CardContent>
       </Card>
     </DashboardSection>

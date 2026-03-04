@@ -85,7 +85,7 @@ export default async function WWWLandingPage() {
             {/* White gradient overlay - top 25% only */}
             <div
               className="absolute top-0 left-0 right-0 h-[34%] pointer-events-none z-[1]"
-              style={{ background: 'var(--gradient-hero)', opacity: 0.92 }}
+              style={{ background: 'white', opacity: 0.92 }}
               aria-hidden
             />
             {/* Hero content - top 25% section */}

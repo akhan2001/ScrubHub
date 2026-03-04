@@ -56,6 +56,7 @@ export async function middleware(request: NextRequest) {
     pathname === '/auth/callback';
   
   const isDashboardPath = pathname.startsWith('/dashboard');
+  const isOnboardingPath = pathname.startsWith('/onboarding');
   const isListingsPath = pathname.startsWith('/listings');
 
   if (isApp) {
@@ -69,8 +70,8 @@ export async function middleware(request: NextRequest) {
       return withSupabaseCookies(response, NextResponse.redirect(new URL('/dashboard', request.url)));
     }
 
-    // Protect dashboard routes
-    if (isDashboardPath && !user) {
+    // Protect dashboard and onboarding routes
+    if ((isDashboardPath || isOnboardingPath) && !user) {
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirectTo', `${APP_URL}${pathname}`);
         return withSupabaseCookies(response, NextResponse.redirect(loginUrl));

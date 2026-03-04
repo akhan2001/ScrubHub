@@ -28,7 +28,7 @@ export async function requireVerifiedRole(
 
   if (profile.role !== role) return fail('/dashboard', new ForbiddenError(`Requires role: ${role}`));
   if (profile.verification_state !== 'verified') {
-    return fail('/dashboard/onboarding', new ForbiddenError('Complete verification before continuing'));
+    return fail('/onboarding', new ForbiddenError('Complete verification before continuing'));
   }
 
   return {

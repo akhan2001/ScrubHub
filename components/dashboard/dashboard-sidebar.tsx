@@ -34,7 +34,6 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
       label: 'Account',
       items: [
         { href: '/dashboard/tenant/profile', label: 'Profile', icon: UserRound },
-        { href: '/dashboard/onboarding', label: 'Settings', icon: Settings },
       ],
     },
   ],
@@ -48,12 +47,6 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/landlord/screening-rules', label: 'Screening rules', icon: ShieldCheck },
       ],
     },
-    {
-      label: 'Account',
-      items: [
-        { href: '/dashboard/onboarding', label: 'Settings', icon: Settings },
-      ],
-    },
   ],
   enterprise: [
     {
@@ -64,18 +57,12 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/enterprise/team', label: 'Team access', icon: Users },
       ],
     },
-    {
-      label: 'Account',
-      items: [
-        { href: '/dashboard/onboarding', label: 'Settings', icon: Settings },
-      ],
-    },
   ],
 };
 
 function isActivePath(pathname: string, href: string) {
   if (pathname === href) return true;
-  return href !== '/dashboard/onboarding' && pathname.startsWith(`${href}/`);
+  return pathname.startsWith(`${href}/`);
 }
 
 export function DashboardSidebar({

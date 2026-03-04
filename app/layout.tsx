@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const poppins = Poppins({
-  weight: ["400", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -26,8 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${poppins.variable} antialiased flex flex-col min-h-screen`}
+      <body className={`${inter.variable} antialiased flex flex-col min-h-screen font-sans`}
       >
         <ThemeProvider
           attribute="class"

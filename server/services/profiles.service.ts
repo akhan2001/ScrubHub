@@ -2,6 +2,7 @@ import {
   fetchProfileById,
   updateProfileRole as updateProfileRoleRepo,
   updateProfileVerificationState as updateProfileVerificationStateRepo,
+  fetchUserOnboardingStatus as fetchUserOnboardingStatusRepo,
 } from '@/server/repositories/profiles.repository';
 import type { AppRole, Profile, VerificationState } from '@/types/database';
 
@@ -54,4 +55,8 @@ export function isVerifiedForRole(profile: Pick<Profile, 'role' | 'verification_
     return profile.verification_state === 'verified';
   }
   return profile.verification_state === 'verified';
+}
+
+export async function getUserOnboardingStatus(userId: string) {
+  return fetchUserOnboardingStatusRepo(userId);
 }
