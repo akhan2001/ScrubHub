@@ -3,14 +3,23 @@ import { getPrimaryOrganizationForUser } from '@/server/services/organizations.s
 import { CreateOrganizationForm } from '@/components/enterprise/create-organization-form';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default async function EnterpriseDashboardPage() {
   const user = await requireRole('enterprise');
   const organization = await getPrimaryOrganizationForUser(user.id);
 
   return (
-    <section className="space-y-4 rounded-lg border border-border bg-card p-6 shadow-sm">
-      <h1 className="text-2xl font-semibold text-foreground">Enterprise dashboard</h1>
+    <section className="space-y-4">
+      <Card>
+        <CardHeader className="flex items-start justify-between gap-4 sm:flex-row">
+          <CardTitle className="text-2xl text-foreground">Enterprise dashboard</CardTitle>
+          <Badge variant={organization ? 'success' : 'warning'}>
+            {organization ? 'Organization ready' : 'Setup required'}
+          </Badge>
+        </CardHeader>
+        <CardContent className="space-y-4">
       {!organization ? (
         <>
           <p className="text-muted-foreground">Create an organization to start posting jobs and managing team access.</p>
@@ -31,6 +40,8 @@ export default async function EnterpriseDashboardPage() {
           </div>
         </>
       )}
+        </CardContent>
+      </Card>
     </section>
   );
 }

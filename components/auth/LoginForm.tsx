@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth: 'Authentication failed. Please try again.',
@@ -53,9 +54,10 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {(error || queryError) && (
-        <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-          {error ?? queryError}
-        </p>
+        <Alert tone="error">
+          <AlertTitle>Unable to sign in</AlertTitle>
+          <AlertDescription>{error ?? queryError}</AlertDescription>
+        </Alert>
       )}
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
@@ -118,7 +120,7 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
           <span className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+          <span className="bg-card px-2 text-muted-foreground">
             Or continue with
           </span>
         </div>

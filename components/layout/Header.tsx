@@ -2,17 +2,19 @@ import Link from 'next/link';
 import { getAuthUser } from '@/server/auth/get-auth-user';
 import { Button } from '@/components/ui/button';
 import { getAppLoginUrl, getAppSignupUrl } from '@/lib/app-url';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 
 export async function Header() {
   const user = await getAuthUser();
 
   return (
-    <header className="border-b border-border bg-card">
-      <nav className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b border-border bg-card/95 backdrop-blur">
+      <nav className="mx-auto flex w-full max-w-[var(--container-max)] items-center justify-between px-4 py-4">
         <Link href="/" className="font-semibold text-lg text-foreground hover:text-primary transition-colors">
           ScrubHub
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button variant="ghost" size="sm" asChild>
             <Link href="/listings">Listings</Link>
           </Button>

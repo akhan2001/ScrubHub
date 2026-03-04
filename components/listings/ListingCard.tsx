@@ -13,26 +13,24 @@ export function ListingCard({ listing }: ListingCardProps) {
       : null;
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+    <Card className="overflow-hidden border-border/90 bg-card/95 transition-all hover:-translate-y-0.5 hover:shadow-lg">
       <CardContent className="pt-6">
-          <h2 className="font-semibold text-lg text-foreground">{listing.title}</h2>
-          {listing.address && (
-            <p className="text-sm text-muted-foreground mt-1">{listing.address}</p>
-          )}
-          {listing.description && (
-            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-              {listing.description}
-            </p>
-          )}
-          <div className="mt-3 flex items-center justify-between">
-            {price && (
-              <span className="text-sm font-semibold text-primary">{price}</span>
-            )}
-            <Badge variant="secondary" className="capitalize">
-              {listing.status}
-            </Badge>
-          </div>
-        </CardContent>
+        <h2 className="text-lg font-semibold text-foreground">{listing.title}</h2>
+        {listing.address && (
+          <p className="mt-1 text-sm text-muted-foreground">{listing.address}</p>
+        )}
+        {listing.description && (
+          <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
+            {listing.description}
+          </p>
+        )}
+        <div className="mt-4 flex items-center justify-between">
+          {price && <span className="text-base font-semibold text-primary">{price}</span>}
+          <Badge variant={listing.status === 'published' ? 'success' : 'secondary'} className="capitalize">
+            {listing.status}
+          </Badge>
+        </div>
+      </CardContent>
     </Card>
   );
 }

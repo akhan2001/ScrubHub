@@ -22,13 +22,13 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
   const { title, subtitle, backLink } = COPY[mode];
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-screen">
+    <div className="flex min-h-screen flex-1 flex-col bg-background lg:flex-row">
       {/* Left: Branding panel with background image */}
       <div
-        className="hidden lg:flex lg:w-[55%] bg-slate-900 p-12 flex-col justify-between bg-cover bg-center bg-no-repeat relative"
+        className="relative hidden bg-slate-900 bg-cover bg-center bg-no-repeat p-12 lg:flex lg:w-[56%] lg:flex-col lg:justify-between"
         style={{ backgroundImage: "url('/images/scrubhub-signin-background-image.png')" }}
       >
-        <div className="absolute inset-0 bg-slate-900/70" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-900/70 to-blue-900/60" aria-hidden />
         <div className="relative z-10 flex flex-1 flex-col justify-between">
           <div>
             <Link
@@ -53,17 +53,19 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
       </div>
 
       {/* Right: Form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-background">
+      <div className="flex flex-1 items-center justify-center bg-background p-6 lg:p-12">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground lg:text-3xl">
               {title}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="mt-2 text-muted-foreground">
               {subtitle}
             </p>
           </div>
-          {children}
+          <div className="rounded-[var(--card-radius)] border border-border bg-card p-6 shadow-[var(--card-shadow)] lg:p-7">
+            {children}
+          </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { getAppDashboardUrl, getAppListingsUrl, getAppLoginUrl, getAppSignupUrl } from '@/lib/app-url';
 import { Home, MapPin, Building2 } from 'lucide-react';
 import { getAuthUser } from '@/server/auth/get-auth-user';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 
 export default async function WWWLandingPage() {
   const user = await getAuthUser();
@@ -14,8 +15,8 @@ export default async function WWWLandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-50">
-        <nav className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur">
+        <nav className="mx-auto flex w-full max-w-[var(--container-max)] items-center justify-between px-4 py-4">
           <Link
             href="/"
             className="flex items-center gap-2 font-semibold text-lg text-foreground hover:text-primary transition-colors"
@@ -50,6 +51,7 @@ export default async function WWWLandingPage() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <>
                 <Button variant="ghost" size="sm" asChild>
@@ -77,30 +79,31 @@ export default async function WWWLandingPage() {
 
       <main className="flex-1">
         {/* Hero + Map - hero overlay on map with white gradient */}
-        <section className="relative w-full">
+        <section className="relative w-full border-b border-border/70 bg-card">
           <div className="relative w-full h-[100vh]">
             <MapTipLanding listings={displayListings} />
             {/* White gradient overlay - top 25% only */}
             <div
-              className="absolute top-0 left-0 right-0 h-[25%] bg-gradient-to-b from-white/90 to-transparent pointer-events-none z-[1]"
+              className="absolute top-0 left-0 right-0 h-[34%] pointer-events-none z-[1]"
+              style={{ background: 'var(--gradient-hero)', opacity: 0.92 }}
               aria-hidden
             />
             {/* Hero content - top 25% section */}
-            <div className="absolute top-0 left-0 right-0 h-[25%] flex flex-col items-center justify-center px-4 text-center z-[2] pointer-events-none">
+            <div className="absolute top-0 left-0 right-0 h-[34%] flex flex-col items-center justify-center px-4 text-center z-[2] pointer-events-none">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="size-2 rounded-full bg-secondary" />
-                <span className="text-sm font-medium text-secondary">What is ScrubHub?</span>
+                <span className="size-2 rounded-full bg-white/85" />
+                <span className="text-sm font-semibold text-white/95">Healthcare Housing Marketplace</span>
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground max-w-3xl mx-auto mb-4">
+              <h1 className="mx-auto mb-4 max-w-3xl text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
                 Easily Find and Manage Rental Properties to Grow Your Portfolio
               </h1>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              <p className="mx-auto max-w-2xl text-base text-white/90 md:text-lg">
                 Take control of your property management. From practitioner housing to clinical suites, ScrubHub connects landlords and healthcare professionals across the 401 Corridor.
               </p>
             </div>
           </div>
           {displayListings.length === 0 && (
-            <div className="max-w-6xl mx-auto px-4 py-8 text-center">
+            <div className="mx-auto max-w-[var(--container-max)] px-4 py-8 text-center">
               <p className="text-muted-foreground">
                 No published listings yet. Sign up to create one.
               </p>
@@ -112,8 +115,8 @@ export default async function WWWLandingPage() {
         </section>
 
         {/* Statistics Section */}
-        <section className="bg-muted py-12">
-          <div className="max-w-6xl mx-auto px-4">
+        <section className="border-b border-border bg-muted py-12">
+          <div className="mx-auto max-w-[var(--container-max)] px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div>
                 <p className="text-2xl md:text-3xl font-bold text-foreground">500+</p>
@@ -136,7 +139,7 @@ export default async function WWWLandingPage() {
         </section>
 
         {/* Feature Section */}
-        <section id="about" className="max-w-6xl mx-auto px-4 py-16">
+        <section id="about" className="mx-auto max-w-[var(--container-max)] px-4 py-16">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div>
               <p className="text-sm font-medium text-secondary mb-2">Reason to choose us</p>
@@ -153,7 +156,7 @@ export default async function WWWLandingPage() {
               </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-6 rounded-xl border border-border bg-card shadow-sm">
+              <div className="rounded-[var(--card-radius)] border border-border bg-card p-6 shadow-[var(--card-shadow)]">
                 <div className="size-10 rounded-lg bg-muted flex items-center justify-center mb-4">
                   <Home className="size-5 text-primary" />
                 </div>
@@ -162,7 +165,7 @@ export default async function WWWLandingPage() {
                   Browse curated properties tailored for healthcare professionals and practitioners.
                 </p>
               </div>
-              <div className="p-6 rounded-xl border border-border bg-card shadow-sm">
+              <div className="rounded-[var(--card-radius)] border border-border bg-card p-6 shadow-[var(--card-shadow)]">
                 <div className="size-10 rounded-lg bg-muted flex items-center justify-center mb-4">
                   <MapPin className="size-5 text-primary" />
                 </div>
@@ -171,7 +174,7 @@ export default async function WWWLandingPage() {
                   Properties near hospitals and clinical sites across the 401 Corridor.
                 </p>
               </div>
-              <div className="p-6 rounded-xl border border-border bg-card shadow-sm sm:col-span-2">
+              <div className="rounded-[var(--card-radius)] border border-border bg-card p-6 shadow-[var(--card-shadow)] sm:col-span-2">
                 <div className="size-10 rounded-lg bg-muted flex items-center justify-center mb-4">
                   <Building2 className="size-5 text-primary" />
                 </div>
@@ -186,7 +189,7 @@ export default async function WWWLandingPage() {
 
         {/* CTA Section */}
         <section className="bg-muted py-16">
-          <div className="max-w-6xl mx-auto px-4 text-center">
+          <div className="mx-auto max-w-[var(--container-max)] px-4 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               Ready to list your property?
             </h2>
@@ -207,7 +210,7 @@ export default async function WWWLandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-border py-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-[var(--container-max)] flex-col items-center justify-between gap-4 px-4 md:flex-row">
           <p className="text-sm text-muted-foreground">© ScrubHub. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href={getAppListingsUrl()} className="text-sm text-muted-foreground hover:text-foreground">

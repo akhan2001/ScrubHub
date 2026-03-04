@@ -8,6 +8,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const ERROR_MESSAGES: Record<string, string> = {
   'User already registered': 'An account with this email already exists.',
@@ -55,27 +56,31 @@ export function SignupForm({ defaultRedirectTo = '/dashboard' }: SignupFormProps
 
   if (success === 'confirm') {
     return (
-      <p className="text-sm text-muted-foreground p-4 rounded-md bg-muted">
-        Check your email to confirm your account. Then{' '}
-        <Link href="/login" className="font-medium text-primary hover:underline">
-          sign in
-        </Link>
-        .
-      </p>
+      <Alert tone="info">
+        <AlertTitle>Check your inbox</AlertTitle>
+        <AlertDescription>
+          Check your email to confirm your account. Then{' '}
+          <Link href="/login" className="font-medium text-primary hover:underline">
+            sign in
+          </Link>
+          .
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md space-y-2">
-          <p>{error}</p>
+        <Alert tone="error" className="space-y-2">
+          <AlertTitle>Unable to create account</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
           {(error.includes('already exists') || error.includes('already registered')) && (
             <Link href="/login" className="font-medium underline block">
               Sign in instead →
             </Link>
           )}
-        </div>
+        </Alert>
       )}
       <div className="space-y-2">
         <Label htmlFor="fullName">Full name</Label>
@@ -134,7 +139,7 @@ export function SignupForm({ defaultRedirectTo = '/dashboard' }: SignupFormProps
           <span className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+          <span className="bg-card px-2 text-muted-foreground">
             Or continue with
           </span>
         </div>

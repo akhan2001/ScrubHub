@@ -3,13 +3,21 @@ import { getLandlordListings } from '@/server/services/listings.service';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 export default async function LandlordListingsPage() {
   const user = await requireRole('landlord');
   const listings = await getLandlordListings(user.id);
 
   return (
-    <div>
+    <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-foreground">My listings</h1>
         <Button asChild size="sm">
@@ -17,26 +25,41 @@ export default async function LandlordListingsPage() {
         </Button>
       </div>
       {!listings.length ? (
-        <p className="text-muted-foreground">No listings yet.</p>
+        <p className="rounded-[var(--card-radius)] border border-border bg-card p-5 text-muted-foreground">No listings yet.</p>
       ) : (
-        <ul className="space-y-2">
-          {listings.map((listing) => (
-            <li
-              key={listing.id}
-              className="flex items-center gap-4 py-3 border-b border-border last:border-0"
-            >
-              <Link
-                href={`/listings/${listing.id}`}
-                className="font-medium text-foreground hover:text-primary transition-colors"
-              >
-                {listing.title}
-              </Link>
-              <Badge variant="secondary" className="capitalize ml-auto">
-                {listing.status}
-              </Badge>
-            </li>
-          ))}
-        </ul>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Listing</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {listings.map((listing) => (
+              <TableRow key={listing.id}>
+                <TableCell className="font-medium">
+                  <Link
+                    href={`/listings/${listing.id}`}
+                    className="text-foreground transition-colors hover:text-primary"
+                  >
+                    {listing.title}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={listing.status === 'published' ? 'success' : 'secondary'} className="capitalize">
+                    {listing.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href={`/listings/${listing.id}`}>Open</Link>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </div>
   );
