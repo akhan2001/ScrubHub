@@ -72,7 +72,7 @@ export default async function EnterpriseJobsPage() {
                   <TableRow key={job.id}>
                     <TableCell className="font-medium">{job.title}</TableCell>
                     <TableCell>
-                      <Badge variant={job.status === 'published' ? 'success' : 'secondary'} className="capitalize">
+                      <Badge variant={job.status === 'published' ? 'default' : 'secondary'} className="capitalize">
                         {job.status}
                       </Badge>
                     </TableCell>
