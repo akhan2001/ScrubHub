@@ -2,8 +2,6 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
 function isAppHost(request: NextRequest): boolean {
   const host = request.headers.get('host') ?? '';
   const hostParam = request.nextUrl.searchParams.get('host');
@@ -35,6 +33,13 @@ function withSupabaseCookies(base: NextResponse, target: NextResponse): NextResp
 }
 
 export async function middleware(request: NextRequest) {
+  let APP_URL = process.env.NEXT_PUBLIC_APP_URL;
+
+  if (!APP_URL) {
+    const url = new URL(request.url);
+    APP_URL = `${url.protocol}//${url.host}`;
+  }
+
   const pathname = request.nextUrl.pathname;
   const isApp = isAppHost(request);
   const isWww = isWwwHost(request);
