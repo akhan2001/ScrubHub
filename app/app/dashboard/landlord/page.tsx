@@ -54,7 +54,7 @@ export default async function LandlordDashboardPage() {
             <CardDescription>Manage and monitor your most recent properties.</CardDescription>
           </div>
           <Button asChild>
-            <Link href="/dashboard/landlord/listings/new">Create listing</Link>
+            <Link href="/dashboard/landlord/listings?create=1">Create listing</Link>
           </Button>
         </CardHeader>
         <CardContent>

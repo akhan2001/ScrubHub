@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ListingsTable } from '@/components/dashboard/listings-table';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
+import { NewListingModalControlled } from '@/components/landlord/new-listing-modal';
 
 export default async function LandlordListingsPage() {
   const user = await requireRole('landlord');
@@ -23,7 +24,7 @@ export default async function LandlordListingsPage() {
       description="Manage all properties, statuses, and incoming applications."
       action={
         <Button asChild size="sm">
-          <Link href="/dashboard/landlord/listings/new">Create listing</Link>
+          <Link href="/dashboard/landlord/listings?create=1">Create listing</Link>
         </Button>
       }
     >
@@ -40,6 +41,7 @@ export default async function LandlordListingsPage() {
           )}
         </CardContent>
       </Card>
+      <NewListingModalControlled />
     </DashboardSection>
   );
 }

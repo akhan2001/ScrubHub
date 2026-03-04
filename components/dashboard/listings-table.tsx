@@ -64,7 +64,7 @@ export function ListingsTable({ rows }: { rows: ListingsTableRow[] }) {
                     <Link href={`/listings/${row.id}`}>View listing</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/landlord/listings/new">Duplicate</Link>
+                    <Link href="/dashboard/landlord/listings?create=1">Duplicate</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
