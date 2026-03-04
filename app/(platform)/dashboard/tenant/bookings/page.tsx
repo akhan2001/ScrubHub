@@ -46,7 +46,7 @@ export default async function TenantBookingsPage() {
                   <TableRow key={booking.id}>
                     <TableCell className="font-medium">{booking.id.slice(0, 10)}</TableCell>
                     <TableCell>
-                      <Badge variant={booking.status === 'approved' ? 'success' : 'secondary'} className="capitalize">
+                      <Badge variant={booking.status === 'approved' ? 'default' : 'secondary'} className="capitalize">
                         {booking.status}
                       </Badge>
                     </TableCell>

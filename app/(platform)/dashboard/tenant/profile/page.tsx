@@ -22,7 +22,7 @@ export default async function TenantProfilePage() {
             <CardTitle>Account details</CardTitle>
             <CardDescription>Profile and verification status used across bookings.</CardDescription>
           </div>
-          <Badge variant={profile?.verification_state === 'verified' ? 'success' : 'warning'} className="capitalize">
+          <Badge variant={profile?.verification_state === 'verified' ? 'default' : 'secondary'} className="capitalize">
             {profile?.verification_state ?? 'pending'}
           </Badge>
         </CardHeader>

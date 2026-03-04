@@ -28,7 +28,7 @@ export default async function EnterpriseDashboardPage() {
       <Card>
         <CardHeader className="flex items-start justify-between gap-4 sm:flex-row">
           <CardTitle className="text-2xl text-foreground">Enterprise dashboard</CardTitle>
-          <Badge variant={organization ? 'success' : 'warning'}>
+          <Badge variant={organization ? 'default' : 'secondary'}>
             {organization ? 'Organization ready' : 'Setup required'}
           </Badge>
         </CardHeader>

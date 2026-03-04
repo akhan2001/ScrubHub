@@ -94,7 +94,7 @@ export function ListingPanel({
                           {listing.address ?? "Address pending"}
                         </p>
                       </div>
-                      <Badge variant={listing.status === "published" ? "success" : "secondary"} className="capitalize">
+                      <Badge variant={listing.status === "published" ? "default" : "secondary"} className="capitalize">
                         {listing.status}
                       </Badge>
                     </div>

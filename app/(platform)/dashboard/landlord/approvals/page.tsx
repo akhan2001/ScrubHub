@@ -48,7 +48,7 @@ export default async function LandlordApprovalsPage() {
                     <TableCell className="font-medium">{booking.id.slice(0, 10)}</TableCell>
                     <TableCell className="text-muted-foreground">{booking.tenant_user_id.slice(0, 10)}</TableCell>
                     <TableCell>
-                      <Badge variant={booking.status === 'requested' ? 'warning' : 'secondary'} className="capitalize">
+                      <Badge variant={booking.status === 'requested' ? 'default' : 'secondary'} className="capitalize">
                         {booking.status}
                       </Badge>
                     </TableCell>

@@ -46,7 +46,7 @@ export function ListingsTable({ rows }: { rows: ListingsTableRow[] }) {
               </Link>
             </TableCell>
             <TableCell>
-              <Badge variant={row.status === 'published' ? 'success' : 'secondary'} className="capitalize">
+              <Badge variant={row.status === 'published' ? 'default' : 'secondary'} className="capitalize">
                 {row.status}
               </Badge>
             </TableCell>

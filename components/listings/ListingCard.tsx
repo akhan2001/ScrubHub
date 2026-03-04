@@ -26,7 +26,7 @@ export function ListingCard({ listing }: ListingCardProps) {
         )}
         <div className="mt-4 flex items-center justify-between">
           {price && <span className="text-base font-semibold text-primary">{price}</span>}
-          <Badge variant={listing.status === 'published' ? 'success' : 'secondary'} className="capitalize">
+          <Badge variant={listing.status === 'published' ? 'default' : 'secondary'} className="capitalize">
             {listing.status}
           </Badge>
         </div>
