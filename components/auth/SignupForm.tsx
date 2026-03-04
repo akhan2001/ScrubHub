@@ -56,7 +56,7 @@ export function SignupForm({ defaultRedirectTo = '/dashboard' }: SignupFormProps
 
   if (success === 'confirm') {
     return (
-      <Alert tone="info">
+      <Alert variant="default">
         <AlertTitle>Check your inbox</AlertTitle>
         <AlertDescription>
           Check your email to confirm your account. Then{' '}
@@ -72,7 +72,7 @@ export function SignupForm({ defaultRedirectTo = '/dashboard' }: SignupFormProps
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <Alert tone="error" className="space-y-2">
+        <Alert variant="destructive" className="space-y-2">
           <AlertTitle>Unable to create account</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
           {(error.includes('already exists') || error.includes('already registered')) && (

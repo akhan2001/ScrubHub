@@ -135,7 +135,8 @@ export async function saveOrgInfo(data: unknown) {
   return { success: true };
 }
 
-export async function savePaymentMethod(_data: unknown) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility; mock impl
+export async function savePaymentMethod(_data?: unknown) {
   // Mocked — in production this would create/update a Stripe payment method
   await getAuthUserId();
   revalidatePath('/dashboard/profile');

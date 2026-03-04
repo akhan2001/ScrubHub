@@ -46,7 +46,7 @@ export function ProfileCard({
   const isCompleted = status === 'completed';
 
   return (
-    <Card>
+    <Card data-section-id={id}>
       <CardHeader className="flex flex-row items-start justify-between gap-3">
         <CardTitle className="text-base font-semibold">{label}</CardTitle>
         <div className="flex items-center gap-2">

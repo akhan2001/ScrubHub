@@ -101,11 +101,6 @@ function formatDate(dateStr: string | null): string | null {
   }
 }
 
-function formatCurrency(cents: number | null): string | null {
-  if (cents == null) return null;
-  return `$${(cents / 100).toLocaleString()}`;
-}
-
 export function computeTenantSections(profile: Profile, wp: WorkerProfile | null) {
   const personalComplete = !!(profile.full_name && profile.phone_number && profile.date_of_birth);
   const credentialsComplete = !!(wp?.healthcare_role && wp?.license_number && wp?.license_state);

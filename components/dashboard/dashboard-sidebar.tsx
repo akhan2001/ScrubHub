@@ -9,7 +9,6 @@ import {
   Home,
   ReceiptText,
   Search,
-  Settings,
   ShieldCheck,
   Users,
   UserRound,

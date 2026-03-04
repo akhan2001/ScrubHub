@@ -33,22 +33,17 @@ export function ListingsMarketplace({ listings }: ListingsMarketplaceProps) {
   const initialListing =
     selectedFromQuery && mappedListings.some((entry) => entry.id === selectedFromQuery)
       ? selectedFromQuery
-      : mappedListings[0]?.id ?? null;
+      : null;
   const [activeListingId, setActiveListingId] = useState<string | null>(initialListing);
+  const effectiveActiveId = activeListingId ?? mappedListings[0]?.id ?? null;
 
   useEffect(() => {
-    if (!activeListingId && mappedListings[0]) {
-      setActiveListingId(mappedListings[0].id);
-    }
-  }, [activeListingId, mappedListings]);
-
-  useEffect(() => {
-    if (!activeListingId) return;
-    if (searchParams.get("listing") === activeListingId) return;
+    if (!effectiveActiveId) return;
+    if (searchParams.get("listing") === effectiveActiveId) return;
     const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("listing", activeListingId);
+    nextParams.set("listing", effectiveActiveId);
     router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
-  }, [activeListingId, pathname, router, searchParams]);
+  }, [effectiveActiveId, pathname, router, searchParams]);
 
   if (!mappedListings.length) {
     return (
@@ -106,7 +101,7 @@ export function ListingsMarketplace({ listings }: ListingsMarketplaceProps) {
           <div className={viewMode === "list" ? "hidden lg:block" : "block"}>
             <MapView
               listings={mappedListings}
-              activeListingId={activeListingId}
+              activeListingId={effectiveActiveId}
               hoveredListingId={hoveredListingId}
               onSelectListing={setActiveListingId}
               onHoverListing={setHoveredListingId}
@@ -116,7 +111,7 @@ export function ListingsMarketplace({ listings }: ListingsMarketplaceProps) {
           <div className={viewMode === "map" ? "hidden lg:block" : "block"}>
             <ListingPanel
               listings={mappedListings}
-              activeListingId={activeListingId}
+              activeListingId={effectiveActiveId}
               hoveredListingId={hoveredListingId}
               onSelectListing={setActiveListingId}
               onHoverListing={setHoveredListingId}

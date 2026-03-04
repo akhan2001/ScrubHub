@@ -49,7 +49,7 @@ export default async function LandlordDashboardPage() {
       </div>
 
       {profile?.verification_state !== 'verified' && (
-        <Alert tone="warning">
+        <Alert variant="default">
           <AlertTitle>Verification required</AlertTitle>
           <AlertDescription>
             Your landlord verification is <strong>{profile?.verification_state}</strong>. Listing creation and approvals are restricted until you are verified.

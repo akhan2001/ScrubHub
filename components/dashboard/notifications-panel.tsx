@@ -110,7 +110,6 @@ function NotificationRow({ item }: { item: NotificationItem }) {
 }
 
 export function NotificationsPanel() {
-  const todayCount = MOCK_TODAY.filter((n) => n.unread).length;
   const totalToday = MOCK_TODAY.length;
 
   return (

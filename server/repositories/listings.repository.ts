@@ -92,7 +92,7 @@ export type InsertListingInput = {
   is_furnished?: boolean;
   are_pets_allowed?: boolean;
   images?: string[] | null;
-  amenities?: any | null;
+  amenities?: unknown;
 };
 
 export async function insertListing(input: InsertListingInput): Promise<void> {

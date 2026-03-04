@@ -31,7 +31,7 @@ export const housingSchema = z.object({
 export const identitySchema = z.object({
   idDocumentUrl: z.string().min(1, 'ID document is required'),
   ssnLast4: z.string().length(4, 'Must be last 4 digits'),
-  backgroundCheckConsent: z.literal(true, { message: 'You must consent to the background check' }),
+  backgroundCheckConsent: z.boolean().refine((v) => v === true, { message: 'You must consent to the background check' }),
 });
 
 export const businessSchema = z.object({

@@ -40,6 +40,7 @@ export function HousingForm({
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch() is not memoizable
   const hasPets = watch('hasPets');
 
   async function onSubmit(data: HousingData) {

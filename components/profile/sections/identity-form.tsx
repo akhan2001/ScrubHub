@@ -28,7 +28,7 @@ export function IdentityForm({
     defaultValues: {
       idDocumentUrl: workerProfile?.id_document_url ?? '',
       ssnLast4: workerProfile?.ssn_last_4 ?? '',
-      backgroundCheckConsent: workerProfile?.background_check_consent ?? false as any,
+      backgroundCheckConsent: workerProfile?.background_check_consent ?? false,
     },
   });
 
@@ -60,7 +60,7 @@ export function IdentityForm({
         <Checkbox
           id="backgroundCheckConsent"
           defaultChecked={workerProfile?.background_check_consent ?? false}
-          onCheckedChange={(checked) => setValue('backgroundCheckConsent', checked as any, { shouldDirty: true })}
+          onCheckedChange={(checked) => setValue('backgroundCheckConsent', checked === true, { shouldDirty: true })}
         />
         <Label htmlFor="backgroundCheckConsent" className="text-sm">
           I consent to a background check as part of the verification process

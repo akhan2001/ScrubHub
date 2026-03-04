@@ -54,7 +54,7 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {(error || queryError) && (
-        <Alert tone="error">
+        <Alert variant="destructive">
           <AlertTitle>Unable to sign in</AlertTitle>
           <AlertDescription>{error ?? queryError}</AlertDescription>
         </Alert>

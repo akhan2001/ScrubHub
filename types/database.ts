@@ -89,7 +89,7 @@ export interface Listing {
   is_furnished: boolean;
   are_pets_allowed: boolean;
   images: string[] | null;
-  amenities: any | null;
+  amenities: unknown;
 
   created_at: string;
   updated_at: string;

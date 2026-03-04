@@ -1,4 +1,4 @@
-import type { AppRole, Profile, WorkerProfile, LandlordProfile, Organization } from './database';
+import type { Profile, WorkerProfile, LandlordProfile, Organization } from './database';
 
 export type ProfileSectionStatus = 'completed' | 'incomplete';
 
