@@ -2,11 +2,11 @@ export type AppRole = 'tenant' | 'landlord' | 'enterprise';
 export type VerificationState = 'pending' | 'verified' | 'rejected' | 'suspended';
 
 export type ListingStatus = 'draft' | 'published' | 'archived';
-export type BookingStatus = 'requested' | 'approved' | 'rejected' | 'cancelled' | 'completed';
+export type BookingStatus = 'requested' | 'reviewing' | 'approved' | 'rejected' | 'cancelled' | 'completed' | 'withdrawn';
 export type PaymentStatus = 'pending' | 'requires_action' | 'succeeded' | 'failed' | 'refunded';
 export type OrganizationRole = 'admin' | 'manager' | 'viewer';
 export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
-export type JobStatus = 'draft' | 'published' | 'closed';
+export type JobStatus = 'draft' | 'published' | 'closed' | 'filled';
 
 export interface Profile {
   id: string;
@@ -77,8 +77,7 @@ export interface Listing {
   address: string | null;
   price_cents: number | null;
   status: ListingStatus;
-  
-  // Beta v1 fields
+
   unit_number: string | null;
   bedrooms: number | null;
   bathrooms: number | null;
@@ -89,7 +88,10 @@ export interface Listing {
   is_furnished: boolean;
   are_pets_allowed: boolean;
   images: string[] | null;
-  amenities: unknown;
+  amenities: string[] | null;
+
+  latitude: number | null;
+  longitude: number | null;
 
   created_at: string;
   updated_at: string;
@@ -102,8 +104,18 @@ export interface Booking {
   landlord_user_id: string;
   notes: string | null;
   status: BookingStatus;
+  move_in_date_requested: string | null;
+  message_to_landlord: string | null;
+  screening_result: ScreeningCheckResult | null;
+  credit_check_result: ScreeningCheckResult | null;
+  background_check_result: ScreeningCheckResult | null;
   requested_at: string;
   updated_at: string;
+}
+
+export interface ScreeningCheckResult {
+  pass: boolean;
+  [key: string]: unknown;
 }
 
 export interface Payment {
@@ -120,9 +132,15 @@ export interface Payment {
 export interface ScreeningRule {
   id: string;
   landlord_user_id: string;
+  listing_id: string | null;
   minimum_score: number;
   notes: string | null;
   auto_approve: boolean;
+  require_background_check: boolean;
+  require_employment_verification: boolean;
+  require_license_verification: boolean;
+  max_income_to_rent_ratio: number | null;
+  instant_book_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -152,6 +170,18 @@ export interface JobPost {
   title: string;
   description: string;
   status: JobStatus;
+  facility_name: string | null;
+  location: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  role_type: string | null;
+  contract_type: string | null;
+  contract_length: string | null;
+  pay_range_min: number | null;
+  pay_range_max: number | null;
+  start_date: string | null;
+  housing_included: boolean;
+  linked_listing_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -29,11 +29,70 @@ export async function fetchBookingsForLandlord(
   return data ?? [];
 }
 
+export interface BookingWithTenantProfile {
+  id: string;
+  listing_id: string;
+  status: BookingStatus;
+  requested_at: string;
+  move_in_date_requested: string | null;
+  message_to_landlord: string | null;
+  screening_result: unknown;
+  credit_check_result: unknown;
+  background_check_result: unknown;
+  tenant_user_id: string;
+  tenant_name: string | null;
+  tenant_email: string | null;
+  tenant_phone: string | null;
+  listing_title: string | null;
+}
+
+export async function fetchBookingsForLandlordWithTenantProfile(
+  landlordUserId: string
+): Promise<BookingWithTenantProfile[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(`
+      id, listing_id, status, requested_at, move_in_date_requested,
+      message_to_landlord, screening_result, credit_check_result,
+      background_check_result, tenant_user_id,
+      profiles!bookings_tenant_user_id_fkey (full_name, email, phone_number),
+      listings!bookings_listing_id_fkey (title)
+    `)
+    .eq('landlord_user_id', landlordUserId)
+    .order('requested_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: Record<string, unknown>) => {
+    const profile = row.profiles as Record<string, unknown> | null;
+    const listing = row.listings as Record<string, unknown> | null;
+    return {
+      id: row.id as string,
+      listing_id: row.listing_id as string,
+      status: row.status as BookingStatus,
+      requested_at: row.requested_at as string,
+      move_in_date_requested: row.move_in_date_requested as string | null,
+      message_to_landlord: row.message_to_landlord as string | null,
+      screening_result: row.screening_result,
+      credit_check_result: row.credit_check_result,
+      background_check_result: row.background_check_result,
+      tenant_user_id: row.tenant_user_id as string,
+      tenant_name: (profile?.full_name as string) ?? null,
+      tenant_email: (profile?.email as string) ?? null,
+      tenant_phone: (profile?.phone_number as string) ?? null,
+      listing_title: (listing?.title as string) ?? null,
+    };
+  });
+}
+
 export async function insertBooking(input: {
   listing_id: string;
   tenant_user_id: string;
   landlord_user_id: string;
   notes?: string | null;
+  move_in_date_requested?: string | null;
+  message_to_landlord?: string | null;
 }): Promise<Pick<Booking, 'id'>> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -43,6 +102,8 @@ export async function insertBooking(input: {
       tenant_user_id: input.tenant_user_id,
       landlord_user_id: input.landlord_user_id,
       notes: input.notes ?? null,
+      move_in_date_requested: input.move_in_date_requested ?? null,
+      message_to_landlord: input.message_to_landlord ?? null,
       status: 'requested',
     })
     .select('id')
@@ -60,6 +121,23 @@ export async function updateBookingStatus(
   const { error } = await supabase
     .from('bookings')
     .update({ status })
+    .eq('id', bookingId);
+
+  if (error) throw error;
+}
+
+export async function updateBookingScreeningResults(
+  bookingId: string,
+  results: {
+    screening_result?: unknown;
+    credit_check_result?: unknown;
+    background_check_result?: unknown;
+  }
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('bookings')
+    .update(results)
     .eq('id', bookingId);
 
   if (error) throw error;
@@ -115,9 +193,7 @@ export async function upsertPayment(input: {
       currency: input.currency ?? 'usd',
       status: input.status ?? 'pending',
     },
-    {
-      onConflict: 'booking_id',
-    }
+    { onConflict: 'booking_id' }
   );
 
   if (error) throw error;

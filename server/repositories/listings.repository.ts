@@ -93,6 +93,8 @@ export type InsertListingInput = {
   are_pets_allowed?: boolean;
   images?: string[] | null;
   amenities?: unknown;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export async function insertListing(input: InsertListingInput): Promise<void> {
@@ -115,7 +117,90 @@ export async function insertListing(input: InsertListingInput): Promise<void> {
     are_pets_allowed: input.are_pets_allowed ?? false,
     images: input.images ?? null,
     amenities: input.amenities ?? null,
+    latitude: input.latitude ?? null,
+    longitude: input.longitude ?? null,
   });
 
   if (error) throw error;
+}
+
+export async function updateListingById(
+  listingId: string,
+  userId: string,
+  fields: Partial<Omit<InsertListingInput, 'user_id'>>
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('listings')
+    .update(fields)
+    .eq('id', listingId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
+export interface MapBoundsFilter {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+  minPrice?: number;
+  maxPrice?: number;
+  leaseTerms?: string[];
+  isFurnished?: boolean;
+  arePetsAllowed?: boolean;
+}
+
+export type MapListingRow = Pick<
+  Listing,
+  'id' | 'title' | 'address' | 'price_cents' | 'latitude' | 'longitude' |
+  'bedrooms' | 'bathrooms' | 'square_footage' | 'is_furnished' | 'are_pets_allowed' |
+  'images' | 'lease_terms'
+>;
+
+export async function fetchPublishedListingsInBounds(
+  filters: MapBoundsFilter
+): Promise<MapListingRow[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from('listings')
+    .select('id, title, address, price_cents, latitude, longitude, bedrooms, bathrooms, square_footage, is_furnished, are_pets_allowed, images, lease_terms')
+    .eq('status', 'published')
+    .not('latitude', 'is', null)
+    .not('longitude', 'is', null)
+    .gte('latitude', filters.south)
+    .lte('latitude', filters.north)
+    .gte('longitude', filters.west)
+    .lte('longitude', filters.east);
+
+  if (filters.minPrice != null) {
+    query = query.gte('price_cents', filters.minPrice * 100);
+  }
+  if (filters.maxPrice != null) {
+    query = query.lte('price_cents', filters.maxPrice * 100);
+  }
+  if (filters.isFurnished != null) {
+    query = query.eq('is_furnished', filters.isFurnished);
+  }
+  if (filters.arePetsAllowed != null) {
+    query = query.eq('are_pets_allowed', filters.arePetsAllowed);
+  }
+
+  const { data, error } = await query.limit(200);
+  if (error) throw error;
+  return (data ?? []) as MapListingRow[];
+}
+
+export async function fetchListingsByUserWithDetails(
+  userId: string
+): Promise<Listing[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('listings')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
 }

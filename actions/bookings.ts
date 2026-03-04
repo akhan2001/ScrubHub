@@ -13,7 +13,12 @@ import {
 } from '@/lib/validation/schemas';
 import { ValidationError } from '@/server/errors/app-error';
 
-export async function createBooking(input: { listingId: string; notes?: string }) {
+export async function createBooking(input: {
+  listingId: string;
+  notes?: string;
+  moveInDateRequested?: string;
+  messageToLandlord?: string;
+}) {
   const parsed = createBookingSchema.safeParse(input);
   if (!parsed.success) {
     throw new ValidationError(parsed.error.message);
@@ -24,12 +29,14 @@ export async function createBooking(input: { listingId: string; notes?: string }
     listingId: parsed.data.listingId,
     tenantUserId: user.id,
     notes: parsed.data.notes,
+    moveInDateRequested: parsed.data.moveInDateRequested,
+    messageToLandlord: parsed.data.messageToLandlord,
   });
 }
 
 export async function updateBookingStatus(input: {
   bookingId: string;
-  status: 'approved' | 'rejected' | 'cancelled' | 'completed';
+  status: 'approved' | 'rejected' | 'cancelled' | 'completed' | 'reviewing' | 'withdrawn';
 }) {
   const parsed = updateBookingStatusSchema.safeParse(input);
   if (!parsed.success) {

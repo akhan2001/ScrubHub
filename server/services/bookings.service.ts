@@ -1,6 +1,7 @@
 import {
   fetchBookingById,
   fetchBookingsForLandlord,
+  fetchBookingsForLandlordWithTenantProfile,
   fetchBookingsForTenant,
   fetchPaymentByBookingId,
   insertBooking,
@@ -13,6 +14,7 @@ import { getListingOwnerById } from '@/server/services/listings.service';
 import { createPaymentIntent } from '@/lib/integrations/stripe';
 import { sendSms } from '@/lib/integrations/twilio';
 import { logAuditEvent } from '@/server/services/audit.service';
+import { evaluateApplication } from '@/server/services/screening.service';
 import type { BookingStatus } from '@/types/database';
 
 export async function getTenantBookings(tenantUserId: string) {
@@ -23,10 +25,16 @@ export async function getLandlordBookings(landlordUserId: string) {
   return fetchBookingsForLandlord(landlordUserId);
 }
 
+export async function getLandlordBookingsWithProfiles(landlordUserId: string) {
+  return fetchBookingsForLandlordWithTenantProfile(landlordUserId);
+}
+
 export async function createBookingForTenant(input: {
   listingId: string;
   tenantUserId: string;
   notes?: string;
+  moveInDateRequested?: string;
+  messageToLandlord?: string;
 }) {
   const listing = await getListingOwnerById(input.listingId);
   if (!listing || listing.status !== 'published') {
@@ -38,6 +46,8 @@ export async function createBookingForTenant(input: {
     tenant_user_id: input.tenantUserId,
     landlord_user_id: listing.user_id,
     notes: input.notes ?? null,
+    move_in_date_requested: input.moveInDateRequested ?? null,
+    message_to_landlord: input.messageToLandlord ?? null,
   });
 
   await insertBookingEvent({
@@ -53,6 +63,12 @@ export async function createBookingForTenant(input: {
     eventName: 'booking.requested',
     payload: { bookingId: booking.id, listingId: input.listingId },
   });
+
+  try {
+    await evaluateApplication(booking.id);
+  } catch {
+    // Screening evaluation failures should not block booking creation
+  }
 
   return booking;
 }

@@ -1,33 +1,92 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { requireVerifiedRole } from '@/server/guards/require-verified-role';
-import { createListing as createListingService } from '@/server/services/listings.service';
-import { z } from 'zod';
+import { requireRole } from '@/server/guards/require-role';
+import {
+  createListing as createListingService,
+  updateListing as updateListingService,
+} from '@/server/services/listings.service';
+import { createListingSchema, type CreateListingData } from '@/lib/validations/listing';
 import { ValidationError } from '@/server/errors/app-error';
 
-export type CreateListingInput = {
-  title: string;
-  description?: string | null;
-  address?: string | null;
-  price_cents?: number | null;
-  status?: 'draft' | 'published';
-};
-
-const createListingSchema = z.object({
-  title: z.string().min(3).max(180),
-  description: z.string().max(4000).nullable().optional(),
-  address: z.string().max(300).nullable().optional(),
-  price_cents: z.number().int().nonnegative().nullable().optional(),
-  status: z.enum(['draft', 'published']).optional(),
-});
-
-export async function createListing(formData: CreateListingInput) {
+export async function createListing(formData: CreateListingData) {
   const parsed = createListingSchema.safeParse(formData);
   if (!parsed.success) {
-    throw new ValidationError(parsed.error.message);
+    throw new ValidationError(parsed.error.issues[0]?.message ?? 'Validation failed');
   }
-  const user = await requireVerifiedRole('landlord', { onFailure: 'throw' });
-  await createListingService(user.id, parsed.data);
+
+  const d = parsed.data;
+  const user = await requireRole('landlord');
+
+  if (d.status === 'published') {
+    await requireVerifiedRole('landlord', { onFailure: 'throw' });
+  }
+
+  await createListingService(user.id, {
+    title: d.title,
+    description: d.description ?? null,
+    address: d.address,
+    price_cents: Math.round(d.monthlyRent * 100),
+    status: d.status,
+    unit_number: d.unitNumber ?? null,
+    bedrooms: d.bedrooms ?? null,
+    bathrooms: d.bathrooms ?? null,
+    square_footage: d.squareFootage ?? null,
+    deposit_amount_cents: d.depositAmount ? Math.round(d.depositAmount * 100) : null,
+    available_date: d.availableDate,
+    lease_terms: d.leaseTerms,
+    is_furnished: d.isFurnished,
+    are_pets_allowed: d.arePetsAllowed,
+    images: d.images,
+    amenities: d.amenities,
+    latitude: d.latitude ?? null,
+    longitude: d.longitude ?? null,
+  });
+
   redirect('/dashboard/landlord/listings');
+}
+
+export async function updateListing(listingId: string, formData: CreateListingData) {
+  const parsed = createListingSchema.safeParse(formData);
+  if (!parsed.success) {
+    throw new ValidationError(parsed.error.issues[0]?.message ?? 'Validation failed');
+  }
+
+  const d = parsed.data;
+  const user = await requireRole('landlord');
+
+  if (d.status === 'published') {
+    await requireVerifiedRole('landlord', { onFailure: 'throw' });
+  }
+
+  await updateListingService(user.id, listingId, {
+    title: d.title,
+    description: d.description ?? null,
+    address: d.address,
+    price_cents: Math.round(d.monthlyRent * 100),
+    status: d.status,
+    unit_number: d.unitNumber ?? null,
+    bedrooms: d.bedrooms ?? null,
+    bathrooms: d.bathrooms ?? null,
+    square_footage: d.squareFootage ?? null,
+    deposit_amount_cents: d.depositAmount ? Math.round(d.depositAmount * 100) : null,
+    available_date: d.availableDate,
+    lease_terms: d.leaseTerms,
+    is_furnished: d.isFurnished,
+    are_pets_allowed: d.arePetsAllowed,
+    images: d.images,
+    amenities: d.amenities,
+    latitude: d.latitude ?? null,
+    longitude: d.longitude ?? null,
+  });
+
+  revalidatePath('/dashboard/landlord/listings');
+}
+
+export async function publishListing(listingId: string) {
+  const user = await requireVerifiedRole('landlord', { onFailure: 'throw' });
+  await updateListingService(user.id, listingId, { status: 'published' });
+  revalidatePath('/dashboard/landlord/listings');
 }

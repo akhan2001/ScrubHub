@@ -6,12 +6,20 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { ListingWithCoordinates } from "@/lib/map/mock-coordinates";
 import { createMarkerElement } from "@/components/map/Marker";
 
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
 type MapViewProps = {
   listings: ListingWithCoordinates[];
   activeListingId: string | null;
   hoveredListingId: string | null;
   onSelectListing: (id: string) => void;
   onHoverListing: (id: string | null) => void;
+  onBoundsChange?: (bounds: MapBounds) => void;
   className?: string;
 };
 
@@ -26,6 +34,7 @@ export function MapView({
   hoveredListingId,
   onSelectListing,
   onHoverListing,
+  onBoundsChange,
   className,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -38,20 +47,12 @@ export function MapView({
       sources: {
         osm: {
           type: "raster",
-          tiles: [
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          ],
+          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
           tileSize: 256,
-          attribution: "© OpenStreetMap contributors",
+          attribution: "\u00a9 OpenStreetMap contributors",
         },
       },
-      layers: [
-        {
-          id: "osm",
-          type: "raster",
-          source: "osm",
-        },
-      ],
+      layers: [{ id: "osm", type: "raster", source: "osm" }],
     }),
     []
   );
@@ -71,19 +72,32 @@ export function MapView({
       zoom: 10.5,
       attributionControl: false,
     });
-    map.on("error", () => {
-      setMapFailed(true);
-    });
+    map.on("error", () => setMapFailed(true));
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
     mapRef.current = map;
 
+    function emitBounds() {
+      if (!onBoundsChange) return;
+      const b = map.getBounds();
+      onBoundsChange({
+        north: b.getNorth(),
+        south: b.getSouth(),
+        east: b.getEast(),
+        west: b.getWest(),
+      });
+    }
+
+    map.on("load", emitBounds);
+    map.on("moveend", emitBounds);
+
     return () => {
       map.remove();
       mapRef.current = null;
     };
-  }, [fallbackCenter, freeStyle]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [freeStyle]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -93,7 +107,7 @@ export function MapView({
     markersRef.current = [];
 
     listings.forEach((listing) => {
-      const markerElement = createMarkerElement({
+      const el = createMarkerElement({
         label: formatPrice(listing.price_cents),
         active: listing.id === activeListingId,
         hovered: listing.id === hoveredListingId,
@@ -102,30 +116,20 @@ export function MapView({
         onMouseLeave: () => onHoverListing(null),
       });
 
-      const marker = new maplibregl.Marker({ element: markerElement })
+      const marker = new maplibregl.Marker({ element: el })
         .setLngLat([listing.longitude, listing.latitude])
         .addTo(map);
 
       markersRef.current.push(marker);
     });
-  }, [
-    listings,
-    activeListingId,
-    hoveredListingId,
-    onHoverListing,
-    onSelectListing,
-  ]);
+  }, [listings, activeListingId, hoveredListingId, onHoverListing, onSelectListing]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !activeListingId) return;
     const listing = listings.find((item) => item.id === activeListingId);
     if (!listing) return;
-
-    map.easeTo({
-      center: [listing.longitude, listing.latitude],
-      duration: 400,
-    });
+    map.easeTo({ center: [listing.longitude, listing.latitude], duration: 400 });
   }, [activeListingId, listings]);
 
   if (mapFailed) {
@@ -133,8 +137,7 @@ export function MapView({
       <div
         className={className}
         style={{
-          background:
-            "radial-gradient(circle at top left, rgba(255,255,255,.8), rgba(236,236,236,.9))",
+          background: "radial-gradient(circle at top left, rgba(255,255,255,.8), rgba(236,236,236,.9))",
         }}
       >
         <div className="flex h-full items-center justify-center px-6 text-center">

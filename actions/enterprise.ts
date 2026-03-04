@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { requireVerifiedRole } from '@/server/guards/require-verified-role';
 import { jobPostSchema, organizationSchema } from '@/lib/validation/schemas';
 import { ValidationError } from '@/server/errors/app-error';
@@ -23,7 +24,19 @@ export async function createJobPost(input: {
   orgId: string;
   title: string;
   description: string;
-  status?: 'draft' | 'published' | 'closed';
+  status?: 'draft' | 'published' | 'closed' | 'filled';
+  facilityName?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+  roleType?: string;
+  contractType?: string;
+  contractLength?: string;
+  payRangeMin?: number;
+  payRangeMax?: number;
+  startDate?: string;
+  housingIncluded?: boolean;
+  linkedListingId?: string;
 }) {
   const parsed = jobPostSchema.safeParse(input);
   if (!parsed.success) {
@@ -36,5 +49,19 @@ export async function createJobPost(input: {
     title: parsed.data.title,
     description: parsed.data.description,
     status: parsed.data.status,
+    facility_name: parsed.data.facilityName ?? null,
+    location: parsed.data.location ?? null,
+    latitude: parsed.data.latitude ?? null,
+    longitude: parsed.data.longitude ?? null,
+    role_type: parsed.data.roleType ?? null,
+    contract_type: parsed.data.contractType ?? null,
+    contract_length: parsed.data.contractLength ?? null,
+    pay_range_min: parsed.data.payRangeMin ?? null,
+    pay_range_max: parsed.data.payRangeMax ?? null,
+    start_date: parsed.data.startDate ?? null,
+    housing_included: parsed.data.housingIncluded ?? false,
+    linked_listing_id: parsed.data.linkedListingId ?? null,
   });
+
+  revalidatePath('/dashboard/enterprise');
 }

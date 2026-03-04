@@ -1,5 +1,10 @@
 import type { Listing } from "@/types/database";
 
+/**
+ * @deprecated Use real lat/lng from listings table. This file remains only
+ * for the shared ListingWithCoordinates type export.
+ */
+
 const BASE_LAT = 43.6532;
 const BASE_LNG = -79.3832;
 
@@ -18,12 +23,26 @@ function toSpread(seed: number, maxOffset: number) {
 
 export type ListingWithCoordinates = Pick<
   Listing,
-  "id" | "title" | "description" | "address" | "price_cents" | "status" | "created_at"
+  | "id"
+  | "title"
+  | "description"
+  | "address"
+  | "price_cents"
+  | "status"
+  | "created_at"
+  | "bedrooms"
+  | "bathrooms"
+  | "square_footage"
+  | "is_furnished"
+  | "are_pets_allowed"
+  | "images"
+  | "lease_terms"
 > & {
   latitude: number;
   longitude: number;
 };
 
+/** @deprecated Prefer real lat/lng columns from DB */
 export function withMockCoordinates(
   listings: Array<
     Pick<Listing, "id" | "title" | "description" | "address" | "price_cents" | "status" | "created_at">
@@ -38,6 +57,13 @@ export function withMockCoordinates(
       ...listing,
       latitude: Number((BASE_LAT + latOffset).toFixed(6)),
       longitude: Number((BASE_LNG + lngOffset).toFixed(6)),
+      bedrooms: null,
+      bathrooms: null,
+      square_footage: null,
+      is_furnished: false,
+      are_pets_allowed: false,
+      images: null,
+      lease_terms: null,
     };
   });
 }

@@ -1,84 +1,251 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createListingSchema, LEASE_TERM_OPTIONS, type CreateListingData } from '@/lib/validations/listing';
 import { createListing } from '@/actions/listings';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { AddressAutocomplete } from '@/components/map/address-autocomplete';
+import { PhotoUpload } from '@/components/listings/photo-upload';
+import { AmenityTags } from '@/components/listings/amenity-tags';
+import { toast } from 'sonner';
 
-export function CreateListingForm() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function CreateListingForm({ onSuccess }: { onSuccess?: () => void }) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateListingData>({
+    resolver: zodResolver(createListingSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      address: '',
+      unitNumber: '',
+      bedrooms: undefined,
+      bathrooms: undefined,
+      squareFootage: undefined,
+      monthlyRent: undefined as unknown as number,
+      depositAmount: undefined,
+      leaseTerms: [],
+      isFurnished: false,
+      arePetsAllowed: false,
+      amenities: [],
+      images: [],
+      availableDate: '',
+      status: 'draft',
+    },
+  });
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const form = e.currentTarget;
-    const formData = {
-      title: (form.elements.namedItem('title') as HTMLInputElement).value,
-      description: (form.elements.namedItem('description') as HTMLTextAreaElement).value || null,
-      address: (form.elements.namedItem('address') as HTMLInputElement).value || null,
-      price_cents: (() => {
-        const raw = (form.elements.namedItem('price_cents') as HTMLInputElement).value;
-        if (!raw) return null;
-        const n = parseInt(raw, 10);
-        return Number.isNaN(n) ? null : n;
-      })(),
-      status: (form.elements.namedItem('status') as HTMLSelectElement).value as 'draft' | 'published',
-    };
+  const leaseTerms = watch('leaseTerms');
+
+  async function onSubmit(data: CreateListingData) {
     try {
-      await createListing(formData);
+      await createListing(data);
+      toast.success('Listing created');
+      onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
+      toast.error(err instanceof Error ? err.message : 'Failed to create listing');
     }
   }
 
+  function toggleLeaseTerm(term: string) {
+    const current = leaseTerms ?? [];
+    const next = current.includes(term)
+      ? current.filter((t) => t !== term)
+      : [...current, term];
+    setValue('leaseTerms', next, { shouldValidate: true });
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md">
-      {error && (
-        <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-          {error}
-        </p>
-      )}
-      <div className="space-y-2">
-        <Label htmlFor="title">Title *</Label>
-        <Input id="title" name="title" type="text" required placeholder="Stylish 2BR near hospital" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea id="description" name="description" rows={3} placeholder="Furnished unit with parking..." />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
-        <Input id="address" name="address" type="text" placeholder="123 Main St, Toronto" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="price_cents">Price (cents)</Label>
-        <Input id="price_cents" name="price_cents" type="number" min={0} step={1} placeholder="180000" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
-        <select
-          id="status"
-          name="status"
-          className={cn(
-            "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs",
-            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none",
-            "disabled:cursor-not-allowed disabled:opacity-50"
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {/* --- Location --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Location</h3>
+        <div className="space-y-2">
+          <Label>Address</Label>
+          <Controller
+            name="address"
+            control={control}
+            render={({ field }) => (
+              <AddressAutocomplete
+                value={field.value}
+                onSelect={(s) => {
+                  setValue('address', s.address, { shouldValidate: true });
+                  setValue('latitude', s.latitude);
+                  setValue('longitude', s.longitude);
+                }}
+              />
+            )}
+          />
+          {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="unitNumber">Unit Number</Label>
+          <Input id="unitNumber" {...register('unitNumber')} placeholder="e.g. Apt 4B" />
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* --- Property Details --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Property Details</h3>
+        <div className="space-y-2">
+          <Label htmlFor="title">Listing Title</Label>
+          <Input id="title" {...register('title')} placeholder="Stylish 2BR near hospital" />
+          {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea id="description" {...register('description')} rows={4} placeholder="Describe the property..." />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="space-y-2">
+            <Label htmlFor="bedrooms">Bedrooms</Label>
+            <Input id="bedrooms" type="number" min={0} step={1} {...register('bedrooms', { valueAsNumber: true })} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bathrooms">Bathrooms</Label>
+            <Input id="bathrooms" type="number" min={0} step={0.5} {...register('bathrooms', { valueAsNumber: true })} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="squareFootage">Square Footage</Label>
+            <Input id="squareFootage" type="number" min={0} {...register('squareFootage', { valueAsNumber: true })} />
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* --- Pricing --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Pricing</h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="monthlyRent">Monthly Rent ($)</Label>
+            <Input id="monthlyRent" type="number" min={0} {...register('monthlyRent', { valueAsNumber: true })} placeholder="1800" />
+            {errors.monthlyRent && <p className="text-sm text-destructive">{errors.monthlyRent.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="depositAmount">Security Deposit ($)</Label>
+            <Input id="depositAmount" type="number" min={0} {...register('depositAmount', { valueAsNumber: true })} placeholder="1800" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Lease Terms</Label>
+          <div className="flex flex-wrap gap-2">
+            {LEASE_TERM_OPTIONS.map((term) => (
+              <button
+                key={term}
+                type="button"
+                onClick={() => toggleLeaseTerm(term)}
+                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  leaseTerms?.includes(term)
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary/50'
+                }`}
+              >
+                {term}
+              </button>
+            ))}
+          </div>
+          {errors.leaseTerms && <p className="text-sm text-destructive">{errors.leaseTerms.message}</p>}
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* --- Features --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Features</h3>
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
+          <label className="flex items-center gap-2 text-sm">
+            <Controller
+              name="isFurnished"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              )}
+            />
+            Furnished
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Controller
+              name="arePetsAllowed"
+              control={control}
+              render={({ field }) => (
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              )}
+            />
+            Pets Allowed
+          </label>
+        </div>
+        <div className="space-y-2">
+          <Label>Amenities</Label>
+          <Controller
+            name="amenities"
+            control={control}
+            render={({ field }) => (
+              <AmenityTags value={field.value} onChange={field.onChange} />
+            )}
+          />
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* --- Photos --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Photos</h3>
+        <Controller
+          name="images"
+          control={control}
+          render={({ field }) => (
+            <PhotoUpload value={field.value} onChange={field.onChange} />
           )}
-        >
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-        </select>
+        />
+        {errors.images && <p className="text-sm text-destructive">{errors.images.message}</p>}
+      </section>
+
+      <Separator />
+
+      {/* --- Availability --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Availability</h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="availableDate">Available Date</Label>
+            <Input id="availableDate" type="date" {...register('availableDate')} />
+            {errors.availableDate && <p className="text-sm text-destructive">{errors.availableDate.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="status">Listing Status</Label>
+            <select
+              id="status"
+              {...register('status')}
+              className="flex h-[var(--input-height)] w-full rounded-[var(--input-radius)] border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none"
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Creating...' : 'Create Listing'}
+        </Button>
       </div>
-      <Button type="submit" disabled={loading}>
-        {loading ? 'Creating…' : 'Create listing'}
-      </Button>
     </form>
   );
 }

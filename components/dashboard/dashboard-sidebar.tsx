@@ -25,7 +25,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
       label: 'Main',
       items: [
         { href: '/dashboard/tenant', label: 'Overview', icon: Home },
-        { href: '/listings', label: 'Search listings', icon: Search },
+        { href: '/dashboard/listings', label: 'Search listings', icon: Search },
         { href: '/dashboard/tenant/bookings', label: 'My bookings', icon: ClipboardList },
       ],
     },
