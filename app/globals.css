@@ -2,11 +2,11 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
+  --color-content: var(--color-content-bg);
   --color-foreground: var(--foreground);
+  --color-label: var(--color-text-label);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -103,11 +103,11 @@
   --radius-xl: 1.25rem;
   --radius-pill: 9999px;
 
-  /* Elevation primitives */
-  --shadow-1: 0 1px 2px rgb(15 23 42 / 8%);
-  --shadow-2: 0 6px 16px rgb(15 23 42 / 10%);
-  --shadow-3: 0 16px 30px rgb(15 23 42 / 18%);
-  --shadow-focus: 0 0 0 3px rgb(10 79 214 / 35%);
+  /* Elevation primitives — clinical SaaS: subtle only, no heavy shadows */
+  --shadow-1: 0 1px 2px rgb(15 23 42 / 6%);
+  --shadow-2: 0 1px 3px rgb(15 23 42 / 8%);
+  --shadow-3: 0 4px 12px rgb(15 23 42 / 10%);
+  --shadow-focus: 0 0 0 3px rgb(37 99 235 / 25%);
 
   /* Typography primitives */
   --font-base: var(--font-inter), "Segoe UI", sans-serif;
@@ -126,66 +126,51 @@
   --content-max: 64rem;
 }
 
-/* ===== Semantic aliases: Light theme ===== */
+/* ===== Semantic aliases: Light theme — clinical SaaS palette ===== */
 :root {
-  --color-primary: #1d4ed8;
+  /* Brand blue — active pill, primary CTA, nav active, badges. #2563eb (blue-600) */
+  --color-primary: #2563eb;
+  /* Inactive nav, secondary text */
   --color-secondary: #374151;
-  --color-success: var(--green-700);
+  --color-success: #16a34a;
   --color-warning: var(--amber-700);
   --color-error: var(--red-700);
-  --color-info: var(--sky-800);
+  --color-info: #2563eb;
 
-  --color-bg: var(--slate-50);
-  --color-surface: var(--white);
-  --color-surface-elevated: var(--white);
-  --color-text: var(--slate-950);
-  --color-text-muted: var(--slate-600);
-  --color-border: var(--slate-200);
+  /* Page: soft blue-grey (#f0f4f8). Nav + title strip + cards: white. */
+  --color-bg: #f0f4f8;
+  --color-content-bg: #f0f4f8;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  /* Headings — near black */
+  --color-text: #0f172a;
+  /* Body / subtext */
+  --color-text-muted: #64748b;
+  /* Labels (small caps, etc.) */
+  --color-text-label: #94a3b8;
+  /* Card border, nav border, outline buttons */
+  --color-border: #e2e8f0;
 
-  --color-primary-hover: #1e40af;
-  --color-primary-active: #1e3a8a;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
 
-  --on-primary: var(--white);
-  --on-secondary: var(--white);
-  --on-success: var(--white);
-  --on-warning: var(--white);
-  --on-error: var(--white);
-  --on-info: var(--white);
-  --on-surface: var(--slate-950);
+  --on-primary: #ffffff;
+  --on-secondary: #ffffff;
+  --on-success: #ffffff;
+  --on-warning: #ffffff;
+  --on-error: #ffffff;
+  --on-info: #ffffff;
+  --on-surface: #0f172a;
 
-  --gradient-hero: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  --gradient-cta: linear-gradient(135deg, #111827 0%, #374151 100%);
-}
+  /* Badge / tint fills */
+  --color-badge-primary-bg: #eff6ff;
+  --color-badge-success-bg: #f0fdf4;
+  /* Card image placeholder blue-grey */
+  --color-placeholder: #dce8f5;
 
-/* ===== Semantic aliases: Dark theme ===== */
-.dark {
-  --color-primary: #60a5fa;
-  --color-secondary: #d4d4d8;
-  --color-success: #34d399;
-  --color-warning: #f59e0b;
-  --color-error: #f87171;
-  --color-info: #38bdf8;
-
-  --color-bg: var(--zinc-950);
-  --color-surface: var(--zinc-900);
-  --color-surface-elevated: var(--zinc-800);
-  --color-text: var(--zinc-100);
-  --color-text-muted: var(--zinc-300);
-  --color-border: var(--zinc-700);
-
-  --color-primary-hover: #93c5fd;
-  --color-primary-active: #bfdbfe;
-
-  --on-primary: #0b1220;
-  --on-secondary: var(--zinc-950);
-  --on-success: var(--zinc-950);
-  --on-warning: var(--zinc-950);
-  --on-error: var(--zinc-950);
-  --on-info: var(--zinc-950);
-  --on-surface: var(--zinc-100);
-
-  --gradient-hero: linear-gradient(145deg, #09090b 0%, #111113 45%, #18181b 100%);
-  --gradient-cta: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
+  /* No heavy gradients — flat clinical look */
+  --gradient-hero: none;
+  --gradient-cta: none;
 }
 
 /* ===== Component tokens ===== */
@@ -196,10 +181,10 @@
   --input-height: 2.75rem;
   --input-radius: var(--radius-md);
   --card-radius: var(--radius-lg);
-  --card-shadow: var(--shadow-2);
+  --card-shadow: var(--shadow-1);
   --modal-radius: var(--radius-xl);
-  --modal-shadow: var(--shadow-3);
-  --table-row-hover: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  --modal-shadow: var(--shadow-2);
+  --table-row-hover: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
 }
 
 /* ===== shadcn token mapping ===== */
@@ -214,9 +199,9 @@
   --primary-foreground: var(--on-primary);
   --secondary: var(--color-secondary);
   --secondary-foreground: var(--on-secondary);
-  --muted: var(--slate-100);
+  --muted: #f8fafc;
   --muted-foreground: var(--color-text-muted);
-  --accent: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  --accent: #f1f5f9;
   --accent-foreground: var(--color-text);
   --destructive: var(--color-error);
   --border: var(--color-border);
@@ -237,20 +222,12 @@
   --sidebar-ring: var(--color-primary);
 }
 
-.dark {
-  --muted: #18181b;
-  --accent: color-mix(in srgb, var(--color-primary) 24%, var(--color-surface));
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   html {
     color-scheme: light;
-  }
-  .dark {
-    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground;

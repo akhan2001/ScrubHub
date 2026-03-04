@@ -9,6 +9,7 @@ import { KpiCard } from '@/components/dashboard/kpi-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ListingsTable } from '@/components/dashboard/listings-table';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
+import { DashboardSection } from '@/components/dashboard/dashboard-section';
 
 export default async function LandlordDashboardPage() {
   const user = await requireRole('landlord');
@@ -30,7 +31,16 @@ export default async function LandlordDashboardPage() {
   }));
 
   return (
-    <section className="space-y-8">
+    <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/landlord' }, { label: 'Overview' }]}
+      title="Overview"
+      description="Your listings, applications, and revenue at a glance."
+      action={
+        <Button asChild size="sm">
+          <Link href="/dashboard/landlord/listings?create=1">Create listing</Link>
+        </Button>
+      }
+    >
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard title="Total listings" value={`${count}`} trend="Across all active and draft properties" />
         <KpiCard title="Active applications" value={`${activeApplications}`} trend="Awaiting landlord decision" />
@@ -75,6 +85,6 @@ export default async function LandlordDashboardPage() {
           tone: booking.status === 'requested' ? 'warning' : 'default',
         }))}
       />
-    </section>
+    </DashboardSection>
   );
 }

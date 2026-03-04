@@ -11,7 +11,11 @@ export default async function TenantProfilePage() {
   const profile = await getProfile(session.id);
 
   return (
-    <DashboardSection title="Tenant profile" description="Manage identity and verification details.">
+    <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/tenant' }, { label: 'Tenant profile' }]}
+      title="Tenant profile"
+      description="Manage identity and verification details."
+    >
       <Card>
         <CardHeader className="flex items-start justify-between gap-3 sm:flex-row">
           <div>

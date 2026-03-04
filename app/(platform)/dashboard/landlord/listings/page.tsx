@@ -20,6 +20,7 @@ export default async function LandlordListingsPage() {
 
   return (
     <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/landlord' }, { label: 'Listings' }]}
       title="Listings"
       description="Manage all properties, statuses, and incoming applications."
       action={

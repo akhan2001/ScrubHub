@@ -20,7 +20,11 @@ export default async function EnterpriseJobsPage() {
 
   if (!organization) {
     return (
-      <DashboardSection title="Job posts" description="Create an organization first from the enterprise dashboard.">
+      <DashboardSection
+        breadcrumb={[{ label: 'Dashboard', href: '/dashboard/enterprise' }, { label: 'Job posts' }]}
+        title="Job posts"
+        description="Create an organization first from the enterprise dashboard."
+      >
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground">No organization found yet.</p>
@@ -33,7 +37,11 @@ export default async function EnterpriseJobsPage() {
   const jobs = await getJobPostsForOrg(organization.org_id);
 
   return (
-    <DashboardSection title="Job posts" description="Create and manage hiring posts for your organization.">
+    <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/enterprise' }, { label: 'Job posts' }]}
+      title="Job posts"
+      description="Create and manage hiring posts for your organization."
+    >
       <Card>
         <CardHeader>
           <CardTitle>Create job post</CardTitle>

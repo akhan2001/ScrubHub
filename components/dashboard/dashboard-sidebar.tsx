@@ -77,7 +77,7 @@ export function DashboardSidebar({
   const pathname = usePathname();
   const sections = NAV_BY_ROLE[role];
   return (
-    <aside className={cn("h-full border-r border-border bg-background", className)}>
+    <aside className={cn("h-full border-r border-border bg-card", className)}>
       <div className="flex h-16 items-center border-b border-border px-4">
         <Link href="/dashboard" onClick={onNavigate} className="text-base font-semibold text-foreground">
           ScrubHub

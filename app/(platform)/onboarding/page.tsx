@@ -17,8 +17,8 @@ export default function OnboardingPage() {
         {/* Worker Card */}
         <Card className="flex flex-col">
           <CardHeader>
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-              <Stethoscope className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+              <Stethoscope className="h-6 w-6 text-blue-600" />
             </div>
             <CardTitle>Healthcare Professional</CardTitle>
             <CardDescription>
@@ -35,8 +35,8 @@ export default function OnboardingPage() {
         {/* Landlord Card */}
         <Card className="flex flex-col">
           <CardHeader>
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
-              <Building2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
+              <Building2 className="h-6 w-6 text-green-600" />
             </div>
             <CardTitle>Landlord</CardTitle>
             <CardDescription>
@@ -53,8 +53,8 @@ export default function OnboardingPage() {
         {/* Enterprise Card */}
         <Card className="flex flex-col">
           <CardHeader>
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-              <Briefcase className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
+              <Briefcase className="h-6 w-6 text-purple-600" />
             </div>
             <CardTitle>Enterprise</CardTitle>
             <CardDescription>

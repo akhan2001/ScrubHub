@@ -32,7 +32,7 @@ export function ListingPreview({ listing }: ListingPreviewProps) {
   return (
     <Card className="overflow-hidden border-border/80">
       <div className="relative aspect-[16/9] border-b border-border bg-muted">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-black/5 dark:from-white/5 dark:to-black/35" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-black/5" />
         <Badge variant="secondary" className="absolute left-3 top-3 capitalize">
           {listing.status}
         </Badge>

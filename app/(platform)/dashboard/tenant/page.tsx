@@ -15,7 +15,16 @@ export default async function TenantDashboardPage() {
   const completed = bookings.filter((booking) => booking.status === 'completed').length;
 
   return (
-    <section className="space-y-8">
+    <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/tenant' }, { label: 'Tenant workspace' }]}
+      title="Tenant workspace"
+      description="Track booking status and discover listings."
+      action={
+        <Button asChild size="sm">
+          <Link href="/listings">Search listings</Link>
+        </Button>
+      }
+    >
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard title="Total requests" value={`${bookings.length}`} trend="All booking applications" />
         <KpiCard title="Awaiting response" value={`${requested}`} trend="Landlord action required" />
@@ -23,30 +32,20 @@ export default async function TenantDashboardPage() {
         <KpiCard title="Completed" value={`${completed}`} trend="Historical successful stays" />
       </div>
 
-      <DashboardSection
-        title="Tenant workspace"
-        description="Track booking status and discover listings."
-        action={
-          <Button asChild>
-            <Link href="/listings">Search listings</Link>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick actions</CardTitle>
+          <CardDescription>Move through your booking lifecycle faster.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/tenant/bookings">View bookings</Link>
           </Button>
-        }
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick actions</CardTitle>
-            <CardDescription>Move through your booking lifecycle faster.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/tenant/bookings">View bookings</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/tenant/profile">Profile settings</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </DashboardSection>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/tenant/profile">Profile settings</Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       <ActivityFeed
         title="Booking activity"
@@ -57,6 +56,6 @@ export default async function TenantDashboardPage() {
           tone: booking.status === 'approved' ? 'success' : booking.status === 'requested' ? 'warning' : 'default',
         }))}
       />
-    </section>
+    </DashboardSection>
   );
 }

@@ -19,6 +19,7 @@ export default async function LandlordApprovalsPage() {
 
   return (
     <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/landlord' }, { label: 'Approvals' }]}
       title="Approvals"
       description="Review booking requests and process landlord decisions."
     >

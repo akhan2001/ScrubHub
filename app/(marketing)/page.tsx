@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { getAppDashboardUrl, getAppListingsUrl, getAppLoginUrl, getAppSignupUrl } from '@/lib/app-url';
 import { Home, MapPin, Building2 } from 'lucide-react';
 import { getAuthUser } from '@/server/auth/get-auth-user';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
-
 export default async function WWWLandingPage() {
   const user = await getAuthUser();
   const listings = await getPublishedListings();
@@ -51,7 +49,6 @@ export default async function WWWLandingPage() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             {user ? (
               <>
                 <Button variant="ghost" size="sm" asChild>

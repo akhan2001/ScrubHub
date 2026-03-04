@@ -10,6 +10,7 @@ export default async function ScreeningRulesPage() {
 
   return (
     <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/landlord' }, { label: 'Screening rules' }]}
       title="Screening rules"
       description="Configure automated screening logic applied during booking approvals."
     >

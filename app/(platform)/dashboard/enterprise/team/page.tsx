@@ -19,7 +19,11 @@ export default async function EnterpriseTeamPage() {
 
   if (!organization) {
     return (
-      <DashboardSection title="Team access" description="No organization found. Create one first.">
+      <DashboardSection
+        breadcrumb={[{ label: 'Dashboard', href: '/dashboard/enterprise' }, { label: 'Team access' }]}
+        title="Team access"
+        description="No organization found. Create one first."
+      >
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground">Organization is required before managing team access.</p>
@@ -32,7 +36,11 @@ export default async function EnterpriseTeamPage() {
   const members = await getOrganizationMembers(organization.org_id);
 
   return (
-    <DashboardSection title="Team access" description="Manage organization members and role assignments.">
+    <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/enterprise' }, { label: 'Team access' }]}
+      title="Team access"
+      description="Manage organization members and role assignments."
+    >
       <Card>
         <CardHeader>
           <CardTitle>Members</CardTitle>

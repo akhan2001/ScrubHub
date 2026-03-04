@@ -18,7 +18,11 @@ export default async function TenantBookingsPage() {
   const bookings = await getTenantBookings(user.id);
 
   return (
-    <DashboardSection title="My bookings" description="Track booking requests and complete payments.">
+    <DashboardSection
+      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/tenant' }, { label: 'My bookings' }]}
+      title="My bookings"
+      description="Track booking requests and complete payments."
+    >
       <Card>
         <CardHeader>
           <CardTitle>Bookings</CardTitle>

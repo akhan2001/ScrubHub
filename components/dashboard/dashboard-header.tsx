@@ -4,7 +4,6 @@ import { Bell, Menu, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { AppRole } from '@/types/database';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -22,7 +21,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { IconButton } from '@/components/ui/icon-button';
 import {
@@ -46,7 +45,7 @@ export function DashboardHeader({ role }: { role: AppRole }) {
   const pageTitle = pathname.split('/').at(-1)?.replace('-', ' ') ?? 'overview';
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur md:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
       <div className="flex items-center gap-3">
         <Sheet>
           <SheetTrigger asChild>
@@ -55,6 +54,7 @@ export function DashboardHeader({ role }: { role: AppRole }) {
             </IconButton>
           </SheetTrigger>
           <SheetContent side="left" className="p-0">
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
             <DashboardSidebar role={role} />
           </SheetContent>
         </Sheet>
@@ -115,6 +115,7 @@ export function DashboardHeader({ role }: { role: AppRole }) {
             </IconButton>
           </SheetTrigger>
           <SheetContent side="right">
+            <SheetTitle className="sr-only">Notifications</SheetTitle>
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
               <div className="space-y-2 rounded-md border border-border bg-muted/40 p-3">
@@ -128,7 +129,6 @@ export function DashboardHeader({ role }: { role: AppRole }) {
             </div>
           </SheetContent>
         </Sheet>
-        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button type="button" className="inline-flex items-center rounded-full">

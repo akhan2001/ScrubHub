@@ -10,16 +10,14 @@ export function DashboardShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-muted/35">
+    <div className="min-h-screen bg-background">
       <div className="md:grid md:min-h-screen md:grid-cols-[260px_1fr]">
         <div className="hidden border-r border-border md:block">
           <DashboardSidebar role={role} />
         </div>
         <div className="flex min-w-0 flex-col">
           <DashboardHeader role={role} />
-          <main className="flex-1 p-4 md:p-8">
-            <div className="mx-auto w-full max-w-[var(--container-max)] space-y-8">{children}</div>
-          </main>
+          <main className="flex-1 flex flex-col">{children}</main>
         </div>
       </div>
     </div>

@@ -2,8 +2,6 @@ import Link from 'next/link';
 import { getAuthUser } from '@/server/auth/get-auth-user';
 import { Button } from '@/components/ui/button';
 import { getAppLoginUrl, getAppSignupUrl } from '@/lib/app-url';
-import { ThemeToggle } from '@/components/layout/theme-toggle';
-
 export async function Header() {
   const user = await getAuthUser();
 
@@ -14,7 +12,6 @@ export async function Header() {
           ScrubHub
         </Link>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <Button variant="ghost" size="sm" asChild>
             <Link href="/listings">Listings</Link>
           </Button>
