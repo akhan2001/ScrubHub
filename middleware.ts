@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-const WWW_URL = process.env.NEXT_PUBLIC_WWW_URL ?? 'http://localhost:3000';
 
 function isAppHost(request: NextRequest): boolean {
   const host = request.headers.get('host') ?? '';
@@ -26,6 +25,13 @@ function isWwwHost(request: NextRequest): boolean {
 function getRewritePath(pathname: string, prefix: string): string {
   if (pathname === '/' || pathname === '') return prefix;
   return `${prefix}${pathname}`;
+}
+
+function withSupabaseCookies(base: NextResponse, target: NextResponse): NextResponse {
+  base.cookies.getAll().forEach(({ name, value }) => {
+    target.cookies.set(name, value);
+  });
+  return target;
 }
 
 export async function middleware(request: NextRequest) {
@@ -52,39 +58,50 @@ export async function middleware(request: NextRequest) {
   );
   const { data: { user } } = await supabase.auth.getUser();
 
+  const isAuthPath =
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/forgot-password' ||
+    pathname === '/auth/reset-password' ||
+    pathname === '/auth/callback';
+  const isDashboardPath = pathname.startsWith('/dashboard');
+  const isAppContentPath =
+    pathname === '/' || pathname.startsWith('/dashboard') || pathname.startsWith('/listings');
+
   if (isApp) {
-    if (pathname === '/' || pathname.startsWith('/dashboard') || pathname.startsWith('/listings')) {
-      if (pathname.startsWith('/dashboard') && !user) {
-        const loginUrl = new URL(WWW_URL);
-        loginUrl.pathname = '/login';
+    if (isAuthPath) {
+      if (user && (pathname === '/login' || pathname === '/signup')) {
+        const target = new URL('/dashboard', request.url);
+        return withSupabaseCookies(response, NextResponse.redirect(target));
+      }
+      const rewritePath = getRewritePath(pathname, '/www');
+      return withSupabaseCookies(response, NextResponse.rewrite(new URL(rewritePath, request.url)));
+    }
+
+    if (isAppContentPath) {
+      if (isDashboardPath && !user) {
+        const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirectTo', `${APP_URL}/dashboard`);
-        return NextResponse.redirect(loginUrl);
+        return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
       }
       const rewritePath = getRewritePath(pathname, '/app');
-      return NextResponse.rewrite(new URL(rewritePath, request.url));
-    }
-    if (pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/forgot-password')) {
-      const target = new URL(WWW_URL);
-      target.pathname = pathname;
-      target.search = request.nextUrl.search;
-      return NextResponse.redirect(target);
+      return withSupabaseCookies(response, NextResponse.rewrite(new URL(rewritePath, request.url)));
     }
   }
 
   if (isWww) {
-    if (pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password' ||
-        pathname === '/auth/reset-password' || pathname === '/auth/callback') {
+    if (pathname === '/') {
       const rewritePath = getRewritePath(pathname === '/' ? '' : pathname, '/www');
-      return NextResponse.rewrite(new URL(rewritePath || '/www', request.url));
+      return withSupabaseCookies(response, NextResponse.rewrite(new URL(rewritePath || '/www', request.url)));
     }
-    if (pathname.startsWith('/dashboard') || pathname.startsWith('/listings')) {
+    if (isAuthPath || pathname.startsWith('/dashboard') || pathname.startsWith('/listings')) {
       const target = new URL(APP_URL);
       target.pathname = pathname;
       target.search = request.nextUrl.search;
       if (!process.env.NEXT_PUBLIC_APP_URL) {
         target.searchParams.set('host', 'app');
       }
-      return NextResponse.redirect(target);
+      return withSupabaseCookies(response, NextResponse.redirect(target));
     }
   }
 

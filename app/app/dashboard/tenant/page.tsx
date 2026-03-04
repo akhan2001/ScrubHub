@@ -8,7 +8,7 @@ export default async function TenantDashboardPage() {
   const bookings = await getTenantBookings(user.id);
 
   return (
-    <div className="space-y-4">
+    <section className="space-y-4 rounded-lg border border-border bg-card p-6 shadow-sm">
       <h1 className="text-2xl font-semibold text-foreground">Tenant dashboard</h1>
       <p className="text-muted-foreground">
         You currently have <strong className="text-foreground">{bookings.length}</strong> booking request
@@ -25,6 +25,6 @@ export default async function TenantDashboardPage() {
           <Link href="/dashboard/tenant/profile">Profile</Link>
         </Button>
       </div>
-    </div>
+    </section>
   );
 }

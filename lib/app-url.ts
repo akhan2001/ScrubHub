@@ -28,6 +28,18 @@ export function getWwwSignupUrl(): string {
   return '/signup?host=www';
 }
 
+export function getAppLoginUrl(): string {
+  const base = getAppUrl();
+  if (base) return `${base}/login`;
+  return '/login?host=app';
+}
+
+export function getAppSignupUrl(): string {
+  const base = getAppUrl();
+  if (base) return `${base}/signup`;
+  return '/signup?host=app';
+}
+
 export function getAppDashboardUrl(): string {
   const base = getAppUrl();
   if (base) return `${base}/dashboard`;

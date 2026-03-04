@@ -34,7 +34,7 @@ export function DashboardSidebar({ role }: { role: AppRole }) {
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-md border border-border px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+            className="rounded-md border border-border bg-background px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             {item.label}
           </Link>

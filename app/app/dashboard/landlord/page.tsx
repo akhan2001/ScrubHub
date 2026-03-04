@@ -10,8 +10,8 @@ export default async function LandlordDashboardPage() {
   const count = await getLandlordListingsCount(user.id);
 
   return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4 text-foreground">Landlord dashboard</h1>
+    <section className="rounded-lg border border-border bg-card p-6 shadow-sm">
+      <h1 className="text-2xl font-semibold mb-3 text-foreground">Landlord dashboard</h1>
       <p className="text-muted-foreground mb-6">
         You have <strong className="text-foreground">{count}</strong> listing{count === 1 ? '' : 's'}.
       </p>
@@ -29,6 +29,6 @@ export default async function LandlordDashboardPage() {
           <Link href="/dashboard/landlord/listings/new">Create listing</Link>
         </Button>
       </div>
-    </div>
+    </section>
   );
 }

@@ -9,7 +9,7 @@ export default async function EnterpriseDashboardPage() {
   const organization = await getPrimaryOrganizationForUser(user.id);
 
   return (
-    <div className="space-y-4">
+    <section className="space-y-4 rounded-lg border border-border bg-card p-6 shadow-sm">
       <h1 className="text-2xl font-semibold text-foreground">Enterprise dashboard</h1>
       {!organization ? (
         <>
@@ -31,6 +31,6 @@ export default async function EnterpriseDashboardPage() {
           </div>
         </>
       )}
-    </div>
+    </section>
   );
 }

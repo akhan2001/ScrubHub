@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { getPublishedListings } from '@/server/services/listings.service';
 import { MapTipLanding } from '@/components/www/MapTipLanding';
 import { Button } from '@/components/ui/button';
-import { getAppListingsUrl } from '@/lib/app-url';
+import { getAppDashboardUrl, getAppListingsUrl, getAppLoginUrl, getAppSignupUrl } from '@/lib/app-url';
 import { Home, MapPin, Building2 } from 'lucide-react';
+import { getAuthUser } from '@/server/auth/get-auth-user';
 
 export default async function WWWLandingPage() {
+  const user = await getAuthUser();
   const listings = await getPublishedListings();
   const displayListings = listings.slice(0, 5);
 
@@ -48,14 +50,27 @@ export default async function WWWLandingPage() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/signup">
-                Join Now <span className="ml-1">→</span>
-              </Link>
-            </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={getAppDashboardUrl()}>Dashboard</Link>
+                </Button>
+                <form action="/api/auth/signout" method="post">
+                  <Button size="sm" type="submit">Logout</Button>
+                </form>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={getAppLoginUrl()}>Login</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href={getAppSignupUrl()}>
+                    Join Now <span className="ml-1">→</span>
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -90,7 +105,7 @@ export default async function WWWLandingPage() {
                 No published listings yet. Sign up to create one.
               </p>
               <Button asChild className="mt-4">
-                <Link href="/signup">Get Started</Link>
+                <Link href={getAppSignupUrl()}>Get Started</Link>
               </Button>
             </div>
           )}
@@ -180,7 +195,7 @@ export default async function WWWLandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
-                <Link href="/signup">Get Started</Link>
+                <Link href={getAppSignupUrl()}>Get Started</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href={getAppListingsUrl()}>Browse Listings</Link>
@@ -198,12 +213,20 @@ export default async function WWWLandingPage() {
             <Link href={getAppListingsUrl()} className="text-sm text-muted-foreground hover:text-foreground">
               Properties
             </Link>
-            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground">
-              Login
-            </Link>
-            <Link href="/signup" className="text-sm text-muted-foreground hover:text-foreground">
-              Sign Up
-            </Link>
+            {user ? (
+              <Link href={getAppDashboardUrl()} className="text-sm text-muted-foreground hover:text-foreground">
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link href={getAppLoginUrl()} className="text-sm text-muted-foreground hover:text-foreground">
+                  Login
+                </Link>
+                <Link href={getAppSignupUrl()} className="text-sm text-muted-foreground hover:text-foreground">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </footer>

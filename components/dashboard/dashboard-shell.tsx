@@ -13,9 +13,11 @@ export function DashboardShell({
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader role={role} />
-      <div className="mx-auto flex w-full max-w-6xl flex-col lg:min-h-[calc(100vh-102px)] lg:flex-row">
+      <div className="mx-auto flex w-full max-w-7xl flex-col lg:min-h-[calc(100vh-102px)] lg:flex-row">
         <DashboardSidebar role={role} />
-        <main className="w-full flex-1 p-4 lg:p-6">{children}</main>
+        <main className="w-full flex-1 p-4 lg:p-8">
+          <div className="mx-auto w-full max-w-5xl">{children}</div>
+        </main>
       </div>
       <DashboardFooter />
     </div>
