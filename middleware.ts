@@ -23,9 +23,6 @@ function isWwwHost(request: NextRequest): boolean {
   return hostParam !== 'app';
 }
 
-const WWW_PATHS = ['/', '/login', '/signup', '/forgot-password', '/auth/reset-password', '/auth/callback'];
-const APP_PATHS = ['/', '/dashboard', '/listings'];
-
 function getRewritePath(pathname: string, prefix: string): string {
   if (pathname === '/' || pathname === '') return prefix;
   return `${prefix}${pathname}`;

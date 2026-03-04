@@ -61,6 +61,23 @@ export async function fetchPublishedListingById(
   return data;
 }
 
+export async function fetchListingOwnerById(
+  id: string
+): Promise<Pick<Listing, 'id' | 'user_id' | 'status'> | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('listings')
+    .select('id, user_id, status')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
 export type InsertListingInput = {
   user_id: string;
   title: string;

@@ -3,6 +3,7 @@ import {
   countListingsByUser,
   fetchPublishedListings,
   fetchPublishedListingById,
+  fetchListingOwnerById,
   insertListing as insertListingRepo,
   type InsertListingInput,
 } from '@/server/repositories/listings.repository';
@@ -21,6 +22,10 @@ export async function getPublishedListings() {
 
 export async function getPublishedListing(id: string) {
   return fetchPublishedListingById(id);
+}
+
+export async function getListingOwnerById(id: string) {
+  return fetchListingOwnerById(id);
 }
 
 export async function createListing(

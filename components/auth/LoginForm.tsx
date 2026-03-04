@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -29,10 +29,10 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') ?? defaultRedirectTo;
-
-  useEffect(() => {
+  const queryError = useMemo(() => {
     const err = searchParams.get('error');
-    if (err) setError(ERROR_MESSAGES[err] ?? 'Something went wrong. Please try again.');
+    if (!err) return null;
+    return ERROR_MESSAGES[err] ?? 'Something went wrong. Please try again.';
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -52,9 +52,9 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {error && (
+      {(error || queryError) && (
         <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-          {error}
+          {error ?? queryError}
         </p>
       )}
       <div className="space-y-2">
