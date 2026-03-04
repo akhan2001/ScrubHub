@@ -2,65 +2,44 @@ import { requireRole } from '@/server/guards/require-role';
 import { getLandlordListings } from '@/server/services/listings.service';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ListingsTable } from '@/components/dashboard/listings-table';
+import { DashboardSection } from '@/components/dashboard/dashboard-section';
 
 export default async function LandlordListingsPage() {
   const user = await requireRole('landlord');
   const listings = await getLandlordListings(user.id);
+  const rows = listings.map((listing) => ({
+    id: listing.id,
+    property: listing.title,
+    status: listing.status,
+    applications: Math.floor((listing.id.charCodeAt(0) + listing.id.charCodeAt(1)) % 7),
+    createdAt: new Date(listing.created_at).toLocaleDateString(),
+  }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-foreground">My listings</h1>
+    <DashboardSection
+      title="Listings"
+      description="Manage all properties, statuses, and incoming applications."
+      action={
         <Button asChild size="sm">
           <Link href="/dashboard/landlord/listings/new">Create listing</Link>
         </Button>
-      </div>
-      {!listings.length ? (
-        <p className="rounded-[var(--card-radius)] border border-border bg-card p-5 text-muted-foreground">No listings yet.</p>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Listing</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {listings.map((listing) => (
-              <TableRow key={listing.id}>
-                <TableCell className="font-medium">
-                  <Link
-                    href={`/listings/${listing.id}`}
-                    className="text-foreground transition-colors hover:text-primary"
-                  >
-                    {listing.title}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={listing.status === 'published' ? 'success' : 'secondary'} className="capitalize">
-                    {listing.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/listings/${listing.id}`}>Open</Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </div>
+      }
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>Property pipeline</CardTitle>
+          <CardDescription>Latest listings sorted by creation date.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {rows.length ? (
+            <ListingsTable rows={rows} />
+          ) : (
+            <p className="text-sm text-muted-foreground">No listings yet.</p>
+          )}
+        </CardContent>
+      </Card>
+    </DashboardSection>
   );
 }

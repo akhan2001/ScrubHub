@@ -1,27 +1,62 @@
 import { requireRole } from '@/server/guards/require-role';
 import { getTenantBookings } from '@/server/services/bookings.service';
 import { CreatePaymentForm } from '@/components/bookings/create-payment-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { DashboardSection } from '@/components/dashboard/dashboard-section';
 
 export default async function TenantBookingsPage() {
   const user = await requireRole('tenant');
   const bookings = await getTenantBookings(user.id);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-foreground">My bookings</h1>
-      {!bookings.length ? (
-        <p className="text-muted-foreground">No booking requests yet.</p>
-      ) : (
-        <ul className="space-y-3">
-          {bookings.map((booking) => (
-            <li key={booking.id} className="rounded-md border border-border p-3">
-              <p className="text-sm text-muted-foreground">Booking ID: {booking.id}</p>
-              <p className="capitalize">Status: {booking.status}</p>
-              <CreatePaymentForm bookingId={booking.id} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <DashboardSection title="My bookings" description="Track booking requests and complete payments.">
+      <Card>
+        <CardHeader>
+          <CardTitle>Bookings</CardTitle>
+          <CardDescription>All current booking activity for your account.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!bookings.length ? (
+            <p className="text-sm text-muted-foreground">No booking requests yet.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Booking ID</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Requested</TableHead>
+                  <TableHead className="text-right">Payment</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {bookings.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell className="font-medium">{booking.id.slice(0, 10)}</TableCell>
+                    <TableCell>
+                      <Badge variant={booking.status === 'approved' ? 'success' : 'secondary'} className="capitalize">
+                        {booking.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{new Date(booking.requested_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <CreatePaymentForm bookingId={booking.id} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </DashboardSection>
   );
 }

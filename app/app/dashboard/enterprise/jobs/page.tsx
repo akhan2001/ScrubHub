@@ -2,6 +2,17 @@ import { requireRole } from '@/server/guards/require-role';
 import { getPrimaryOrganizationForUser } from '@/server/services/organizations.service';
 import { getJobPostsForOrg } from '@/server/services/job-posts.service';
 import { CreateJobPostForm } from '@/components/enterprise/create-job-post-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { DashboardSection } from '@/components/dashboard/dashboard-section';
 
 export default async function EnterpriseJobsPage() {
   const user = await requireRole('enterprise');
@@ -9,31 +20,62 @@ export default async function EnterpriseJobsPage() {
 
   if (!organization) {
     return (
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">Job posts</h1>
-        <p className="text-muted-foreground mt-2">Create an organization first from the enterprise dashboard.</p>
-      </div>
+      <DashboardSection title="Job posts" description="Create an organization first from the enterprise dashboard.">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted-foreground">No organization found yet.</p>
+          </CardContent>
+        </Card>
+      </DashboardSection>
     );
   }
 
   const jobs = await getJobPostsForOrg(organization.org_id);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-foreground">Job posts</h1>
-      <CreateJobPostForm orgId={organization.org_id} />
-      {!jobs.length ? (
-        <p className="text-muted-foreground">No job posts yet.</p>
-      ) : (
-        <ul className="space-y-2">
-          {jobs.map((job) => (
-            <li key={job.id} className="rounded-md border border-border p-3">
-              <p className="font-medium">{job.title}</p>
-              <p className="text-sm text-muted-foreground capitalize">{job.status}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <DashboardSection title="Job posts" description="Create and manage hiring posts for your organization.">
+      <Card>
+        <CardHeader>
+          <CardTitle>Create job post</CardTitle>
+          <CardDescription>New entries become visible in your recruiting pipeline.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CreateJobPostForm orgId={organization.org_id} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Current posts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!jobs.length ? (
+            <p className="text-sm text-muted-foreground">No job posts yet.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {jobs.map((job) => (
+                  <TableRow key={job.id}>
+                    <TableCell className="font-medium">{job.title}</TableCell>
+                    <TableCell>
+                      <Badge variant={job.status === 'published' ? 'success' : 'secondary'} className="capitalize">
+                        {job.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{new Date(job.created_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </DashboardSection>
   );
 }

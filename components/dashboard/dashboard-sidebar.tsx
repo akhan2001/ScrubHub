@@ -2,56 +2,131 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  Building2,
+  CircleCheckBig,
+  ClipboardList,
+  Home,
+  ReceiptText,
+  Search,
+  Settings,
+  ShieldCheck,
+  Users,
+  UserRound,
+} from 'lucide-react';
 import type { AppRole } from '@/types/database';
 import { cn } from '@/lib/utils';
 
-type NavItem = { href: string; label: string };
+type NavItem = { href: string; label: string; icon: React.ComponentType<{ className?: string }> };
+type NavSection = { label: string; items: NavItem[] };
 
-const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
+const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
   tenant: [
-    { href: '/dashboard/tenant', label: 'Overview' },
-    { href: '/listings', label: 'Search listings' },
-    { href: '/dashboard/tenant/bookings', label: 'Bookings' },
-    { href: '/dashboard/tenant/profile', label: 'Profile' },
+    {
+      label: 'Main',
+      items: [
+        { href: '/dashboard/tenant', label: 'Overview', icon: Home },
+        { href: '/listings', label: 'Search listings', icon: Search },
+        { href: '/dashboard/tenant/bookings', label: 'Applications', icon: ClipboardList },
+      ],
+    },
+    {
+      label: 'Account',
+      items: [
+        { href: '/dashboard/tenant/profile', label: 'Profile', icon: UserRound },
+        { href: '/dashboard/onboarding', label: 'Settings', icon: Settings },
+      ],
+    },
   ],
   landlord: [
-    { href: '/dashboard/landlord', label: 'Overview' },
-    { href: '/dashboard/landlord/listings', label: 'My listings' },
-    { href: '/dashboard/landlord/listings/new', label: 'Create listing' },
-    { href: '/dashboard/landlord/screening-rules', label: 'Screening rules' },
-    { href: '/dashboard/landlord/approvals', label: 'Approvals' },
+    {
+      label: 'Main',
+      items: [
+        { href: '/dashboard/landlord', label: 'Overview', icon: Home },
+        { href: '/dashboard/landlord/listings', label: 'Listings', icon: Building2 },
+        { href: '/dashboard/landlord/approvals', label: 'Approvals', icon: CircleCheckBig },
+        { href: '/dashboard/landlord/screening-rules', label: 'Screening rules', icon: ShieldCheck },
+      ],
+    },
+    {
+      label: 'Account',
+      items: [
+        { href: '/dashboard/onboarding', label: 'Settings', icon: Settings },
+      ],
+    },
   ],
   enterprise: [
-    { href: '/dashboard/enterprise', label: 'Overview' },
-    { href: '/dashboard/enterprise/jobs', label: 'Job posts' },
-    { href: '/dashboard/enterprise/team', label: 'Team access' },
+    {
+      label: 'Main',
+      items: [
+        { href: '/dashboard/enterprise', label: 'Overview', icon: Home },
+        { href: '/dashboard/enterprise/jobs', label: 'Job posts', icon: ReceiptText },
+        { href: '/dashboard/enterprise/team', label: 'Team access', icon: Users },
+      ],
+    },
+    {
+      label: 'Account',
+      items: [
+        { href: '/dashboard/onboarding', label: 'Settings', icon: Settings },
+      ],
+    },
   ],
 };
 
-export function DashboardSidebar({ role }: { role: AppRole }) {
-  const pathname = usePathname();
-  const items = NAV_BY_ROLE[role];
+function isActivePath(pathname: string, href: string) {
+  if (pathname === href) return true;
+  return href !== '/dashboard/onboarding' && pathname.startsWith(`${href}/`);
+}
 
+export function DashboardSidebar({
+  role,
+  onNavigate,
+  className,
+}: {
+  role: AppRole;
+  onNavigate?: () => void;
+  className?: string;
+}) {
+  const pathname = usePathname();
+  const sections = NAV_BY_ROLE[role];
   return (
-    <aside className="w-full border-b border-border bg-card px-4 py-3 lg:w-72 lg:border-r lg:border-b-0 lg:p-5">
-      <nav className="flex flex-wrap gap-2 lg:flex-col">
-        {items.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-md border px-3 py-2 text-sm transition-colors",
-                active
-                  ? "border-primary/35 bg-primary/12 font-semibold text-primary"
-                  : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+    <aside className={cn("h-full border-r border-border bg-background", className)}>
+      <div className="flex h-16 items-center border-b border-border px-4">
+        <Link href="/dashboard" onClick={onNavigate} className="text-base font-semibold text-foreground">
+          ScrubHub
+        </Link>
+      </div>
+      <nav className="space-y-6 p-4">
+        {sections.map((section) => (
+          <div key={section.label} className="space-y-2">
+            <p className="px-2 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+              {section.label}
+            </p>
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const active = isActivePath(pathname, item.href);
+                const Icon = item.icon;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    className={cn(
+                      "flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors",
+                      active
+                        ? "bg-muted text-foreground font-medium"
+                        : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="size-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
     </aside>
   );

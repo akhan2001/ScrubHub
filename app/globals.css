@@ -128,8 +128,8 @@
 
 /* ===== Semantic aliases: Light theme ===== */
 :root {
-  --color-primary: var(--blue-700);
-  --color-secondary: var(--teal-700);
+  --color-primary: #111827;
+  --color-secondary: #374151;
   --color-success: var(--green-700);
   --color-warning: var(--amber-700);
   --color-error: var(--red-700);
@@ -142,8 +142,8 @@
   --color-text-muted: var(--slate-600);
   --color-border: var(--slate-200);
 
-  --color-primary-hover: #0a46bf;
-  --color-primary-active: #083ca1;
+  --color-primary-hover: #1f2937;
+  --color-primary-active: #030712;
 
   --on-primary: var(--white);
   --on-secondary: var(--white);
@@ -153,14 +153,14 @@
   --on-info: var(--white);
   --on-surface: var(--slate-950);
 
-  --gradient-hero: linear-gradient(135deg, #0a4fd6 0%, #2d7bff 50%, #0f766e 100%);
-  --gradient-cta: linear-gradient(135deg, #0a4fd6 0%, #5b84ff 100%);
+  --gradient-hero: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  --gradient-cta: linear-gradient(135deg, #111827 0%, #374151 100%);
 }
 
 /* ===== Semantic aliases: Dark theme ===== */
 .dark {
-  --color-primary: #7aa2ff;
-  --color-secondary: #2fa89d;
+  --color-primary: #f4f4f5;
+  --color-secondary: #d4d4d8;
   --color-success: #34d399;
   --color-warning: #f59e0b;
   --color-error: #f87171;
@@ -173,8 +173,8 @@
   --color-text-muted: var(--zinc-300);
   --color-border: var(--zinc-700);
 
-  --color-primary-hover: #95b5ff;
-  --color-primary-active: #acc6ff;
+  --color-primary-hover: #e4e4e7;
+  --color-primary-active: #d4d4d8;
 
   --on-primary: var(--zinc-950);
   --on-secondary: var(--zinc-950);
@@ -184,8 +184,8 @@
   --on-info: var(--zinc-950);
   --on-surface: var(--zinc-100);
 
-  --gradient-hero: linear-gradient(145deg, #09090b 0%, #111113 45%, #27272a 100%);
-  --gradient-cta: linear-gradient(135deg, #27272a 0%, #3f3f46 100%);
+  --gradient-hero: linear-gradient(145deg, #09090b 0%, #111113 45%, #18181b 100%);
+  --gradient-cta: linear-gradient(135deg, #f4f4f5 0%, #d4d4d8 100%);
 }
 
 /* ===== Component tokens ===== */
