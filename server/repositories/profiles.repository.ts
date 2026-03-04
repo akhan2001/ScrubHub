@@ -1,16 +1,102 @@
 import { createClient } from '@/lib/supabase/server';
-import type { Profile } from '@/types/database';
+import type { Profile, WorkerProfile, LandlordProfile, Organization } from '@/types/database';
 
 export async function fetchProfileById(userId: string): Promise<Profile | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, email, full_name, role, verification_state, verification_notes, created_at, updated_at')
+    .select('id, email, full_name, role, verification_state, verification_notes, phone_number, date_of_birth, avatar_url, created_at, updated_at')
     .eq('id', userId)
     .single();
 
   if (error) throw error;
   return data;
+}
+
+export async function fetchWorkerProfile(userId: string): Promise<WorkerProfile | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('worker_profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchLandlordProfile(userId: string): Promise<LandlordProfile | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('landlord_profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchOrganizationByOwner(userId: string): Promise<Organization | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('owner_user_id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateProfile(
+  userId: string,
+  fields: Partial<Omit<Profile, 'id' | 'created_at' | 'updated_at'>>
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles')
+    .update(fields)
+    .eq('id', userId);
+
+  if (error) throw error;
+}
+
+export async function upsertWorkerProfile(
+  userId: string,
+  fields: Partial<Omit<WorkerProfile, 'id' | 'created_at' | 'updated_at'>>
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('worker_profiles')
+    .upsert({ id: userId, ...fields });
+
+  if (error) throw error;
+}
+
+export async function upsertLandlordProfile(
+  userId: string,
+  fields: Partial<Omit<LandlordProfile, 'id' | 'created_at' | 'updated_at'>>
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('landlord_profiles')
+    .upsert({ id: userId, ...fields });
+
+  if (error) throw error;
+}
+
+export async function updateOrganization(
+  orgId: string,
+  fields: Partial<Omit<Organization, 'id' | 'owner_user_id' | 'created_at' | 'updated_at'>>
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('organizations')
+    .update(fields)
+    .eq('id', orgId);
+
+  if (error) throw error;
 }
 
 export async function updateProfileRole(

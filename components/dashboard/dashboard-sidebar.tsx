@@ -27,13 +27,13 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
       items: [
         { href: '/dashboard/tenant', label: 'Overview', icon: Home },
         { href: '/listings', label: 'Search listings', icon: Search },
-        { href: '/dashboard/tenant/bookings', label: 'Applications', icon: ClipboardList },
+        { href: '/dashboard/tenant/bookings', label: 'My bookings', icon: ClipboardList },
       ],
     },
     {
       label: 'Account',
       items: [
-        { href: '/dashboard/tenant/profile', label: 'Profile', icon: UserRound },
+        { href: '/dashboard/profile', label: 'Profile', icon: UserRound },
       ],
     },
   ],
@@ -47,6 +47,12 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/landlord/screening-rules', label: 'Screening rules', icon: ShieldCheck },
       ],
     },
+    {
+      label: 'Account',
+      items: [
+        { href: '/dashboard/profile', label: 'Profile', icon: UserRound },
+      ],
+    },
   ],
   enterprise: [
     {
@@ -57,12 +63,18 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/enterprise/team', label: 'Team access', icon: Users },
       ],
     },
+    {
+      label: 'Account',
+      items: [
+        { href: '/dashboard/profile', label: 'Profile', icon: UserRound },
+      ],
+    },
   ],
 };
 
+/** Active only when pathname exactly matches the nav href (one highlight per page). */
 function isActivePath(pathname: string, href: string) {
-  if (pathname === href) return true;
-  return pathname.startsWith(`${href}/`);
+  return pathname === href;
 }
 
 export function DashboardSidebar({

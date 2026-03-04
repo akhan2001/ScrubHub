@@ -1,12 +1,10 @@
 'use client';
 
-import { Bell, Menu, Plus, Search } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { AppRole } from '@/types/database';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,16 +21,9 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
+import { NotificationsPanel } from '@/components/dashboard/notifications-panel';
 import { IconButton } from '@/components/ui/icon-button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 const ROLE_LABELS: Record<AppRole, string> = {
   tenant: 'Tenant',
@@ -40,9 +31,32 @@ const ROLE_LABELS: Record<AppRole, string> = {
   enterprise: 'Enterprise',
 };
 
-export function DashboardHeader({ role }: { role: AppRole }) {
+function getInitials(fullName: string | null, role: AppRole): string {
+  if (fullName?.trim()) {
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+    return fullName.slice(0, 2).toUpperCase();
+  }
+  return ROLE_LABELS[role].charAt(0);
+}
+
+type DashboardHeaderUser = {
+  fullName: string | null;
+  avatarUrl: string | null;
+};
+
+export function DashboardHeader({
+  role,
+  user,
+}: {
+  role: AppRole;
+  user: DashboardHeaderUser;
+}) {
   const pathname = usePathname();
-  const pageTitle = pathname.split('/').at(-1)?.replace('-', ' ') ?? 'overview';
+  const pageTitle = pathname.split('/').at(-1)?.replace(/-/g, ' ') ?? 'overview';
+  const initials = getInitials(user.fullName, role);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
@@ -58,89 +72,67 @@ export function DashboardHeader({ role }: { role: AppRole }) {
             <DashboardSidebar role={role} />
           </SheetContent>
         </Sheet>
-        <div>
-          <p className="text-sm font-semibold text-foreground">{ROLE_LABELS[role]} Workspace</p>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage className="capitalize">{pageTitle}</BreadcrumbPage>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <span className="text-muted-foreground">Dashboard</span>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+        <div className="flex items-center gap-2.5">
+          <div
+            className={cn(
+              'flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground'
+            )}
+            aria-hidden
+          >
+            S
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              {ROLE_LABELS[role]} Workspace
+            </p>
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="capitalize">{pageTitle}</BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <span className="text-muted-foreground">Dashboard</span>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="relative hidden lg:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="h-9 w-64 pl-9" placeholder="Search listings, users, bookings..." />
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="sm" className="hidden md:inline-flex">
-              <Plus className="mr-1 size-4" />
-              New
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Quick create</DialogTitle>
-              <DialogDescription>Create a new item without leaving this page.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-2">
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/landlord/listings?create=1">New listing</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/enterprise/jobs">New job post</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/dashboard/onboarding">Update profile</Link>
-              </Button>
-            </div>
-            <DialogFooter>
-              <Button variant="ghost" asChild>
-                <Link href="/dashboard">Go to workspace</Link>
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
         <Sheet>
           <SheetTrigger asChild>
             <IconButton variant="subtle" aria-label="Notifications">
               <Bell className="size-4" />
             </IconButton>
           </SheetTrigger>
-          <SheetContent side="right">
+          <SheetContent side="right" className="w-full flex flex-col p-0 sm:max-w-md">
             <SheetTitle className="sr-only">Notifications</SheetTitle>
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
-              <div className="space-y-2 rounded-md border border-border bg-muted/40 p-3">
-                <p className="text-sm text-foreground">New booking request received.</p>
-                <p className="text-xs text-muted-foreground">2 minutes ago</p>
-              </div>
-              <div className="space-y-2 rounded-md border border-border bg-muted/40 p-3">
-                <p className="text-sm text-foreground">Screening rules updated successfully.</p>
-                <p className="text-xs text-muted-foreground">1 hour ago</p>
-              </div>
-            </div>
+            <NotificationsPanel />
           </SheetContent>
         </Sheet>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type="button" className="inline-flex items-center rounded-full">
-              <Avatar>
-                <AvatarFallback>{ROLE_LABELS[role].charAt(0)}</AvatarFallback>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Account menu"
+            >
+              <Avatar className="size-8">
+                <AvatarImage src={user.avatarUrl ?? undefined} alt={user.fullName ?? undefined} />
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
+              <span className="hidden text-left text-sm font-medium text-foreground sm:inline">
+                {user.fullName ?? ROLE_LABELS[role]}
+              </span>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem disabled>{ROLE_LABELS[role]} account</DropdownMenuItem>
+            <DropdownMenuItem disabled className="font-medium">
+              {ROLE_LABELS[role]} account
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/dashboard/onboarding">Settings</Link>
+              <Link href="/dashboard/profile">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
