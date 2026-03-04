@@ -1,0 +1,12 @@
+-- Migration 00007: Enterprise Schema Updates
+
+ALTER TABLE public.organizations
+ADD COLUMN IF NOT EXISTS type TEXT,
+ADD COLUMN IF NOT EXISTS industry TEXT,
+ADD COLUMN IF NOT EXISTS size TEXT,
+ADD COLUMN IF NOT EXISTS website TEXT,
+ADD COLUMN IF NOT EXISTS ein_number TEXT,
+ADD COLUMN IF NOT EXISTS billing_address TEXT;
+
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS job_title TEXT;

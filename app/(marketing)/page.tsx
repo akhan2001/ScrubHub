@@ -92,12 +92,12 @@ export default async function WWWLandingPage() {
             <div className="absolute top-0 left-0 right-0 h-[34%] flex flex-col items-center justify-center px-4 text-center z-[2] pointer-events-none">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <span className="size-2 rounded-full bg-white/85" />
-                <span className="text-sm font-semibold text-white/95">Healthcare Housing Marketplace</span>
+                <span className="text-sm font-semibold text-black/95">Healthcare Housing Marketplace</span>
               </div>
-              <h1 className="mx-auto mb-4 max-w-3xl text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
+              <h1 className="mx-auto mb-4 max-w-3xl text-3xl font-bold tracking-tight text-black md:text-4xl lg:text-5xl">
                 Easily Find and Manage Rental Properties to Grow Your Portfolio
               </h1>
-              <p className="mx-auto max-w-2xl text-base text-white/90 md:text-lg">
+              <p className="mx-auto max-w-2xl text-base text-black/90 md:text-lg">
                 Take control of your property management. From practitioner housing to clinical suites, ScrubHub connects landlords and healthcare professionals across the 401 Corridor.
               </p>
             </div>

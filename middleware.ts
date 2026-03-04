@@ -10,21 +10,6 @@ function isAppHost(request: NextRequest): boolean {
   return false;
 }
 
-function isWwwHost(request: NextRequest): boolean {
-  const host = request.headers.get('host') ?? '';
-  const hostParam = request.nextUrl.searchParams.get('host');
-  if (host.startsWith('www.') || (host !== 'localhost' && !host.startsWith('localhost:'))) {
-    if (host.startsWith('app.')) return false;
-    return true;
-  }
-  return hostParam !== 'app';
-}
-
-function getRewritePath(pathname: string, prefix: string): string {
-  if (pathname === '/' || pathname === '') return prefix;
-  return `${prefix}${pathname}`;
-}
-
 function withSupabaseCookies(base: NextResponse, target: NextResponse): NextResponse {
   base.cookies.getAll().forEach(({ name, value }) => {
     target.cookies.set(name, value);
@@ -42,7 +27,7 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isApp = isAppHost(request);
-  const isWww = isWwwHost(request);
+  const isWww = !isApp;
 
   const response = NextResponse.next({ request });
   const supabase = createServerClient(
@@ -69,45 +54,49 @@ export async function middleware(request: NextRequest) {
     pathname === '/forgot-password' ||
     pathname === '/auth/reset-password' ||
     pathname === '/auth/callback';
+  
   const isDashboardPath = pathname.startsWith('/dashboard');
-  const isAppContentPath =
-    pathname === '/' || pathname.startsWith('/dashboard') || pathname.startsWith('/listings');
+  const isListingsPath = pathname.startsWith('/listings');
 
   if (isApp) {
-    if (isAuthPath) {
-      if (user && (pathname === '/login' || pathname === '/signup')) {
-        const target = new URL('/dashboard', request.url);
-        return withSupabaseCookies(response, NextResponse.redirect(target));
-      }
-      const rewritePath = getRewritePath(pathname, '/www');
-      return withSupabaseCookies(response, NextResponse.rewrite(new URL(rewritePath, request.url)));
+    // Redirect root to dashboard
+    if (pathname === '/') {
+      return withSupabaseCookies(response, NextResponse.redirect(new URL('/dashboard', request.url)));
     }
 
-    if (isAppContentPath) {
-      if (isDashboardPath && !user) {
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirectTo', `${APP_URL}/dashboard`);
-        return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
-      }
-      const rewritePath = getRewritePath(pathname, '/app');
-      return withSupabaseCookies(response, NextResponse.rewrite(new URL(rewritePath, request.url)));
+    // If user is already logged in and tries to access auth pages, redirect to dashboard
+    if (isAuthPath && user && (pathname === '/login' || pathname === '/signup')) {
+      return withSupabaseCookies(response, NextResponse.redirect(new URL('/dashboard', request.url)));
     }
+
+    // Protect dashboard routes
+    if (isDashboardPath && !user) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirectTo', `${APP_URL}${pathname}`);
+        return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
+    }
+
+    // Allow all other routes to resolve naturally
+    return response;
   }
 
   if (isWww) {
-    if (pathname === '/') {
-      const rewritePath = getRewritePath(pathname === '/' ? '' : pathname, '/www');
-      return withSupabaseCookies(response, NextResponse.rewrite(new URL(rewritePath || '/www', request.url)));
-    }
-    if (isAuthPath || pathname.startsWith('/dashboard') || pathname.startsWith('/listings')) {
+    // Redirect app-specific paths to App domain
+    if (isDashboardPath || isListingsPath) {
       const target = new URL(APP_URL);
       target.pathname = pathname;
       target.search = request.nextUrl.search;
+      
+      // Fallback for local dev without subdomain support
       if (!process.env.NEXT_PUBLIC_APP_URL) {
         target.searchParams.set('host', 'app');
       }
+      
       return withSupabaseCookies(response, NextResponse.redirect(target));
     }
+
+    // Allow all other routes to resolve naturally
+    return response;
   }
 
   return response;
