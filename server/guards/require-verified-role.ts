@@ -11,22 +11,24 @@ export async function requireVerifiedRole(
   }
 ) {
   const onFailure = options?.onFailure ?? 'redirect';
-  const fail = (path: string, error: Error) => {
+  const fail = (path: string, error: Error): never => {
     if (onFailure === 'throw') {
       throw error;
     }
     redirect(path);
+    // Ensure TS knows this function never returns
+    throw error;
   };
 
   const user = await getAuthUser();
-  if (!user) fail('/login', new UnauthorizedError('Sign in required'));
+  if (!user) return fail('/login', new UnauthorizedError('Sign in required'));
 
   const profile = await getProfile(user.id);
-  if (!profile) fail('/login', new UnauthorizedError('Profile not found for current user'));
+  if (!profile) return fail('/login', new UnauthorizedError('Profile not found for current user'));
 
-  if (profile.role !== role) fail('/dashboard', new ForbiddenError(`Requires role: ${role}`));
+  if (profile.role !== role) return fail('/dashboard', new ForbiddenError(`Requires role: ${role}`));
   if (profile.verification_state !== 'verified') {
-    fail('/dashboard/onboarding', new ForbiddenError('Complete verification before continuing'));
+    return fail('/dashboard/onboarding', new ForbiddenError('Complete verification before continuing'));
   }
 
   return {
