@@ -1,11 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        variant="outline"
+        size="icon-sm"
+        type="button"
+        aria-label="Toggle theme"
+        title="Toggle theme"
+        className="relative overflow-hidden"
+      >
+        <Sun className="size-4" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
+  }
+
   const isDark = resolvedTheme === "dark";
   const label = isDark ? "Switch to light mode" : "Switch to dark mode";
 

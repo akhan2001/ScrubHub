@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import maplibregl, { type StyleSpecification } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import type { ListingWithCoordinates } from "@/lib/map/mock-coordinates";
 import { createMarkerElement } from "@/components/map/Marker";
 
@@ -29,10 +29,32 @@ export function MapView({
   className,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const markersRef = useRef<maplibregl.Marker[]>([]);
   const [mapFailed, setMapFailed] = useState(false);
-  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const freeStyle = useMemo<StyleSpecification>(
+    () => ({
+      version: 8,
+      sources: {
+        osm: {
+          type: "raster",
+          tiles: [
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          ],
+          tileSize: 256,
+          attribution: "© OpenStreetMap contributors",
+        },
+      },
+      layers: [
+        {
+          id: "osm",
+          type: "raster",
+          source: "osm",
+        },
+      ],
+    }),
+    []
+  );
 
   const fallbackCenter = useMemo(() => {
     const first = listings[0];
@@ -40,12 +62,11 @@ export function MapView({
   }, [listings]);
 
   useEffect(() => {
-    if (!containerRef.current || !token) return;
+    if (!containerRef.current) return;
 
-    mapboxgl.accessToken = token;
-    const map = new mapboxgl.Map({
+    const map = new maplibregl.Map({
       container: containerRef.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: freeStyle,
       center: fallbackCenter as [number, number],
       zoom: 10.5,
       attributionControl: false,
@@ -54,14 +75,15 @@ export function MapView({
       setMapFailed(true);
     });
 
-    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right");
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
     mapRef.current = map;
 
     return () => {
       map.remove();
       mapRef.current = null;
     };
-  }, [fallbackCenter, token]);
+  }, [fallbackCenter, freeStyle]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -80,7 +102,7 @@ export function MapView({
         onMouseLeave: () => onHoverListing(null),
       });
 
-      const marker = new mapboxgl.Marker({ element: markerElement })
+      const marker = new maplibregl.Marker({ element: markerElement })
         .setLngLat([listing.longitude, listing.latitude])
         .addTo(map);
 
@@ -106,7 +128,7 @@ export function MapView({
     });
   }, [activeListingId, listings]);
 
-  if (!token || mapFailed) {
+  if (mapFailed) {
     return (
       <div
         className={className}
@@ -119,9 +141,7 @@ export function MapView({
           <div className="max-w-sm rounded-2xl border border-border bg-background/95 p-4">
             <p className="text-sm font-medium text-foreground">Map unavailable</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {!token
-                ? "Add `NEXT_PUBLIC_MAPBOX_TOKEN` to enable live map rendering."
-                : "Map failed to load. Listing panel remains available."}
+              Map failed to load. Listing panel remains available.
             </p>
           </div>
         </div>
