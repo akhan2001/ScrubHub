@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createListingSchema, LEASE_TERM_OPTIONS, type CreateListingData } from '@/lib/validations/listing';
@@ -14,6 +15,7 @@ import { AddressAutocomplete } from '@/components/map/address-autocomplete';
 import { PhotoUpload } from '@/components/listings/photo-upload';
 import { AmenityTags } from '@/components/listings/amenity-tags';
 import { toast } from 'sonner';
+import { Sparkles, Loader2 } from 'lucide-react';
 import type { Listing } from '@/types/database';
 
 interface ListingFormProps {
@@ -76,6 +78,64 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
   });
 
   const leaseTerms = watch('leaseTerms');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const watched = watch([
+    'description',
+    'address',
+    'title',
+    'bedrooms',
+    'bathrooms',
+    'squareFootage',
+    'monthlyRent',
+    'isFurnished',
+    'arePetsAllowed',
+    'leaseTerms',
+    'amenities',
+  ]);
+
+  async function handleGenerateDescription() {
+    const [description, address, title, bedrooms, bathrooms, squareFootage, monthlyRent, isFurnished, arePetsAllowed, leaseTermsVal, amenitiesVal] = watched;
+    const hasTitle = typeof title === 'string' && title.trim().length > 0;
+    const hasDescription = typeof description === 'string' && description.trim().length > 0;
+    if (!hasTitle && !hasDescription) {
+      toast.error('Add a title or some description to generate from.');
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const res = await fetch('/api/ai/listing-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userPrompt: (typeof description === 'string' && description.trim()) ? description.trim() : undefined,
+          address: address?.trim() || undefined,
+          title: title?.toString().trim() || undefined,
+          bedrooms: bedrooms,
+          bathrooms: bathrooms,
+          squareFootage: squareFootage,
+          monthlyRent: monthlyRent,
+          isFurnished: isFurnished,
+          arePetsAllowed: arePetsAllowed,
+          leaseTerms: leaseTermsVal,
+          amenities: amenitiesVal,
+        }),
+      });
+      const data = (await res.json()) as { description?: string; error?: string };
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to generate description');
+        return;
+      }
+      if (data.description) {
+        setValue('description', data.description, { shouldValidate: true });
+        toast.success('Description generated');
+      }
+    } catch {
+      toast.error('Failed to generate description');
+    } finally {
+      setIsGenerating(false);
+    }
+  }
 
   async function onSubmit(data: CreateListingData) {
     try {
@@ -142,7 +202,34 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
         </div>
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
-          <Textarea id="description" {...register('description')} rows={4} placeholder="Describe the property..." />
+          <Textarea
+            id="description"
+            {...register('description')}
+            rows={4}
+            placeholder="Describe the property or add notes..."
+            className="min-h-[100px] w-full resize-y"
+          />
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleGenerateDescription}
+              disabled={isGenerating}
+              className="text-violet-600 hover:text-violet-700 hover:bg-transparent border-0 p-0 h-auto min-h-0 font-medium"
+              aria-label={isGenerating ? 'Generating description…' : 'Generate description with AI'}
+            >
+              {isGenerating ? (
+                <Loader2 className="size-4 animate-spin text-violet-600" />
+              ) : (
+                <Sparkles className="size-4 text-violet-600" />
+              )}
+              <span>{isGenerating ? 'Generating…' : 'Generate with AI'}</span>
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Uses your details below to draft a description
+            </span>
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="space-y-2">
