@@ -5,7 +5,7 @@ export const AMENITY_OPTIONS = [
   'In-unit Laundry',
   'Shared Laundry',
   'Pet Friendly',
-  'Near Medical Campus',
+  'Near Transit',
   'Wheelchair Accessible',
   'Gym / Fitness',
   'Pool',

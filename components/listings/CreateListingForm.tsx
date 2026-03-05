@@ -197,7 +197,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
         <h3 className="text-base font-semibold text-foreground">Property Details</h3>
         <div className="space-y-2">
           <Label htmlFor="title">Listing Title</Label>
-          <Input id="title" {...register('title')} placeholder="Stylish 2BR near hospital" />
+          <Input id="title" {...register('title')} placeholder="Stylish 2BR in downtown" />
           {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
         </div>
         <div className="space-y-2">
@@ -216,13 +216,13 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
               size="sm"
               onClick={handleGenerateDescription}
               disabled={isGenerating}
-              className="text-violet-600 hover:text-violet-700 hover:bg-transparent border-0 p-0 h-auto min-h-0 font-medium"
+              className="text-violet-500 hover:text-violet-600 hover:bg-transparent border-0 p-0 h-auto min-h-0 font-medium"
               aria-label={isGenerating ? 'Generating description…' : 'Generate description with AI'}
             >
               {isGenerating ? (
-                <Loader2 className="size-4 animate-spin text-violet-600" />
+                <Loader2 className="size-4 animate-spin text-violet-500" />
               ) : (
-                <Sparkles className="size-4 text-violet-600" />
+                <Sparkles className="size-4 text-violet-500" />
               )}
               <span>{isGenerating ? 'Generating…' : 'Generate with AI'}</span>
             </Button>

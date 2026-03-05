@@ -52,7 +52,7 @@ export async function generateListingDescription(params: {
           {
             role: 'system',
             content:
-              'You are a real estate copywriter. Generate a concise, professional rental listing description for healthcare workers. Output only the description text, no headings or labels.',
+              'You are a real estate copywriter. Generate a concise, professional rental listing description. Output only the description text, no headings or labels.',
           },
           { role: 'user', content: userContent },
         ],
