@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { CreateListingForm } from "@/components/listings/CreateListingForm";
+import { ListingForm } from "@/components/listings/CreateListingForm";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +42,7 @@ export function NewListingModalControlled({
             Add a new property and publish it to your marketplace.
           </DialogDescription>
         </DialogHeader>
-        <CreateListingForm />
+        <ListingForm />
       </DialogContent>
     </Dialog>
   );

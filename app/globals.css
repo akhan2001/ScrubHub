@@ -226,6 +226,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  button, [role="menuitem"], [role="option"], a {
+    cursor: pointer;
+  }
   html {
     color-scheme: light;
   }

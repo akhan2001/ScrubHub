@@ -6,6 +6,7 @@ import {
   updateProfileRole as updateProfileRoleRepo,
   updateProfileVerificationState as updateProfileVerificationStateRepo,
   fetchUserOnboardingStatus as fetchUserOnboardingStatusRepo,
+  markRoleSelected as markRoleSelectedRepo,
 } from '@/server/repositories/profiles.repository';
 import type { AppRole, Profile, WorkerProfile, LandlordProfile, Organization, VerificationState } from '@/types/database';
 
@@ -15,6 +16,11 @@ export async function getProfile(userId: string) {
 
 export async function updateProfileRole(userId: string, role: AppRole): Promise<void> {
   await updateProfileRoleRepo(userId, role);
+}
+
+export async function confirmRoleSelection(userId: string, role: AppRole): Promise<void> {
+  await updateProfileRoleRepo(userId, role);
+  await markRoleSelectedRepo(userId);
 }
 
 const TRANSITIONS: Record<VerificationState, VerificationState[]> = {

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireVerifiedRole } from '@/server/guards/require-verified-role';
+import { requirePlan } from '@/server/guards/require-plan';
 import { screeningRulesSchema } from '@/lib/validation/schemas';
 import { ValidationError } from '@/server/errors/app-error';
 import { saveScreeningRule } from '@/server/services/screening-rules.service';
@@ -23,6 +24,7 @@ export async function upsertLandlordScreeningRules(input: {
   }
 
   const user = await requireVerifiedRole('landlord', { onFailure: 'throw' });
+  await requirePlan('growth', { action: 'screening_rules' });
   await saveScreeningRule({
     landlordUserId: user.id,
     minimumScore: parsed.data.minimumScore,

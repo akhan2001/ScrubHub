@@ -1,10 +1,10 @@
 import { requireRole } from '@/server/guards/require-role';
-import { getLandlordListings, getLandlordListingsCount } from '@/server/services/listings.service';
+import { getLandlordListingsWithDetails, getLandlordListingsCount } from '@/server/services/listings.service';
 import { getLandlordBookings } from '@/server/services/bookings.service';
 import { getProfile } from '@/server/services/profiles.service';
 import Link from 'next/link';
+import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { KpiCard } from '@/components/dashboard/kpi-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ListingsTable } from '@/components/dashboard/listings-table';
@@ -16,19 +16,13 @@ export default async function LandlordDashboardPage() {
   const profile = await getProfile(user.id);
   const count = await getLandlordListingsCount(user.id);
   const [listings, bookings] = await Promise.all([
-    getLandlordListings(user.id),
+    getLandlordListingsWithDetails(user.id),
     getLandlordBookings(user.id),
   ]);
 
   const activeApplications = bookings.filter((booking) => booking.status === 'requested').length;
   const pendingApprovals = bookings.filter((booking) => booking.status === 'approved').length;
-  const rows = listings.slice(0, 6).map((listing) => ({
-    id: listing.id,
-    property: listing.title,
-    status: listing.status,
-    applications: bookings.filter((booking) => booking.listing_id === listing.id).length,
-    createdAt: new Date(listing.created_at).toLocaleDateString(),
-  }));
+  const recentListings = listings.slice(0, 6);
 
   return (
     <DashboardSection
@@ -49,12 +43,20 @@ export default async function LandlordDashboardPage() {
       </div>
 
       {profile?.verification_state !== 'verified' && (
-        <Alert variant="default">
-          <AlertTitle>Verification required</AlertTitle>
-          <AlertDescription>
-            Your landlord verification is <strong>{profile?.verification_state}</strong>. Listing creation and approvals are restricted until you are verified.
-          </AlertDescription>
-        </Alert>
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200/60 bg-amber-50/50 px-4 py-3.5">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+            <ShieldAlert className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-amber-900">Verification pending</p>
+            <p className="mt-0.5 text-sm text-amber-700/80">
+              Complete your identity verification to publish listings and approve tenants.
+            </p>
+          </div>
+          <Button asChild size="sm" variant="outline" className="shrink-0 border-amber-300 text-amber-800 hover:bg-amber-100/60">
+            <Link href="/dashboard/profile">Verify now</Link>
+          </Button>
+        </div>
       )}
 
       <Card>
@@ -68,8 +70,8 @@ export default async function LandlordDashboardPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {rows.length ? (
-            <ListingsTable rows={rows} />
+          {recentListings.length ? (
+            <ListingsTable listings={recentListings} />
           ) : (
             <p className="text-sm text-muted-foreground">No listings found. Create your first listing to get started.</p>
           )}

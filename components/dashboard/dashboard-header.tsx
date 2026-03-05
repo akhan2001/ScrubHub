@@ -1,14 +1,17 @@
 'use client';
 
-import { Bell, Menu } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import { Bell, Check, Menu, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { AppRole } from '@/types/database';
+import { updateProfileRole } from '@/actions/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -26,10 +29,18 @@ import { IconButton } from '@/components/ui/icon-button';
 import { cn } from '@/lib/utils';
 
 const ROLE_LABELS: Record<AppRole, string> = {
+  tenant: 'Healthcare Professional',
+  landlord: 'Property Owner',
+  enterprise: 'Enterprise',
+};
+
+const ROLE_SHORT: Record<AppRole, string> = {
   tenant: 'Tenant',
   landlord: 'Landlord',
   enterprise: 'Enterprise',
 };
+
+const ALL_ROLES: AppRole[] = ['tenant', 'landlord', 'enterprise'];
 
 function getInitials(fullName: string | null, role: AppRole): string {
   if (fullName?.trim()) {
@@ -55,8 +66,20 @@ export function DashboardHeader({
   user: DashboardHeaderUser;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const pageTitle = pathname.split('/').at(-1)?.replace(/-/g, ' ') ?? 'overview';
   const initials = getInitials(user.fullName, role);
+  const [isSwitching, startTransition] = useTransition();
+  const otherRoles = ALL_ROLES.filter((r) => r !== role);
+
+  function handleSwitchRole(newRole: AppRole) {
+    if (isSwitching) return;
+    startTransition(async () => {
+      await updateProfileRole(newRole);
+      router.push('/dashboard');
+      router.refresh();
+    });
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
@@ -83,7 +106,7 @@ export function DashboardHeader({
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">
-              {ROLE_LABELS[role]} Workspace
+              {ROLE_SHORT[role]} Workspace
             </p>
             <Breadcrumb>
               <BreadcrumbList>
@@ -115,7 +138,7 @@ export function DashboardHeader({
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Account menu"
             >
               <Avatar className="size-8">
@@ -127,10 +150,29 @@ export function DashboardHeader({
               </span>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              Active Role
+            </DropdownMenuLabel>
             <DropdownMenuItem disabled className="font-medium">
-              {ROLE_LABELS[role]} account
+              <Check className="mr-2 size-3.5" />
+              {ROLE_LABELS[role]}
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              Switch Role
+            </DropdownMenuLabel>
+            {otherRoles.map((r) => (
+              <DropdownMenuItem
+                key={r}
+                disabled={isSwitching}
+                onSelect={() => handleSwitchRole(r)}
+              >
+                <Plus className="mr-2 size-3.5" />
+                {ROLE_LABELS[r]}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard/profile">Settings</Link>
             </DropdownMenuItem>

@@ -4,9 +4,13 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { requireVerifiedRole } from '@/server/guards/require-verified-role';
 import { requireRole } from '@/server/guards/require-role';
+import { requirePlan } from '@/server/guards/require-plan';
 import {
   createListing as createListingService,
   updateListing as updateListingService,
+  deleteListing as deleteListingService,
+  archiveListing as archiveListingService,
+  unpublishListing as unpublishListingService,
 } from '@/server/services/listings.service';
 import { createListingSchema, type CreateListingData } from '@/lib/validations/listing';
 import { ValidationError } from '@/server/errors/app-error';
@@ -22,6 +26,7 @@ export async function createListing(formData: CreateListingData) {
 
   if (d.status === 'published') {
     await requireVerifiedRole('landlord', { onFailure: 'throw' });
+    await requirePlan('starter', { action: 'publish_listing' });
   }
 
   await createListingService(user.id, {
@@ -87,6 +92,28 @@ export async function updateListing(listingId: string, formData: CreateListingDa
 
 export async function publishListing(listingId: string) {
   const user = await requireVerifiedRole('landlord', { onFailure: 'throw' });
+  await requirePlan('starter', { action: 'publish_listing' });
   await updateListingService(user.id, listingId, { status: 'published' });
   revalidatePath('/dashboard/landlord/listings');
+  revalidatePath(`/dashboard/landlord/listings/${listingId}`);
+}
+
+export async function unpublishListing(listingId: string) {
+  const user = await requireRole('landlord');
+  await unpublishListingService(user.id, listingId);
+  revalidatePath('/dashboard/landlord/listings');
+  revalidatePath(`/dashboard/landlord/listings/${listingId}`);
+}
+
+export async function archiveListing(listingId: string) {
+  const user = await requireRole('landlord');
+  await archiveListingService(user.id, listingId);
+  revalidatePath('/dashboard/landlord/listings');
+}
+
+export async function deleteListing(listingId: string) {
+  const user = await requireRole('landlord');
+  await deleteListingService(user.id, listingId);
+  revalidatePath('/dashboard/landlord/listings');
+  redirect('/dashboard/landlord/listings');
 }

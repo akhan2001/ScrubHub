@@ -4,8 +4,10 @@ import {
   fetchPublishedListings,
   fetchPublishedListingById,
   fetchListingOwnerById,
+  fetchListingById,
   insertListing as insertListingRepo,
   updateListingById,
+  deleteListingById,
   fetchPublishedListingsInBounds as fetchInBoundsRepo,
   fetchListingsByUserWithDetails,
   type InsertListingInput,
@@ -53,4 +55,20 @@ export async function updateListing(
 
 export async function getPublishedListingsInBounds(filters: MapBoundsFilter) {
   return fetchInBoundsRepo(filters);
+}
+
+export async function getListingById(id: string) {
+  return fetchListingById(id);
+}
+
+export async function deleteListing(userId: string, listingId: string): Promise<void> {
+  await deleteListingById(listingId, userId);
+}
+
+export async function archiveListing(userId: string, listingId: string): Promise<void> {
+  await updateListingById(listingId, userId, { status: 'archived' });
+}
+
+export async function unpublishListing(userId: string, listingId: string): Promise<void> {
+  await updateListingById(listingId, userId, { status: 'draft' });
 }

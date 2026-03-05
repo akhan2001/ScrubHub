@@ -191,6 +191,37 @@ export async function fetchPublishedListingsInBounds(
   return (data ?? []) as MapListingRow[];
 }
 
+export async function fetchListingById(
+  listingId: string
+): Promise<Listing | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('listings')
+    .select('*')
+    .eq('id', listingId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function deleteListingById(
+  listingId: string,
+  userId: string
+): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('listings')
+    .delete()
+    .eq('id', listingId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
 export async function fetchListingsByUserWithDetails(
   userId: string
 ): Promise<Listing[]> {

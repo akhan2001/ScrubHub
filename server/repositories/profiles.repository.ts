@@ -5,12 +5,17 @@ export async function fetchProfileById(userId: string): Promise<Profile | null> 
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, email, full_name, role, verification_state, verification_notes, phone_number, date_of_birth, avatar_url, created_at, updated_at')
+    .select('*')
     .eq('id', userId)
     .single();
 
   if (error) throw error;
-  return data;
+  if (!data) return null;
+
+  return {
+    ...data,
+    has_selected_role: data.has_selected_role ?? false,
+  } as Profile;
 }
 
 export async function fetchWorkerProfile(userId: string): Promise<WorkerProfile | null> {
@@ -111,6 +116,16 @@ export async function updateProfileRole(
     .eq('id', userId);
 
   if (error) throw error;
+}
+
+export async function markRoleSelected(userId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('profiles')
+    .update({ has_selected_role: true })
+    .eq('id', userId);
+
+  if (error && error.code !== 'PGRST204') throw error;
 }
 
 export async function updateProfileVerificationState(

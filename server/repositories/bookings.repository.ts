@@ -50,34 +50,55 @@ export async function fetchBookingsForLandlordWithTenantProfile(
   landlordUserId: string
 ): Promise<BookingWithTenantProfile[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  const { data: bookings, error: bookingsErr } = await supabase
     .from('bookings')
     .select(`
       id, listing_id, status, requested_at, move_in_date_requested,
       message_to_landlord, screening_result, credit_check_result,
-      background_check_result, tenant_user_id,
-      profiles!bookings_tenant_user_id_fkey (full_name, email, phone_number),
-      listings!bookings_listing_id_fkey (title)
+      background_check_result, tenant_user_id
     `)
     .eq('landlord_user_id', landlordUserId)
     .order('requested_at', { ascending: false });
 
-  if (error) throw error;
+  if (bookingsErr) throw bookingsErr;
+  if (!bookings || bookings.length === 0) return [];
 
-  return (data ?? []).map((row: Record<string, unknown>) => {
-    const profile = row.profiles as Record<string, unknown> | null;
-    const listing = row.listings as Record<string, unknown> | null;
+  const tenantIds = [...new Set(bookings.map((b) => b.tenant_user_id))];
+  const listingIds = [...new Set(bookings.map((b) => b.listing_id))];
+
+  const [profilesRes, listingsRes] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('id, full_name, email, phone_number')
+      .in('id', tenantIds),
+    supabase
+      .from('listings')
+      .select('id, title')
+      .in('id', listingIds),
+  ]);
+
+  const profileMap = new Map(
+    (profilesRes.data ?? []).map((p: Record<string, unknown>) => [p.id as string, p])
+  );
+  const listingMap = new Map(
+    (listingsRes.data ?? []).map((l: Record<string, unknown>) => [l.id as string, l])
+  );
+
+  return bookings.map((row) => {
+    const profile = profileMap.get(row.tenant_user_id);
+    const listing = listingMap.get(row.listing_id);
     return {
-      id: row.id as string,
-      listing_id: row.listing_id as string,
+      id: row.id,
+      listing_id: row.listing_id,
       status: row.status as BookingStatus,
-      requested_at: row.requested_at as string,
-      move_in_date_requested: row.move_in_date_requested as string | null,
-      message_to_landlord: row.message_to_landlord as string | null,
+      requested_at: row.requested_at,
+      move_in_date_requested: row.move_in_date_requested,
+      message_to_landlord: row.message_to_landlord,
       screening_result: row.screening_result,
       credit_check_result: row.credit_check_result,
       background_check_result: row.background_check_result,
-      tenant_user_id: row.tenant_user_id as string,
+      tenant_user_id: row.tenant_user_id,
       tenant_name: (profile?.full_name as string) ?? null,
       tenant_email: (profile?.email as string) ?? null,
       tenant_phone: (profile?.phone_number as string) ?? null,

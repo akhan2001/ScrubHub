@@ -7,6 +7,8 @@ export type PaymentStatus = 'pending' | 'requires_action' | 'succeeded' | 'faile
 export type OrganizationRole = 'admin' | 'manager' | 'viewer';
 export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
 export type JobStatus = 'draft' | 'published' | 'closed' | 'filled';
+export type PlanTier = 'free' | 'starter' | 'growth' | 'pro';
+export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled';
 
 export interface Profile {
   id: string;
@@ -18,6 +20,19 @@ export interface Profile {
   phone_number: string | null;
   date_of_birth: string | null;
   avatar_url: string | null;
+  has_selected_role: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  plan_tier: PlanTier;
+  status: SubscriptionStatus;
+  billing_cycle: 'monthly' | 'annual' | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
   created_at: string;
   updated_at: string;
 }
