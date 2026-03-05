@@ -235,14 +235,17 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
           <div className="space-y-2">
             <Label htmlFor="bedrooms">Bedrooms</Label>
             <Input id="bedrooms" type="number" min={0} step={1} {...register('bedrooms', { valueAsNumber: true })} />
+            {errors.bedrooms && <p className="text-sm text-destructive">{errors.bedrooms.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="bathrooms">Bathrooms</Label>
             <Input id="bathrooms" type="number" min={0} step={0.5} {...register('bathrooms', { valueAsNumber: true })} />
+            {errors.bathrooms && <p className="text-sm text-destructive">{errors.bathrooms.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="squareFootage">Square Footage</Label>
             <Input id="squareFootage" type="number" min={0} {...register('squareFootage', { valueAsNumber: true })} />
+            {errors.squareFootage && <p className="text-sm text-destructive">{errors.squareFootage.message}</p>}
           </div>
         </div>
       </section>
@@ -261,6 +264,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
           <div className="space-y-2">
             <Label htmlFor="depositAmount">Security Deposit ($)</Label>
             <Input id="depositAmount" type="number" min={0} {...register('depositAmount', { valueAsNumber: true })} placeholder="1800" />
+            {errors.depositAmount && <p className="text-sm text-destructive">{errors.depositAmount.message}</p>}
           </div>
         </div>
         <div className="space-y-2">

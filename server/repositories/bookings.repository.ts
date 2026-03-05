@@ -166,11 +166,11 @@ export async function updateBookingScreeningResults(
 
 export async function fetchBookingById(
   bookingId: string
-): Promise<Pick<Booking, 'id' | 'listing_id' | 'tenant_user_id' | 'landlord_user_id' | 'status'> | null> {
+): Promise<Pick<Booking, 'id' | 'listing_id' | 'tenant_user_id' | 'landlord_user_id' | 'status' | 'move_in_date_requested'> | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('bookings')
-    .select('id, listing_id, tenant_user_id, landlord_user_id, status')
+    .select('id, listing_id, tenant_user_id, landlord_user_id, status, move_in_date_requested')
     .eq('id', bookingId)
     .single();
 

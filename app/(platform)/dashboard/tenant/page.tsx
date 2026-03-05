@@ -42,6 +42,9 @@ export default async function TenantDashboardPage() {
             <Link href="/dashboard/tenant/bookings">View bookings</Link>
           </Button>
           <Button variant="outline" asChild>
+            <Link href="/dashboard/tenant/tenancy">My tenancy</Link>
+          </Button>
+          <Button variant="outline" asChild>
             <Link href="/dashboard/tenant/profile">Profile settings</Link>
           </Button>
         </CardContent>

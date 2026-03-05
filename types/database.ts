@@ -9,6 +9,11 @@ export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
 export type JobStatus = 'draft' | 'published' | 'closed' | 'filled';
 export type PlanTier = 'free' | 'starter' | 'growth' | 'pro';
 export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled';
+export type LeaseStatus = 'active' | 'terminating' | 'terminated' | 'expired';
+export type LeaseType = 'monthly' | 'fixed_term';
+export type RentalPeriod = 'monthly' | 'weekly';
+export type N9Reason = 'end_of_term' | 'moving_out' | 'mutual_agreement';
+export type N9Status = 'draft' | 'signed' | 'delivered' | 'acknowledged' | 'disputed';
 
 export interface Profile {
   id: string;
@@ -176,6 +181,39 @@ export interface OrgMembership {
   user_id: string;
   role: OrganizationRole;
   created_at: string;
+}
+
+export interface Lease {
+  id: string;
+  booking_id: string | null;
+  listing_id: string;
+  tenant_user_id: string;
+  landlord_user_id: string;
+  status: LeaseStatus;
+  lease_type: LeaseType;
+  rental_period: RentalPeriod;
+  start_date: string;
+  end_date: string | null;
+  monthly_rent_cents: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface N9Notice {
+  id: string;
+  lease_id: string;
+  tenant_user_id: string;
+  reason: N9Reason;
+  termination_date: string;
+  status: N9Status;
+  signature_name: string | null;
+  signature_date: string | null;
+  signature_ip: string | null;
+  pdf_url: string | null;
+  landlord_acknowledged_at: string | null;
+  landlord_notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface JobPost {

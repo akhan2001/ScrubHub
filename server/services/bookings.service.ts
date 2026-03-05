@@ -15,6 +15,7 @@ import { createPaymentIntent } from '@/lib/integrations/stripe';
 import { sendSms } from '@/lib/integrations/twilio';
 import { logAuditEvent } from '@/server/services/audit.service';
 import { evaluateApplication } from '@/server/services/screening.service';
+import { tryCreateLeaseFromApproval } from '@/server/services/leases.service';
 import type { BookingStatus } from '@/types/database';
 
 export async function getTenantBookings(tenantUserId: string) {
@@ -94,6 +95,14 @@ export async function setBookingStatus(input: {
     event_type: 'booking_status_updated',
     payload: { status: input.nextStatus },
   });
+
+  if (input.nextStatus === 'approved') {
+    try {
+      await tryCreateLeaseFromApproval(input.bookingId);
+    } catch {
+      // Lease creation failure should not block the booking approval
+    }
+  }
 
   const notifyPhone = process.env.DEFAULT_BOOKING_ALERT_PHONE;
   if (notifyPhone) {

@@ -1,6 +1,7 @@
 import { fetchBookingById, updateBookingScreeningResults, updateBookingStatus } from '@/server/repositories/bookings.repository';
 import { fetchScreeningRuleForListing } from '@/server/repositories/screening-rules.repository';
 import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
+import { tryCreateLeaseFromApproval } from '@/server/services/leases.service';
 import type { ScreeningRule } from '@/types/database';
 
 interface CheckResult {
@@ -79,6 +80,12 @@ export async function evaluateApplication(bookingId: string): Promise<void> {
       body: `A tenant application was auto-approved based on your screening rules.`,
       metadata: { bookingId, listingId: booking.listing_id },
     });
+
+    try {
+      await tryCreateLeaseFromApproval(bookingId);
+    } catch {
+      // Lease creation failure should not block auto-approval
+    }
   } else if (!overallPass) {
     await updateBookingStatus(bookingId, 'reviewing');
 

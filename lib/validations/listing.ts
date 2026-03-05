@@ -28,18 +28,36 @@ export const createListingSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   unitNumber: z.string().optional(),
-  bedrooms: z.number().min(0).optional(),
-  bathrooms: z.number().min(0).optional(),
-  squareFootage: z.number().min(0).optional(),
-  monthlyRent: z.number().min(0, 'Rent must be positive'),
-  depositAmount: z.number().min(0).optional(),
+  bedrooms: z.preprocess(
+    (v) => (v === '' || (typeof v === 'number' && Number.isNaN(v)) ? undefined : v),
+    z.number().min(0, 'Cannot be negative').optional()
+  ),
+  bathrooms: z.preprocess(
+    (v) => (v === '' || (typeof v === 'number' && Number.isNaN(v)) ? undefined : v),
+    z.number().min(0, 'Cannot be negative').optional()
+  ),
+  squareFootage: z.preprocess(
+    (v) => (v === '' || (typeof v === 'number' && Number.isNaN(v)) ? undefined : v),
+    z.number().min(0, 'Cannot be negative').optional()
+  ),
+  monthlyRent: z
+    .number({ required_error: 'Monthly rent is required' })
+    .refine((v) => !Number.isNaN(v), 'Monthly rent is required')
+    .min(0, 'Rent must be 0 or greater'),
+  depositAmount: z.preprocess(
+    (v) => (v === '' || (typeof v === 'number' && Number.isNaN(v)) ? undefined : v),
+    z.number().min(0, 'Cannot be negative').optional()
+  ),
   leaseTerms: z.array(z.string()).min(1, 'Select at least one lease term'),
   isFurnished: z.boolean(),
   arePetsAllowed: z.boolean(),
   amenities: z.array(z.string()),
-  images: z.array(z.string()).min(1, 'Upload at least one photo'),
+  images: z.array(z.string()),
   availableDate: z.string().refine((v) => !isNaN(Date.parse(v)), 'Invalid date'),
   status: z.enum(['draft', 'published']),
-});
+}).refine(
+  (data) => data.status !== 'published' || data.images.length >= 1,
+  { message: 'Upload at least one photo to publish', path: ['images'] }
+);
 
 export type CreateListingData = z.infer<typeof createListingSchema>;

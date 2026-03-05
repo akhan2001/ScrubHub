@@ -7,20 +7,17 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const origin = request.nextUrl.origin;
 
   const appUrl = getAppUrl();
-  let redirectTarget: string;
-  if (redirectTo.startsWith('http')) {
-    redirectTarget = redirectTo;
-  } else if (appUrl) {
-    redirectTarget = `${appUrl}${redirectTo.startsWith('/') ? '' : '/'}${redirectTo}`;
-  } else {
-    redirectTarget = redirectTo === '/dashboard'
-      ? `${request.nextUrl.origin}${getAppDashboardUrl()}`
-      : `${request.nextUrl.origin}${redirectTo}`;
+
+  function buildRedirect(path: string): string {
+    if (path.startsWith('http')) return path;
+    if (appUrl) return `${appUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+    return `${origin}${path.startsWith('/') ? path : `/${path}`}`;
   }
 
-  const response = NextResponse.redirect(redirectTarget);
+  const response = NextResponse.redirect(buildRedirect('/dashboard'));
 
   if (code) {
     const supabase = createServerClient(
@@ -41,8 +38,13 @@ export async function GET(request: NextRequest) {
     );
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').update({ verification_state: 'verified' }).eq('id', user.id);
+      }
+      response.headers.set('Location', buildRedirect('/auth/confirm-success'));
       return response;
     }
   }
-  return NextResponse.redirect(`${request.nextUrl.origin}/login?error=auth`);
+  return NextResponse.redirect(`${origin}/login?error=auth`);
 }

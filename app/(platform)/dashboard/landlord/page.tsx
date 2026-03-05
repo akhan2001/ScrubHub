@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ListingsTable } from '@/components/dashboard/listings-table';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
+import { N9LandlordSection } from '@/components/n9/N9LandlordSection';
 
 export default async function LandlordDashboardPage() {
   const user = await requireRole('landlord');
@@ -39,7 +40,11 @@ export default async function LandlordDashboardPage() {
         <KpiCard title="Total listings" value={`${count}`} trend="Across all active and draft properties" />
         <KpiCard title="Active applications" value={`${activeApplications}`} trend="Awaiting landlord decision" />
         <KpiCard title="Pending approvals" value={`${pendingApprovals}`} trend="Require payment follow-up" />
-        <KpiCard title="Revenue (MTD)" value="$12,450" trend="+8.2% compared to last month" />
+        <KpiCard
+          title="Revenue (MTD)"
+          value={count === 0 ? '—' : '$0'}
+          trend={count === 0 ? 'Create listings to get started' : 'From approved bookings'}
+        />
       </div>
 
       {profile?.verification_state !== 'verified' && (
@@ -58,6 +63,8 @@ export default async function LandlordDashboardPage() {
           </Button>
         </div>
       )}
+
+      <N9LandlordSection />
 
       <Card>
         <CardHeader className="flex items-center justify-between gap-3 md:flex-row">

@@ -26,6 +26,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { NotificationsPanel } from '@/components/dashboard/notifications-panel';
 import { IconButton } from '@/components/ui/icon-button';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const ROLE_LABELS: Record<AppRole, string> = {
@@ -75,9 +76,13 @@ export function DashboardHeader({
   function handleSwitchRole(newRole: AppRole) {
     if (isSwitching) return;
     startTransition(async () => {
-      await updateProfileRole(newRole);
-      router.push('/dashboard');
-      router.refresh();
+      try {
+        await updateProfileRole(newRole);
+        router.push('/dashboard');
+        router.refresh();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to switch role');
+      }
     });
   }
 

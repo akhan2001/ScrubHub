@@ -2,8 +2,8 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { ImagePlus, GripVertical, X, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { uploadListingPhoto } from '@/lib/integrations/supabase-storage';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 interface PhotoUploadProps {
@@ -29,8 +29,9 @@ export function PhotoUpload({ value, onChange, max = 20 }: PhotoUploadProps) {
       try {
         const urls = await Promise.all(batch.map((f) => uploadListingPhoto(f)));
         onChange([...value, ...urls]);
-      } catch {
-        // Storage upload failed — silently skip for now
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Upload failed';
+        toast.error(message);
       } finally {
         setUploading(false);
       }
