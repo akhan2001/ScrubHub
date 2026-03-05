@@ -102,6 +102,55 @@ export async function fetchN9NoticesForLandlord(landlordUserId: string): Promise
   });
 }
 
+export async function fetchAllN9NoticesForLandlord(landlordUserId: string): Promise<
+  (N9Notice & { lease_tenant_name: string | null; lease_address: string | null })[]
+> {
+  const supabase = await createClient();
+
+  const { data: leases, error: leasesErr } = await supabase
+    .from('leases')
+    .select('id, listing_id, tenant_user_id')
+    .eq('landlord_user_id', landlordUserId);
+
+  if (leasesErr) throw leasesErr;
+  if (!leases?.length) return [];
+
+  const leaseIds = leases.map((l) => l.id);
+  const { data: notices, error: noticesErr } = await supabase
+    .from('n9_notices')
+    .select('*')
+    .in('lease_id', leaseIds)
+    .order('created_at', { ascending: false });
+
+  if (noticesErr) throw noticesErr;
+  if (!notices?.length) return [];
+
+  const tenantIds = [...new Set(leases.map((l) => l.tenant_user_id))];
+  const listingIds = [...new Set(leases.map((l) => l.listing_id))];
+
+  const [profilesRes, listingsRes] = await Promise.all([
+    supabase.from('profiles').select('id, full_name').in('id', tenantIds),
+    supabase.from('listings').select('id, address').in('id', listingIds),
+  ]);
+
+  const profileMap = new Map(
+    (profilesRes.data ?? []).map((p: { id: string; full_name: string | null }) => [p.id, p.full_name])
+  );
+  const listingMap = new Map(
+    (listingsRes.data ?? []).map((l: { id: string; address: string | null }) => [l.id, l.address])
+  );
+  const leaseMap = new Map(leases.map((l) => [l.id, l]));
+
+  return notices.map((n) => {
+    const lease = leaseMap.get(n.lease_id);
+    return {
+      ...n,
+      lease_tenant_name: lease ? (profileMap.get(lease.tenant_user_id) ?? null) : null,
+      lease_address: lease ? (listingMap.get(lease.listing_id) ?? null) : null,
+    };
+  });
+}
+
 export async function updateN9NoticeSignature(
   noticeId: string,
   input: {

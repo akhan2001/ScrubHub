@@ -10,6 +10,7 @@ import {
   signAndDeliverN9,
   acknowledgeN9,
   getN9NoticesForLandlord,
+  getAllN9NoticesForLandlord,
 } from '@/server/services/n9.service';
 import { fetchN9NoticesForLease } from '@/server/repositories/n9-notices.repository';
 import type { N9Reason } from '@/types/database';
@@ -51,23 +52,30 @@ export async function signN9Action(noticeId: string, signatureName: string) {
   });
   revalidatePath('/dashboard/tenant/tenancy');
   revalidatePath('/dashboard/landlord');
+  revalidatePath('/dashboard/landlord/notices');
   return result;
 }
 
 export async function acknowledgeN9Action(noticeId: string, notes?: string) {
   const user = await requireRole('landlord');
-  await acknowledgeN9(({
+  await acknowledgeN9({
     noticeId,
     landlordUserId: user.id,
     notes,
-  }));
+  });
   revalidatePath('/dashboard/landlord');
+  revalidatePath('/dashboard/landlord/notices');
   revalidatePath('/dashboard/tenant/tenancy');
 }
 
 export async function getLandlordN9NoticesAction() {
   const user = await requireRole('landlord');
   return getN9NoticesForLandlord(user.id);
+}
+
+export async function getAllLandlordN9NoticesAction() {
+  const user = await requireRole('landlord');
+  return getAllN9NoticesForLandlord(user.id);
 }
 
 export async function getN9NoticesForLeaseAction(leaseId: string) {

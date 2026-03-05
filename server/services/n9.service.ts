@@ -6,6 +6,7 @@ import {
   updateN9NoticeStatus,
   acknowledgeN9Notice as acknowledgeN9NoticeRepo,
   fetchN9NoticesForLandlord,
+  fetchAllN9NoticesForLandlord,
 } from '@/server/repositories/n9-notices.repository';
 import { fetchLeaseById, updateLeaseStatus } from '@/server/repositories/leases.repository';
 import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
@@ -219,6 +220,10 @@ export async function acknowledgeN9(input: {
 
 export async function getN9NoticesForLandlord(landlordUserId: string) {
   return fetchN9NoticesForLandlord(landlordUserId);
+}
+
+export async function getAllN9NoticesForLandlord(landlordUserId: string) {
+  return fetchAllN9NoticesForLandlord(landlordUserId);
 }
 
 export async function getN9NoticeWithLease(noticeId: string) {

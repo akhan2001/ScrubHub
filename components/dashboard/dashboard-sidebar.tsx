@@ -6,6 +6,7 @@ import {
   Building2,
   CircleCheckBig,
   ClipboardList,
+  FileText,
   Home,
   ReceiptText,
   Search,
@@ -27,6 +28,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/tenant', label: 'Overview', icon: Home },
         { href: '/dashboard/listings', label: 'Search listings', icon: Search },
         { href: '/dashboard/tenant/bookings', label: 'My bookings', icon: ClipboardList },
+        { href: '/dashboard/tenant/tenancy', label: 'My tenancy', icon: FileText },
       ],
     },
     {
@@ -43,6 +45,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/landlord', label: 'Overview', icon: Home },
         { href: '/dashboard/landlord/listings', label: 'Listings', icon: Building2 },
         { href: '/dashboard/landlord/approvals', label: 'Approvals', icon: CircleCheckBig },
+        { href: '/dashboard/landlord/notices', label: 'Notices', icon: FileText },
         { href: '/dashboard/landlord/screening-rules', label: 'Screening rules', icon: ShieldCheck },
       ],
     },
