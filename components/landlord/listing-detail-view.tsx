@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { ListingScreeningRules } from '@/components/landlord/listing-screening-rules';
+import { ListingModal } from '@/components/listings/ListingModal';
 import { toast } from 'sonner';
 import type { Listing, ScreeningRule } from '@/types/database';
 import type { BookingWithTenantProfile } from '@/server/repositories/bookings.repository';
@@ -47,6 +48,7 @@ export function ListingDetailView({
   const [isPending, startTransition] = useTransition();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const price = listing.price_cents != null
     ? `$${Math.round(listing.price_cents / 100).toLocaleString()}`
@@ -96,6 +98,7 @@ export function ListingDetailView({
       try {
         await deleteListing(listing.id);
         toast.success('Listing deleted');
+        router.push('/dashboard/landlord/listings');
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Failed to delete');
       }
@@ -110,11 +113,9 @@ export function ListingDetailView({
           {statusBadge.label}
         </Badge>
         <div className="flex-1" />
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`/listings/${listing.id}`}>
-            <Eye className="mr-1.5 size-3.5" />
-            Public view
-          </Link>
+        <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
+          <Eye className="mr-1.5 size-3.5" />
+          Public view
         </Button>
         <Button variant="outline" size="sm" asChild>
           <Link href={`/dashboard/landlord/listings/${listing.id}/edit`}>
@@ -323,6 +324,13 @@ export function ListingDetailView({
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Public view modal */}
+      <ListingModal
+        listing={listing}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+      />
 
       {/* Confirm dialogs */}
       <ConfirmDialog

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BedDouble, Bath, Ruler } from "lucide-react";
 import type { ListingWithCoordinates } from "@/lib/map/mock-coordinates";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 
 type ListingPreviewProps = {
   listing: ListingWithCoordinates;
+  onViewDetails?: () => void;
 };
 
 function formatPrice(cents: number | null) {
@@ -14,7 +14,7 @@ function formatPrice(cents: number | null) {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
-export function ListingPreview({ listing }: ListingPreviewProps) {
+export function ListingPreview({ listing, onViewDetails }: ListingPreviewProps) {
   const coverImage = listing.images?.[0];
 
   return (
@@ -55,8 +55,8 @@ export function ListingPreview({ listing }: ListingPreviewProps) {
           <p className="text-lg font-semibold text-foreground">
             {formatPrice(listing.price_cents)}<span className="text-sm font-normal text-muted-foreground">/mo</span>
           </p>
-          <Button asChild size="sm">
-            <Link href={`/listings/${listing.id}`}>View details</Link>
+          <Button size="sm" onClick={onViewDetails}>
+            View details
           </Button>
         </div>
       </CardContent>

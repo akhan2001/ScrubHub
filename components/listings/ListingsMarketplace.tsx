@@ -57,11 +57,15 @@ export function ListingsMarketplace({ listings: initialListings }: ListingsMarke
   }, [initialListings, dynamicListings]);
 
   const selectedFromQuery = searchParams.get("listing");
+  const shouldAutoOpenDetail = searchParams.get("view") === "detail";
   const initialListing =
     selectedFromQuery && mappedListings.some((entry) => entry.id === selectedFromQuery)
       ? selectedFromQuery
       : null;
   const [activeListingId, setActiveListingId] = useState<string | null>(initialListing);
+  const [autoOpenListingId] = useState<string | null>(
+    shouldAutoOpenDetail && initialListing ? initialListing : null
+  );
   const effectiveActiveId = activeListingId ?? mappedListings[0]?.id ?? null;
 
   useEffect(() => {
@@ -69,6 +73,7 @@ export function ListingsMarketplace({ listings: initialListings }: ListingsMarke
     if (searchParams.get("listing") === effectiveActiveId) return;
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set("listing", effectiveActiveId);
+    nextParams.delete("view");
     router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
   }, [effectiveActiveId, pathname, router, searchParams]);
 
@@ -172,6 +177,7 @@ export function ListingsMarketplace({ listings: initialListings }: ListingsMarke
               hoveredListingId={hoveredListingId}
               onSelectListing={setActiveListingId}
               onHoverListing={setHoveredListingId}
+              autoOpenListingId={autoOpenListingId}
               className="h-full rounded-none border-0 border-l border-border lg:rounded-none"
             />
           </div>

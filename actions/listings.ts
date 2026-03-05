@@ -115,5 +115,4 @@ export async function deleteListing(listingId: string) {
   const user = await requireRole('landlord');
   await deleteListingService(user.id, listingId);
   revalidatePath('/dashboard/landlord/listings');
-  redirect('/dashboard/landlord/listings');
 }
