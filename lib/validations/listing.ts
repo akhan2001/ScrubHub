@@ -41,9 +41,9 @@ export const createListingSchema = z.object({
     z.number().min(0, 'Cannot be negative').optional()
   ),
   monthlyRent: z
-    .number({ required_error: 'Monthly rent is required' })
+    .number()
     .refine((v) => !Number.isNaN(v), 'Monthly rent is required')
-    .min(0, 'Rent must be 0 or greater'),
+    .refine((v) => v >= 0, 'Rent must be 0 or greater'),
   depositAmount: z.preprocess(
     (v) => (v === '' || (typeof v === 'number' && Number.isNaN(v)) ? undefined : v),
     z.number().min(0, 'Cannot be negative').optional()

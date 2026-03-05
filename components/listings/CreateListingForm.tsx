@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createListingSchema, LEASE_TERM_OPTIONS, type CreateListingData } from '@/lib/validations/listing';
 import { createListing, updateListing } from '@/actions/listings';
@@ -35,7 +35,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
     watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateListingData>({
-    resolver: zodResolver(createListingSchema),
+    resolver: zodResolver(createListingSchema) as Resolver<CreateListingData>,
     defaultValues: initialData
       ? {
           title: initialData.title,
