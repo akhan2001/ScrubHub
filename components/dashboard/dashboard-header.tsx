@@ -30,8 +30,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const ROLE_LABELS: Record<AppRole, string> = {
-  tenant: 'Healthcare Professional',
-  landlord: 'Property Owner',
+  tenant: 'Tenant',
+  landlord: 'Landlord',
   enterprise: 'Enterprise',
 };
 

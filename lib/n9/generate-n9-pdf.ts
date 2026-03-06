@@ -1,180 +1,243 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 export interface N9PdfData {
-  tenantName: string;
   landlordName: string;
+  tenantName: string;
   rentalAddress: string;
-  unitNumber: string | null;
-  terminationDate: string;
-  reason: string;
-  signatureName: string;
-  signatureDate: string;
-  monthlyRent: string;
-  leaseStartDate: string;
+  terminationDate: string; // dd/mm/yyyy
+  signatureFirstName: string;
+  signatureLastName: string;
+  phoneNumber: string;
+  signatureDate: string; // dd/mm/yyyy
 }
 
 const MARGIN_LEFT = 50;
 const MARGIN_RIGHT = 50;
-const PAGE_TOP = 770;
-const LINE_HEIGHT = 16;
-const SECTION_GAP = 24;
+const PAGE_TOP = 750;
+const LINE_HEIGHT = 15;
 
 export async function generateN9Pdf(data: N9PdfData): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
-  const page = doc.addPage([612, 792]); // Letter size
-
   const fontRegular = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const fontItalic = await doc.embedFont(StandardFonts.HelveticaOblique);
 
   const pageWidth = 612;
+  const pageHeight = 792;
   const contentWidth = pageWidth - MARGIN_LEFT - MARGIN_RIGHT;
+
+  // --- Page 1 ---
+  const page1 = doc.addPage([pageWidth, pageHeight]);
   let y = PAGE_TOP;
 
-  function drawText(
+  function draw(
+    page: ReturnType<typeof doc.addPage>,
     text: string,
-    options: {
+    opts: {
       font?: typeof fontRegular;
       size?: number;
       color?: ReturnType<typeof rgb>;
       x?: number;
-      maxWidth?: number;
     } = {}
   ) {
-    const font = options.font ?? fontRegular;
-    const size = options.size ?? 10;
-    const color = options.color ?? rgb(0, 0, 0);
-    const x = options.x ?? MARGIN_LEFT;
-
+    const font = opts.font ?? fontRegular;
+    const size = opts.size ?? 10;
+    const color = opts.color ?? rgb(0, 0, 0);
+    const x = opts.x ?? MARGIN_LEFT;
     page.drawText(text, { x, y, size, font, color });
     y -= LINE_HEIGHT;
   }
 
-  function drawWrappedText(
+  function drawWrapped(
+    page: ReturnType<typeof doc.addPage>,
     text: string,
-    options: {
-      font?: typeof fontRegular;
-      size?: number;
-      maxWidth?: number;
-    } = {}
+    opts: { font?: typeof fontRegular; size?: number; maxWidth?: number } = {}
   ) {
-    const font = options.font ?? fontRegular;
-    const size = options.size ?? 10;
-    const maxWidth = options.maxWidth ?? contentWidth;
-
+    const font = opts.font ?? fontRegular;
+    const size = opts.size ?? 10;
+    const maxWidth = opts.maxWidth ?? contentWidth;
     const words = text.split(' ');
     let line = '';
-
     for (const word of words) {
       const test = line ? `${line} ${word}` : word;
-      const width = font.widthOfTextAtSize(test, size);
-      if (width > maxWidth && line) {
-        drawText(line, { font, size });
+      if (font.widthOfTextAtSize(test, size) > maxWidth && line) {
+        draw(page, line, { font, size });
         line = word;
       } else {
         line = test;
       }
     }
-    if (line) {
-      drawText(line, { font, size });
-    }
+    if (line) draw(page, line, { font, size });
   }
 
-  function drawLine() {
+  function drawHorizontalLine(page: ReturnType<typeof doc.addPage>) {
     page.drawLine({
       start: { x: MARGIN_LEFT, y: y + 8 },
       end: { x: pageWidth - MARGIN_RIGHT, y: y + 8 },
       thickness: 0.5,
-      color: rgb(0.7, 0.7, 0.7),
+      color: rgb(0.6, 0.6, 0.6),
     });
-    y -= 8;
+    y -= 6;
   }
 
-  function sectionGap() {
-    y -= SECTION_GAP;
+  function gap(px = 12) {
+    y -= px;
   }
 
   // Header
-  drawText('FORM N9', { font: fontBold, size: 18 });
-  y -= 4;
-  drawText("Tenant's Notice to Terminate the Tenancy", { font: fontBold, size: 12 });
-  y -= 2;
-  drawText('Residential Tenancies Act, 2006', { size: 8, color: rgb(0.4, 0.4, 0.4) });
-  sectionGap();
-  drawLine();
-  sectionGap();
+  draw(page1, "Tenant's Notice to End the Tenancy", { font: fontBold, size: 16 });
+  gap(2);
+  draw(page1, 'N9', { font: fontBold, size: 24 });
+  gap(4);
+  drawHorizontalLine(page1);
+  gap(8);
 
-  // Section 1: Addresses
-  drawText('1. Address of the Rental Unit', { font: fontBold, size: 11 });
-  y -= 4;
-  const fullAddress = data.unitNumber
-    ? `Unit ${data.unitNumber}, ${data.rentalAddress}`
-    : data.rentalAddress;
-  drawWrappedText(fullAddress);
-  sectionGap();
+  // To / From line
+  draw(page1, `To:  ${data.landlordName}`, { font: fontBold, size: 11 });
+  gap(2);
+  draw(page1, `From:  ${data.tenantName}`, { font: fontBold, size: 11 });
+  gap(8);
 
-  // Section 2: Landlord
-  drawText('2. Landlord Name', { font: fontBold, size: 11 });
-  y -= 4;
-  drawText(data.landlordName);
-  sectionGap();
+  // Address
+  draw(page1, 'Address of the Rental Unit:', { font: fontBold, size: 11 });
+  gap(2);
+  drawWrapped(page1, data.rentalAddress, { size: 11 });
+  gap(12);
+  drawHorizontalLine(page1);
+  gap(8);
 
-  // Section 3: Tenant
-  drawText('3. Tenant Name', { font: fontBold, size: 11 });
-  y -= 4;
-  drawText(data.tenantName);
-  sectionGap();
+  // Statement
+  drawWrapped(page1, 'I am giving this notice because I want to move out of the rental unit.', {
+    size: 11,
+  });
+  gap(12);
 
-  // Section 4: Lease details
-  drawText('4. Tenancy Details', { font: fontBold, size: 11 });
-  y -= 4;
-  drawText(`Lease start date: ${data.leaseStartDate}`);
-  drawText(`Monthly rent: ${data.monthlyRent}`);
-  sectionGap();
-
-  // Section 5: Termination
-  drawText('5. Termination Date', { font: fontBold, size: 11 });
-  y -= 4;
-  drawText(`I want to terminate my tenancy on: ${data.terminationDate}`, { font: fontBold });
-  sectionGap();
-
-  // Section 6: Reason
-  drawText('6. Reason for Termination', { font: fontBold, size: 11 });
-  y -= 4;
-  const reasonText =
-    data.reason === 'end_of_term'
-      ? 'End of fixed-term lease'
-      : data.reason === 'moving_out'
-        ? 'Moving out (periodic tenancy)'
-        : 'Mutual agreement with landlord';
-  drawText(reasonText);
-  sectionGap();
-  drawLine();
-  sectionGap();
-
-  // Signature block
-  drawText('7. Signature', { font: fontBold, size: 11 });
-  y -= 4;
-  drawWrappedText(
-    'I confirm that the information in this notice is true and that I am giving this notice ' +
-      'in good faith. I understand that this notice terminates my tenancy on the date specified above.'
+  // Termination date
+  draw(page1, 'The last day of my tenancy will be:', { font: fontBold, size: 11 });
+  gap(4);
+  draw(page1, data.terminationDate, { font: fontBold, size: 14 });
+  gap(2);
+  draw(page1, 'This is the termination date.', { size: 10, font: fontItalic });
+  gap(4);
+  drawWrapped(
+    page1,
+    'I will move out of the rental unit on or before the termination date.',
+    { size: 10 }
   );
-  y -= 8;
+  gap(16);
+  drawHorizontalLine(page1);
+  gap(8);
 
-  drawText(`Signed by: ${data.signatureName}`, { font: fontBold });
-  drawText(`Date signed: ${data.signatureDate}`);
-  sectionGap();
-  drawLine();
+  // Important Information
+  draw(page1, 'Important Information from the Landlord and Tenant Board', {
+    font: fontBold,
+    size: 11,
+  });
+  gap(6);
 
-  // Footer
-  y -= 4;
-  drawText(
-    'This form was generated by ScrubHub in accordance with the Ontario Residential Tenancies Act, 2006.',
-    { size: 7, color: rgb(0.5, 0.5, 0.5) }
+  draw(page1, 'The termination date', { font: fontBold, size: 9 });
+  gap(2);
+  drawWrapped(
+    page1,
+    'For most types of tenancies (including monthly tenancies) the termination date must be at least 60 days after the tenant gives the landlord this notice. Also, the termination date must be the last day of the rental period.',
+    { size: 8 }
   );
-  drawText(
-    'Landlord and Tenant Board (LTB) — Form N9: Tenant\'s Notice to Terminate the Tenancy.',
-    { size: 7, color: rgb(0.5, 0.5, 0.5) }
+  gap(6);
+
+  draw(page1, 'Exceptions:', { font: fontBold, size: 9 });
+  gap(2);
+  drawWrapped(
+    page1,
+    'The termination date must be at least 28 days after notice if the tenancy is daily or weekly. The termination date must be the last day of the rental period.',
+    { size: 8 }
   );
+  gap(4);
+  drawWrapped(
+    page1,
+    'A special rule allows less than 60 days notice in some situations. The tenant can give notice for the end of February no later than January 1st and notice for the end of March no later than February 1st.',
+    { size: 8 }
+  );
+  gap(8);
+
+  draw(page1, 'The landlord can apply to end the tenancy', { font: fontBold, size: 9 });
+  gap(2);
+  drawWrapped(
+    page1,
+    'The landlord can apply to the Board for an order to end the tenancy and evict the tenant as soon as the tenant gives the landlord this notice. However, the order will not require the tenant to move out any earlier than the termination date in this notice.',
+    { size: 8 }
+  );
+  gap(16);
+
+  // Footer page 1
+  draw(page1, 'Page 1 of 2', {
+    size: 8,
+    color: rgb(0.5, 0.5, 0.5),
+    x: pageWidth / 2 - 20,
+  });
+
+  // --- Page 2: Signature ---
+  const page2 = doc.addPage([pageWidth, pageHeight]);
+  y = PAGE_TOP;
+
+  draw(page2, 'Signature', { font: fontBold, size: 16 });
+  gap(4);
+  drawHorizontalLine(page2);
+  gap(12);
+
+  // Signer type
+  draw(page2, 'Signed by:    [X] Tenant    [ ] Representative', { size: 10 });
+  gap(12);
+
+  // Name fields
+  draw(page2, 'First Name', { font: fontBold, size: 9 });
+  gap(2);
+  draw(page2, data.signatureFirstName, { size: 11 });
+  gap(8);
+
+  draw(page2, 'Last Name', { font: fontBold, size: 9 });
+  gap(2);
+  draw(page2, data.signatureLastName, { size: 11 });
+  gap(8);
+
+  // Phone
+  draw(page2, 'Phone Number', { font: fontBold, size: 9 });
+  gap(2);
+  draw(page2, data.phoneNumber || 'N/A', { size: 11 });
+  gap(12);
+  drawHorizontalLine(page2);
+  gap(8);
+
+  // Signature + date
+  draw(page2, 'Signature', { font: fontBold, size: 9 });
+  gap(2);
+  draw(page2, `${data.signatureFirstName} ${data.signatureLastName}`, {
+    font: fontItalic,
+    size: 12,
+  });
+  gap(8);
+
+  draw(page2, 'Date (dd/mm/yyyy)', { font: fontBold, size: 9 });
+  gap(2);
+  draw(page2, data.signatureDate, { size: 11 });
+  gap(16);
+  drawHorizontalLine(page2);
+  gap(8);
+
+  // Generated-by footer
+  draw(page2, 'This form was generated by ScrubHub in accordance with the Ontario Residential Tenancies Act, 2006.', {
+    size: 7,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+  draw(page2, "Landlord and Tenant Board (LTB) -- Form N9: Tenant's Notice to End the Tenancy.", {
+    size: 7,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+  gap(8);
+  draw(page2, 'Page 2 of 2', {
+    size: 8,
+    color: rgb(0.5, 0.5, 0.5),
+    x: pageWidth / 2 - 20,
+  });
 
   return doc.save();
 }

@@ -85,8 +85,15 @@ export async function createN9Draft(input: {
 export async function signAndDeliverN9(input: {
   noticeId: string;
   tenantUserId: string;
-  signatureName: string;
+  signatureFirstName: string;
+  signatureLastName: string;
   signatureIp: string;
+  formOverrides?: {
+    landlordName?: string;
+    tenantName?: string;
+    rentalAddress?: string;
+    phoneNumber?: string;
+  };
 }) {
   const notice = await fetchN9NoticeById(input.noticeId);
   if (!notice) throw new Error('N9 notice not found');
@@ -101,32 +108,25 @@ export async function signAndDeliverN9(input: {
   if (!leaseDetails) throw new Error('Lease not found');
 
   const signatureDate = new Date().toISOString();
-  const formattedSignDate = new Date(signatureDate).toLocaleDateString('en-CA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const formattedTermDate = new Date(notice.termination_date).toLocaleDateString('en-CA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const termDate = new Date(notice.termination_date + 'T00:00:00');
+  const signDate = new Date(signatureDate);
+
+  const formatDdMmYyyy = (d: Date) =>
+    `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
+  const fullAddress = leaseDetails.listing_unit_number
+    ? `Unit ${leaseDetails.listing_unit_number}, ${leaseDetails.listing_address ?? 'Address not available'}`
+    : (leaseDetails.listing_address ?? 'Address not available');
 
   const pdfBytes = await generateN9Pdf({
-    tenantName: leaseDetails.tenant_name ?? 'Unknown Tenant',
-    landlordName: leaseDetails.landlord_name ?? 'Unknown Landlord',
-    rentalAddress: leaseDetails.listing_address ?? 'Address not available',
-    unitNumber: leaseDetails.listing_unit_number,
-    terminationDate: formattedTermDate,
-    reason: notice.reason,
-    signatureName: input.signatureName,
-    signatureDate: formattedSignDate,
-    monthlyRent: `$${(leaseDetails.monthly_rent_cents / 100).toFixed(2)}`,
-    leaseStartDate: new Date(leaseDetails.start_date).toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }),
+    landlordName: input.formOverrides?.landlordName || leaseDetails.landlord_name || 'Unknown Landlord',
+    tenantName: input.formOverrides?.tenantName || leaseDetails.tenant_name || 'Unknown Tenant',
+    rentalAddress: input.formOverrides?.rentalAddress || fullAddress,
+    terminationDate: formatDdMmYyyy(termDate),
+    signatureFirstName: input.signatureFirstName,
+    signatureLastName: input.signatureLastName,
+    phoneNumber: input.formOverrides?.phoneNumber ?? '',
+    signatureDate: formatDdMmYyyy(signDate),
   });
 
   const supabase = await createClient();
@@ -146,8 +146,15 @@ export async function signAndDeliverN9(input: {
 
   const pdfUrl = urlData?.signedUrl ?? '';
 
+  const fullSignatureName = `${input.signatureFirstName} ${input.signatureLastName}`;
+  const formattedTermDate = termDate.toLocaleDateString('en-CA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   await updateN9NoticeSignature(input.noticeId, {
-    signature_name: input.signatureName,
+    signature_name: fullSignatureName,
     signature_date: signatureDate,
     signature_ip: input.signatureIp,
     pdf_url: pdfUrl,
@@ -160,7 +167,7 @@ export async function signAndDeliverN9(input: {
     user_id: leaseDetails.landlord_user_id,
     event_type: 'n9_notice_received',
     title: 'N9 Notice Received',
-    body: `${leaseDetails.tenant_name ?? 'Your tenant'} has submitted an N9 notice to terminate their tenancy on ${formattedTermDate}.`,
+    body: `${input.formOverrides?.tenantName || leaseDetails.tenant_name || 'Your tenant'} has submitted an N9 notice to terminate their tenancy on ${formattedTermDate}.`,
     metadata: {
       noticeId: input.noticeId,
       leaseId: notice.lease_id,

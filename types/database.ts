@@ -216,6 +216,20 @@ export interface N9Notice {
   updated_at: string;
 }
 
+export interface SavedN9Form {
+  id: string;
+  tenant_user_id: string;
+  landlord_name: string;
+  tenant_name: string;
+  rental_address: string;
+  termination_date: string;
+  phone_number: string | null;
+  signature_first_name: string;
+  signature_last_name: string;
+  pdf_url: string;
+  created_at: string;
+}
+
 export interface JobPost {
   id: string;
   org_id: string;

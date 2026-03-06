@@ -7,6 +7,7 @@ import {
   CircleCheckBig,
   ClipboardList,
   FileText,
+  FileWarning,
   Home,
   ReceiptText,
   Search,
@@ -29,6 +30,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
         { href: '/dashboard/listings', label: 'Search listings', icon: Search },
         { href: '/dashboard/tenant/bookings', label: 'My bookings', icon: ClipboardList },
         { href: '/dashboard/tenant/tenancy', label: 'My tenancy', icon: FileText },
+        { href: '/dashboard/tenant/n9', label: 'N9 Form', icon: FileWarning },
       ],
     },
     {
