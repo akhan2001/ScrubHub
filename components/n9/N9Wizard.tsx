@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { N9Form } from '@/components/n9/N9Form';
+import { N9Preview } from '@/components/n9/N9Preview';
 import {
   getLeaseDetailsAction,
   calculateTerminationDateAction,
@@ -401,7 +401,7 @@ export function N9Wizard({ lease, open, onOpenChange, standalone = false }: N9Wi
                   : 'Review the details below. Once you sign, this notice will be delivered to your landlord.'}
               </p>
               <div className="overflow-x-auto rounded-lg border">
-                <N9Form
+                <N9Preview
                   landlordName={landlordName}
                   tenantName={tenantName}
                   rentalAddress={rentalAddress}
@@ -416,7 +416,6 @@ export function N9Wizard({ lease, open, onOpenChange, standalone = false }: N9Wi
                   phoneNumber={phoneNumber}
                   signatureFirstName={signatureFirstName}
                   signatureLastName={signatureLastName}
-                  showSignatureSection
                 />
               </div>
             </div>

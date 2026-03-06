@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { N9Form } from '@/components/n9/N9Form';
+import { N9Preview } from '@/components/n9/N9Preview';
 import { N9Wizard } from '@/components/n9/N9Wizard';
 import { getN9NoticesForLeaseAction, getLeaseDetailsAction } from '@/actions/n9';
 
@@ -204,7 +204,7 @@ function SavedFormCard({ form }: { form: SavedN9Form }) {
             <DialogTitle>N9 Form Preview</DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto p-4 pt-2">
-            <N9Form
+            <N9Preview
               landlordName={form.landlord_name}
               tenantName={form.tenant_name}
               rentalAddress={form.rental_address}
@@ -212,7 +212,6 @@ function SavedFormCard({ form }: { form: SavedN9Form }) {
               phoneNumber={form.phone_number ?? ''}
               signatureFirstName={form.signature_first_name}
               signatureLastName={form.signature_last_name}
-              showSignatureSection
             />
           </div>
         </DialogContent>
@@ -353,7 +352,7 @@ function N9NoticeRow({ lease }: { lease: Lease }) {
           </DialogHeader>
           <div className="overflow-y-auto p-4 pt-2">
             {leaseDetails ? (
-              <N9Form
+              <N9Preview
                 landlordName={leaseDetails.landlordName}
                 tenantName={leaseDetails.tenantName}
                 rentalAddress={leaseDetails.rentalAddress}
@@ -361,7 +360,6 @@ function N9NoticeRow({ lease }: { lease: Lease }) {
                 phoneNumber=""
                 signatureFirstName={sigFirst}
                 signatureLastName={sigLast}
-                showSignatureSection
               />
             ) : (
               <div className="flex items-center justify-center py-12">
