@@ -18,6 +18,8 @@ import {
   updateOrganization,
   fetchOrganizationByOwner,
 } from '@/server/repositories/profiles.repository';
+import { createOrganizationForUser } from '@/server/services/organizations.service';
+import { requireRole } from '@/server/guards/require-role';
 
 async function getAuthUserId(): Promise<string> {
   const supabase = await createClient();
@@ -120,16 +122,22 @@ export async function saveLandlordIdentity(data: unknown) {
 }
 
 export async function saveOrgInfo(data: unknown) {
-  const userId = await getAuthUserId();
+  const user = await requireRole('enterprise');
   const parsed = orgInfoSchema.parse(data);
 
-  const org = await fetchOrganizationByOwner(userId);
-  if (!org) throw new Error('Organization not found');
-
-  await updateOrganization(org.id, {
-    name: parsed.name,
-    domain: parsed.domain ?? null,
-  });
+  const org = await fetchOrganizationByOwner(user.id);
+  if (!org) {
+    await createOrganizationForUser({
+      userId: user.id,
+      name: parsed.name,
+      domain: parsed.domain ?? undefined,
+    });
+  } else {
+    await updateOrganization(org.id, {
+      name: parsed.name,
+      domain: parsed.domain ?? null,
+    });
+  }
 
   revalidatePath('/dashboard/profile');
   return { success: true };

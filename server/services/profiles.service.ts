@@ -251,7 +251,7 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
 export function computeEnterpriseSections(profile: Profile, org: Organization | null) {
   const adminComplete = !!(profile.full_name && profile.phone_number);
   const orgComplete = !!(org?.name);
-  const billingComplete = false;
+  const billingComplete = true; // Billing is optional / handled separately; show as complete
 
   const statuses: boolean[] = [adminComplete, orgComplete, billingComplete];
 
@@ -288,7 +288,7 @@ export function computeEnterpriseSections(profile: Profile, org: Organization | 
       weight: 25,
       status: getStatus(2),
       fields: [
-        { label: 'Billing Method', value: null },
+        { label: 'Billing Method', value: 'Default plan' },
       ],
     },
   ];

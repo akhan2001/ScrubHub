@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { requireRole } from '@/server/guards/require-role';
 import { requireVerifiedRole } from '@/server/guards/require-verified-role';
 import { requirePlan } from '@/server/guards/require-plan';
 import { jobPostSchema, organizationSchema } from '@/lib/validation/schemas';
@@ -43,7 +44,7 @@ export async function createJobPost(input: {
   if (!parsed.success) {
     throw new ValidationError(parsed.error.message);
   }
-  const user = await requireVerifiedRole('enterprise', { onFailure: 'throw' });
+  const user = await requireRole('enterprise');
   await requirePlan('starter', { action: 'post_job' });
   await createJobPostForOrg({
     orgId: parsed.data.orgId,

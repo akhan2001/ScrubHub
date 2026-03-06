@@ -35,7 +35,7 @@ export const organizationSchema = z.object({
 export const jobPostSchema = z.object({
   orgId: z.string().uuid(),
   title: z.string().min(3).max(180),
-  description: z.string().min(10).max(5000),
+  description: z.string().min(3, 'Description must be at least 3 characters').max(5000),
   status: z.enum(['draft', 'published', 'closed', 'filled']).default('draft'),
   facilityName: z.string().max(200).optional(),
   location: z.string().max(500).optional(),
