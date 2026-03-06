@@ -57,10 +57,9 @@ export function MapView({
     []
   );
 
-  const fallbackCenter = useMemo(() => {
-    const first = listings[0];
-    return first ? [first.longitude, first.latitude] : [-79.3832, 43.6532];
-  }, [listings]);
+  // Southern Ontario default: center on 401 corridor (Kitchener–Toronto), zoom to show region
+  const SOUTHERN_ONTARIO_CENTER: [number, number] = [-80.0, 43.65];
+  const SOUTHERN_ONTARIO_ZOOM = 7.5;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -68,8 +67,8 @@ export function MapView({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: freeStyle,
-      center: fallbackCenter as [number, number],
-      zoom: 10.5,
+      center: SOUTHERN_ONTARIO_CENTER,
+      zoom: SOUTHERN_ONTARIO_ZOOM,
       attributionControl: false,
     });
     map.on("error", () => setMapFailed(true));
@@ -123,14 +122,6 @@ export function MapView({
       markersRef.current.push(marker);
     });
   }, [listings, activeListingId, hoveredListingId, onHoverListing, onSelectListing]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !activeListingId) return;
-    const listing = listings.find((item) => item.id === activeListingId);
-    if (!listing) return;
-    map.easeTo({ center: [listing.longitude, listing.latitude], duration: 400 });
-  }, [activeListingId, listings]);
 
   if (mapFailed) {
     return (

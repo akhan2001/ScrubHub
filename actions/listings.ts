@@ -2,7 +2,6 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { requireVerifiedRole } from '@/server/guards/require-verified-role';
 import { requireRole } from '@/server/guards/require-role';
 import { requirePlan } from '@/server/guards/require-plan';
 import {
@@ -25,7 +24,6 @@ export async function createListing(formData: CreateListingData) {
   const user = await requireRole('landlord');
 
   if (d.status === 'published') {
-    await requireVerifiedRole('landlord', { onFailure: 'throw' });
     await requirePlan('starter', { action: 'publish_listing' });
   }
 
@@ -63,7 +61,7 @@ export async function updateListing(listingId: string, formData: CreateListingDa
   const user = await requireRole('landlord');
 
   if (d.status === 'published') {
-    await requireVerifiedRole('landlord', { onFailure: 'throw' });
+    await requirePlan('starter', { action: 'publish_listing' });
   }
 
   await updateListingService(user.id, listingId, {
@@ -91,7 +89,7 @@ export async function updateListing(listingId: string, formData: CreateListingDa
 }
 
 export async function publishListing(listingId: string) {
-  const user = await requireVerifiedRole('landlord', { onFailure: 'throw' });
+  const user = await requireRole('landlord');
   await requirePlan('starter', { action: 'publish_listing' });
   await updateListingService(user.id, listingId, { status: 'published' });
   revalidatePath('/dashboard/landlord/listings');

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { List, Map as MapIcon } from "lucide-react";
 import type { ListingWithCoordinates } from "@/lib/map/mock-coordinates";
@@ -77,6 +77,8 @@ export function ListingsMarketplace({ listings: initialListings }: ListingsMarke
     router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
   }, [effectiveActiveId, pathname, router, searchParams]);
 
+  const fetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const fetchViewport = useCallback(
     async (bounds: MapBounds) => {
       const params = new URLSearchParams({
@@ -110,10 +112,20 @@ export function ListingsMarketplace({ listings: initialListings }: ListingsMarke
 
   const handleBoundsChange = useCallback(
     (bounds: MapBounds) => {
-      fetchViewport(bounds);
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = setTimeout(() => {
+        fetchTimeoutRef.current = null;
+        fetchViewport(bounds);
+      }, 400);
     },
     [fetchViewport]
   );
+
+  useEffect(() => {
+    return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+    };
+  }, []);
 
   if (!mappedListings.length && !dynamicListings) {
     return (
