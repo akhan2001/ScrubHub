@@ -7,6 +7,7 @@ export type PaymentStatus = 'pending' | 'requires_action' | 'succeeded' | 'faile
 export type OrganizationRole = 'admin' | 'manager' | 'viewer';
 export type InviteStatus = 'pending' | 'accepted' | 'expired' | 'revoked';
 export type JobStatus = 'draft' | 'published' | 'closed' | 'filled';
+export type JobApplicationStatus = 'submitted' | 'reviewed' | 'rejected' | 'hired';
 export type PlanTier = 'free' | 'starter' | 'growth' | 'pro';
 export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled';
 export type LeaseStatus = 'active' | 'terminating' | 'terminated' | 'expired';
@@ -249,6 +250,19 @@ export interface JobPost {
   start_date: string | null;
   housing_included: boolean;
   linked_listing_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobApplication {
+  id: string;
+  job_post_id: string;
+  user_id: string;
+  email: string;
+  phone: string;
+  resume_url: string;
+  cover_message: string | null;
+  status: JobApplicationStatus;
   created_at: string;
   updated_at: string;
 }

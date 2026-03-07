@@ -1,5 +1,6 @@
 'use client';
 
+import { unstable_rethrow } from 'next/navigation';
 import { useState } from 'react';
 import { createJobPost } from '@/actions/enterprise';
 import { Button } from '@/components/ui/button';
@@ -60,6 +61,7 @@ export function CreateJobPostForm({ orgId, orgListings = [] }: CreateJobPostForm
       setLatitude(undefined);
       setLongitude(undefined);
     } catch (err) {
+      unstable_rethrow(err);
       toast.error(err instanceof Error ? err.message : 'Unable to create job post');
     } finally {
       setLoading(false);

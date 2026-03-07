@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { SiteHeaderWrapper } from "@/components/layout/site-header-wrapper";
+import { SiteFooter } from "@/components/layout/site-footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased flex flex-col min-h-screen font-sans`}>
-        {children}
+        <SiteHeaderWrapper />
+        <div className="flex-1 flex flex-col">{children}</div>
+        <SiteFooter />
         <Toaster position="bottom-right" closeButton />
       </body>
     </html>

@@ -1,5 +1,6 @@
 'use client';
 
+import { unstable_rethrow } from 'next/navigation';
 import { useState } from 'react';
 import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -149,6 +150,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
         onSuccess?.();
       }
     } catch (err) {
+      unstable_rethrow(err);
       toast.error(err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} listing`);
     }
   }

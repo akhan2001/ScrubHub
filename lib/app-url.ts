@@ -57,3 +57,13 @@ export function getAppListingUrl(id: string): string {
   if (base) return `${base}/listings/${id}`;
   return `/listings/${id}?host=app`;
 }
+
+export function getAppJobUrl(id: string): string {
+  const base = getAppUrl();
+  if (base) return `${base}/jobs/${id}`;
+  return `/jobs/${id}?host=app`;
+}
+
+export function getStaffingJobUrl(id: string): string {
+  return `/staffing/jobs/${id}`;
+}

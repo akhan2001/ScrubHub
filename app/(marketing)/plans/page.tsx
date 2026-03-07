@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import { CheckCircle, X, Zap, Building2, Crown, MessageSquare, Shield, BarChart3 } from 'lucide-react';
-import { ScrubHubNav, MiaFab } from '@/components/www/ScrubHubNav';
-import { MarketingFooter } from '@/components/www/MarketingFooter';
 
 const FEATURES = [
   { label: 'Browse verified listings', pro: true, ent: true },
@@ -36,7 +34,7 @@ const TRUST = [
 export default function PlansPage() {
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="flex-1"
       style={{
         background: '#f0f4fa',
         backgroundImage:
@@ -44,9 +42,7 @@ export default function PlansPage() {
         backgroundSize: '28px 28px',
       }}
     >
-      <ScrubHubNav activePage="Membership Plans" />
-
-      <main className="flex-1 mx-auto max-w-[88rem] w-full px-6 py-16">
+      <main className="mx-auto max-w-[88rem] w-full px-6 py-16">
         <div className="text-center mb-14">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-primary mb-4">
             Transparent Pricing
@@ -210,10 +206,6 @@ export default function PlansPage() {
           </div>
         </div>
       </main>
-
-      <MarketingFooter />
-
-      <MiaFab />
     </div>
   );
 }

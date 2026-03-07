@@ -9,8 +9,6 @@ import {
   Calendar,
   Clock,
 } from 'lucide-react';
-import { ScrubHubNav } from '@/components/www/ScrubHubNav';
-import { MarketingFooter } from '@/components/www/MarketingFooter';
 import type { User } from '@supabase/supabase-js';
 import { getAppSignupUrl } from '@/lib/app-url';
 
@@ -145,9 +143,7 @@ export function LandingClient({ user }: { user: User | null }) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-blobs font-sans text-foreground">
-      <ScrubHubNav user={user} />
-
+    <div className="flex-1 flex flex-col bg-blobs font-sans text-foreground">
       <main className="flex-1">
         {/* Hero */}
         <section className="mx-auto max-w-[88rem] px-6 pt-24 pb-20 reveal-on-scroll">
@@ -306,8 +302,6 @@ export function LandingClient({ user }: { user: User | null }) {
           </div>
         </section>
       </main>
-
-      <MarketingFooter />
 
       <LiaisonConcierge />
     </div>

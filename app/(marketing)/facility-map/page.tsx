@@ -2,8 +2,6 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-import { ScrubHubNav, MiaFab } from '@/components/www/ScrubHubNav';
-import { MarketingFooter } from '@/components/www/MarketingFooter';
 
 /* ─────────────────────────────────────────────────────
    Ontario 401 CORRIDOR  — 400+ healthcare facilities
@@ -349,8 +347,7 @@ export default function FacilityMapPage() {
     }, []);
 
     return (
-        <div className="flex flex-col min-h-screen">
-            <ScrubHubNav activePage="Facility Map" />
+        <div className="flex flex-col flex-1">
 
             {/* Sub-header */}
             <div className="shrink-0 border-b border-[#d8e4f0] bg-white px-6 py-4 z-[500] relative">
@@ -406,9 +403,6 @@ export default function FacilityMapPage() {
                 </div>
             </div>
 
-            <MarketingFooter />
-
-            <MiaFab />
         </div>
     );
 }

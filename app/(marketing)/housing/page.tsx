@@ -4,8 +4,6 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { CheckCircle, Zap, X } from 'lucide-react';
-import { ScrubHubNav, MiaFab } from '@/components/www/ScrubHubNav';
-import { MarketingFooter } from '@/components/www/MarketingFooter';
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R = 6371;
@@ -376,8 +374,6 @@ export default function HousingPage() {
         backgroundSize: '28px 28px',
       }}
     >
-      <ScrubHubNav activePage="Practitioner Housing" />
-
       <main className="flex-1 mx-auto max-w-[88rem] w-full px-6 py-10">
         <div className="mb-8">
           <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">401 Corridor</p>
@@ -425,10 +421,6 @@ export default function HousingPage() {
       </main>
 
       {mapListing && <ListingMapModal listing={mapListing} onClose={() => setMapListing(null)} />}
-
-      <MarketingFooter />
-
-      <MiaFab />
     </div>
   );
 }
