@@ -16,6 +16,8 @@ type ListingPanelProps = {
   onSelectListing: (id: string) => void;
   onHoverListing: (id: string | null) => void;
   autoOpenListingId?: string | null;
+  /** Returns false for mock/sample listings that cannot be applied to */
+  getCanApply?: (listing: ListingWithCoordinates) => boolean;
   className?: string;
 };
 
@@ -31,6 +33,7 @@ export function ListingPanel({
   onSelectListing,
   onHoverListing,
   autoOpenListingId,
+  getCanApply = () => true,
   className,
 }: ListingPanelProps) {
   const rowRefs = useRef<Record<string, HTMLLIElement | null>>({});
@@ -73,6 +76,7 @@ export function ListingPanel({
           <ListingPreview
             listing={activeListing}
             onViewDetails={() => setModalListing(activeListing)}
+            canApply={getCanApply(activeListing)}
           />
         ) : null}
 
@@ -112,8 +116,17 @@ export function ListingPanel({
                           {listing.address ?? "Address pending"}
                         </p>
                       </div>
-                      <Badge variant={listing.status === "published" ? "default" : "secondary"} className="capitalize">
-                        {listing.status}
+                      <Badge
+                        variant={
+                          !getCanApply(listing)
+                            ? "outline"
+                            : listing.status === "published"
+                              ? "default"
+                              : "secondary"
+                        }
+                        className="capitalize"
+                      >
+                        {!getCanApply(listing) ? "Sample" : listing.status}
                       </Badge>
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
@@ -140,6 +153,7 @@ export function ListingPanel({
         onOpenChange={(open) => {
           if (!open) setModalListing(null);
         }}
+        canApply={modalListing ? getCanApply(modalListing) : true}
       />
     </section>
   );

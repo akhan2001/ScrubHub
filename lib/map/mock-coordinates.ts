@@ -40,6 +40,8 @@ export type ListingWithCoordinates = Pick<
 > & {
   latitude: number;
   longitude: number;
+  /** When true, listing is a mock/sample and cannot be applied to */
+  isMock?: boolean;
 };
 
 /** @deprecated Prefer real lat/lng columns from DB */

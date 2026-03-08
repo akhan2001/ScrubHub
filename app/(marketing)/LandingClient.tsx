@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
@@ -11,6 +12,11 @@ import {
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { getAppSignupUrl } from '@/lib/app-url';
+
+const CombinedListingsMap = dynamic(
+  () => import('@/components/map/CombinedListingsMap').then((m) => m.CombinedListingsMap),
+  { ssr: false }
+);
 
 const PLATFORM_STATS = [
   { value: 284, label: 'Active Rentals', trend: '+12% this month', urgent: false },
@@ -279,7 +285,7 @@ export function LandingClient({ user }: { user: User | null }) {
                   ))}
                 </div>
                 <Link
-                  href="/facility-map"
+                  href="/listings"
                   className="inline-flex items-center gap-2 text-foreground font-bold text-lg hover:gap-3 transition-all"
                 >
                   Open Med-Map <ArrowRight className="size-5" />
@@ -288,14 +294,8 @@ export function LandingClient({ user }: { user: User | null }) {
 
               <div className="relative pt-6 pl-4">
                 <div className="absolute top-0 left-0 font-sans text-muted-foreground text-sm italic">Fig. 1 — Map View</div>
-                <div className="w-full aspect-[4/3] rounded-2xl border border-[#c8c8c8] shadow-[0_30px_60px_rgba(0,31,63,0.12)] bg-white p-2 hover:scale-[1.01] transition-transform duration-500 overflow-hidden relative">
-                  <div className="absolute inset-2 rounded-xl bg-[#f0f4fa] border border-[#e0e0e0] overflow-hidden">
-                    <img
-                      src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80"
-                      alt="Map View of the Corridor"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                <div className="w-full rounded-2xl border border-[#c8c8c8] shadow-[0_30px_60px_rgba(0,31,63,0.12)] bg-white p-2 hover:scale-[1.01] transition-transform duration-500 overflow-hidden relative">
+                  <CombinedListingsMap listings={[]} variant="compact" className="rounded-xl" />
                 </div>
               </div>
             </div>

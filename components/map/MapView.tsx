@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import maplibregl, { type StyleSpecification } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import { useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import type { ListingWithCoordinates } from "@/lib/map/mock-coordinates";
-import { createMarkerElement } from "@/components/map/Marker";
+import { markerClassName } from "@/components/map/Marker";
 
 export interface MapBounds {
   north: number;
@@ -28,6 +28,23 @@ function formatPrice(cents: number | null) {
   return `$${Math.round(cents / 100)}`;
 }
 
+function createMarkerIcon(
+  label: string,
+  active: boolean,
+  hovered: boolean
+): L.DivIcon {
+  const className = markerClassName({ active, hovered });
+  return L.divIcon({
+    html: `<span class="${className}">${label}</span>`,
+    className: "!border-0 !bg-transparent",
+    iconSize: [60, 28],
+    iconAnchor: [30, 28],
+  });
+}
+
+const SOUTHERN_ONTARIO_CENTER: L.LatLngTuple = [43.65, -80.0];
+const SOUTHERN_ONTARIO_ZOOM = 7.5;
+
 export function MapView({
   listings,
   activeListingId,
@@ -38,43 +55,28 @@ export function MapView({
   className,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const markersRef = useRef<maplibregl.Marker[]>([]);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
   const [mapFailed, setMapFailed] = useState(false);
-  const freeStyle = useMemo<StyleSpecification>(
-    () => ({
-      version: 8,
-      sources: {
-        osm: {
-          type: "raster",
-          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-          tileSize: 256,
-          attribution: "\u00a9 OpenStreetMap contributors",
-        },
-      },
-      layers: [{ id: "osm", type: "raster", source: "osm" }],
-    }),
-    []
-  );
-
-  // Southern Ontario default: center on 401 corridor (Kitchener–Toronto), zoom to show region
-  const SOUTHERN_ONTARIO_CENTER: [number, number] = [-80.0, 43.65];
-  const SOUTHERN_ONTARIO_ZOOM = 7.5;
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: freeStyle,
-      center: SOUTHERN_ONTARIO_CENTER,
-      zoom: SOUTHERN_ONTARIO_ZOOM,
-      attributionControl: false,
-    });
-    map.on("error", () => setMapFailed(true));
+    let map: L.Map;
+    try {
+      map = L.map(containerRef.current, {
+        center: SOUTHERN_ONTARIO_CENTER,
+        zoom: SOUTHERN_ONTARIO_ZOOM,
+      });
 
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+    } catch {
+      setMapFailed(true);
+      return undefined;
+    }
+
     mapRef.current = map;
 
     function emitBounds() {
@@ -88,47 +90,54 @@ export function MapView({
       });
     }
 
-    map.on("load", emitBounds);
+    map.whenReady(emitBounds);
     map.on("moveend", emitBounds);
 
     return () => {
       map.remove();
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [freeStyle]);
+  }, [onBoundsChange]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
     listings.forEach((listing) => {
-      const el = createMarkerElement({
-        label: formatPrice(listing.price_cents),
-        active: listing.id === activeListingId,
-        hovered: listing.id === hoveredListingId,
-        onClick: () => onSelectListing(listing.id),
-        onMouseEnter: () => onHoverListing(listing.id),
-        onMouseLeave: () => onHoverListing(null),
-      });
+      const active = listing.id === activeListingId;
+      const hovered = listing.id === hoveredListingId;
+      const icon = createMarkerIcon(
+        formatPrice(listing.price_cents),
+        active,
+        hovered
+      );
 
-      const marker = new maplibregl.Marker({ element: el })
-        .setLngLat([listing.longitude, listing.latitude])
-        .addTo(map);
+      const marker = L.marker([listing.latitude, listing.longitude], { icon })
+        .addTo(map)
+        .on("click", () => onSelectListing(listing.id))
+        .on("mouseover", () => onHoverListing(listing.id))
+        .on("mouseout", () => onHoverListing(null));
 
       markersRef.current.push(marker);
     });
-  }, [listings, activeListingId, hoveredListingId, onHoverListing, onSelectListing]);
+  }, [
+    listings,
+    activeListingId,
+    hoveredListingId,
+    onSelectListing,
+    onHoverListing,
+  ]);
 
   if (mapFailed) {
     return (
       <div
         className={className}
         style={{
-          background: "radial-gradient(circle at top left, rgba(255,255,255,.8), rgba(236,236,236,.9))",
+          background:
+            "radial-gradient(circle at top left, rgba(255,255,255,.8), rgba(236,236,236,.9))",
         }}
       >
         <div className="flex h-full items-center justify-center px-6 text-center">

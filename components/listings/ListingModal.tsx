@@ -40,9 +40,11 @@ type ListingModalProps = {
   listing: ListingModalData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** When false, listing is a sample/mock and cannot be applied to */
+  canApply?: boolean;
 };
 
-export function ListingModal({ listing, open, onOpenChange }: ListingModalProps) {
+export function ListingModal({ listing, open, onOpenChange, canApply = true }: ListingModalProps) {
   const [imageIndex, setImageIndex] = useState(0);
 
   useEffect(() => {
@@ -245,7 +247,9 @@ export function ListingModal({ listing, open, onOpenChange }: ListingModalProps)
             <Separator />
             <div className="flex items-center justify-center rounded-lg bg-muted/50 py-2.5">
               <p className="text-xs font-medium text-muted-foreground">
-                Contact the landlord to apply for this property
+                {canApply
+                  ? 'Contact the landlord to apply for this property'
+                  : 'Sample listing — sign up to apply to real listings'}
               </p>
             </div>
           </div>

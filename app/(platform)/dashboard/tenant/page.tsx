@@ -1,15 +1,20 @@
 import { requireRole } from '@/server/guards/require-role';
 import { getTenantBookings } from '@/server/services/bookings.service';
+import { getPublishedListings } from '@/server/services/listings.service';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { KpiCard } from '@/components/dashboard/kpi-card';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { DashboardSection } from '@/components/dashboard/dashboard-section';
+import { CombinedListingsMap } from '@/components/map/CombinedListingsMap';
 
 export default async function TenantDashboardPage() {
   const user = await requireRole('tenant');
-  const bookings = await getTenantBookings(user.id);
+  const [bookings, listings] = await Promise.all([
+    getTenantBookings(user.id),
+    getPublishedListings(),
+  ]);
   const requested = bookings.filter((booking) => booking.status === 'requested').length;
   const approved = bookings.filter((booking) => booking.status === 'approved').length;
   const completed = bookings.filter((booking) => booking.status === 'completed').length;
@@ -31,6 +36,16 @@ export default async function TenantDashboardPage() {
         <KpiCard title="Approved stays" value={`${approved}`} trend="Ready for payment and move-in" />
         <KpiCard title="Completed" value={`${completed}`} trend="Historical successful stays" />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Discover listings</CardTitle>
+          <CardDescription>Healthcare facilities and housing near hospitals across the GTA corridor.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CombinedListingsMap listings={listings} variant="compact" showFilters={false} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

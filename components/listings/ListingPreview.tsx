@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 type ListingPreviewProps = {
   listing: ListingWithCoordinates;
   onViewDetails?: () => void;
+  /** When false, listing is a sample/mock and cannot be applied to */
+  canApply?: boolean;
 };
 
 function formatPrice(cents: number | null) {
@@ -14,7 +16,7 @@ function formatPrice(cents: number | null) {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
-export function ListingPreview({ listing, onViewDetails }: ListingPreviewProps) {
+export function ListingPreview({ listing, onViewDetails, canApply = true }: ListingPreviewProps) {
   const coverImage = listing.images?.[0];
 
   return (
@@ -25,8 +27,11 @@ export function ListingPreview({ listing, onViewDetails }: ListingPreviewProps) 
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-black/5" />
         )}
-        <Badge variant="secondary" className="absolute left-3 top-3 capitalize">
-          {listing.status}
+        <Badge
+          variant={canApply ? "secondary" : "outline"}
+          className="absolute left-3 top-3 capitalize"
+        >
+          {canApply ? listing.status : "Sample listing"}
         </Badge>
       </div>
       <CardContent className="space-y-4 pt-5">
