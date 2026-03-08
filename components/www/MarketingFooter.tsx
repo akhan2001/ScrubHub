@@ -16,7 +16,7 @@ export function MarketingFooter() {
 
           <div className="flex flex-wrap gap-8 text-sm font-medium">
             <Link
-              href="/housing"
+              href="/facility-map"
               className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
             >
               Portfolios

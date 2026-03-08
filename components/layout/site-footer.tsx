@@ -6,7 +6,7 @@ import { getAppLoginUrl } from '@/lib/app-url';
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-border bg-slate-50/80">
+    <footer className="relative z-10 mt-auto border-t border-border bg-slate-50/80">
       <div className="mx-auto max-w-[88rem] px-4 py-12 sm:px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-center md:text-left">
@@ -20,7 +20,7 @@ export function SiteFooter() {
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium">
             <Link
-              href="/housing"
+              href="/facility-map"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               Housing

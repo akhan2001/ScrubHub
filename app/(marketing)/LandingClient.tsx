@@ -31,14 +31,14 @@ const EDITORIAL_CARDS = [
     description:
       'Bright, minimalist residential spaces near top healthcare facilities. Fully furnished for seamless transient staffing.',
     image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80',
-    href: '/housing',
+    href: '/facility-map',
   },
   {
     title: 'Clinical Suites',
     description:
       'Modern, glass-walled medical offices with luxury finishings. Book by the half-day or week with zero overhead.',
     image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80',
-    href: '/housing',
+    href: '/facility-map',
   },
   {
     title: 'The Staffing Protocol',
@@ -175,7 +175,7 @@ export function LandingClient({ user }: { user: User | null }) {
                   Join the Network
                 </Link>
                 <Link
-                  href="/housing"
+                  href="/facility-map"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white/50 backdrop-blur-md text-foreground text-base font-bold px-8 py-4 transition-all duration-300 hover:bg-white hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
                 >
                   Explore Portfolios

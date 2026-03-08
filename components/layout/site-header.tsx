@@ -9,9 +9,8 @@ import type { User } from '@supabase/supabase-js';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { href: '/housing', label: 'Practitioner Housing' },
-  { href: '/staffing', label: 'Staffing' },
   { href: '/facility-map', label: 'Facility Map' },
+  { href: '/staffing', label: 'Staffing' },
   { href: '/plans', label: 'Pricing' },
   { href: '/listings', label: 'Listings' },
 ] as const;

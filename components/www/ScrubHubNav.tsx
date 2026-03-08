@@ -5,7 +5,7 @@ import { getAppLoginUrl, getAppSignupUrl, getAppDashboardUrl } from '@/lib/app-u
 import type { User } from '@supabase/supabase-js';
 
 const NAV_LINKS = [
-  { href: '/housing', label: 'Practitioner Housing' },
+  { href: '/facility-map', label: 'Practitioner Housing' },
   { href: '/staffing', label: 'Staffing' },
   { href: '/facility-map', label: 'Facility Map' },
   { href: '/plans', label: 'Membership Plans' },

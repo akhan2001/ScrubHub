@@ -4,13 +4,21 @@
 import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import type { Facility } from '@/lib/map/facilities';
+import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
+
+function formatPrice(cents: number | null) {
+  if (!cents) return 'N/A';
+  return `$${Math.round(cents / 100)}`;
+}
 
 export function useFacilityMap(
   mapElRef: RefObject<HTMLDivElement | null>,
-  facilities: Facility[]
+  facilities: Facility[],
+  listings: ListingWithCoordinates[] = []
 ) {
   const mapRef = useRef<any>(null);
   const markersByFacilityIdRef = useRef<Record<number, any>>({});
+  const listingMarkersRef = useRef<any[]>([]);
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -134,6 +142,56 @@ export function useFacilityMap(
       loadScripts();
     }
   }, [mapElRef, facilities]);
+
+  useEffect(() => {
+    if (!mapReady || !mapRef.current || !(window as any).L) return;
+    const addListingMarkers = (map: any, list: ListingWithCoordinates[]) => {
+      const L = (window as any).L;
+      if (!L) return;
+
+      listingMarkersRef.current.forEach((m) => m.remove());
+      listingMarkersRef.current = [];
+
+      list.forEach((listing) => {
+        const priceLabel = formatPrice(listing.price_cents);
+        const icon = L.divIcon({
+          html: `<div style="
+            font-family:Inter,sans-serif;
+            font-size:11px;font-weight:600;
+            padding:4px 8px;
+            border-radius:999px;
+            border:2px solid #0f172a;
+            background:#fff;
+            color:#0f172a;
+            box-shadow:0 1px 4px rgba(0,0,0,0.2);
+            white-space:nowrap;
+          ">${priceLabel}</div>`,
+          className: '',
+          iconSize: [60, 24],
+          iconAnchor: [30, 12],
+        });
+
+        const listingId = String(listing.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const popup = `
+          <div style="font-family:Inter,sans-serif;min-width:180px;padding:4px 2px;">
+            <h4 style="margin:0 0 6px;font-size:13px;font-weight:700;color:#0F172A;">${(listing.title ?? 'Listing').replace(/</g, '&lt;')}</h4>
+            <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">${priceLabel}/mo</p>
+            <button type="button" onclick="event.preventDefault();var fn=window.__facilityMapViewListing;if(fn)fn('${listingId}');" style="
+              display:block;width:100%;text-align:center;background:#2563eb;color:white;
+              border-radius:8px;padding:6px 0;font-size:12px;font-weight:600;
+              border:none;cursor:pointer;
+            ">View Listing →</button>
+          </div>`;
+
+        const marker = L.marker([listing.latitude, listing.longitude], { icon })
+          .bindPopup(popup, { maxWidth: 240 })
+          .addTo(map);
+
+        listingMarkersRef.current.push(marker);
+      });
+    };
+    addListingMarkers(mapRef.current, listings);
+  }, [mapReady, listings]);
 
   return { mapRef, markersByFacilityIdRef, mapReady };
 }

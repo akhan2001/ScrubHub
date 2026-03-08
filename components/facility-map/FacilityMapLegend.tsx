@@ -7,6 +7,7 @@ export function FacilityMapLegend() {
           { col: '#2563eb', label: 'Hospital' },
           { col: '#475569', label: 'Clinic' },
           { col: '#EF4444', label: 'Urgent Staffing Needed' },
+          { col: '#0f172a', label: 'Listings (price)' },
         ].map(({ col, label }) => (
           <div key={label} className="flex items-center gap-2">
             <span

@@ -1,24 +1,80 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Facility } from '@/lib/map/facilities';
 import { FACILITIES } from '@/lib/map/facilities';
+import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
 import { useFacilityMap } from '@/hooks/use-facility-map';
 import { FacilitySearch } from '@/components/facility-map/FacilitySearch';
 import { FacilityMapLegend } from '@/components/facility-map/FacilityMapLegend';
 import { FacilityMapCTA } from '@/components/facility-map/FacilityMapCTA';
+import { ListingDetailPanel } from '@/components/facility-map/ListingDetailPanel';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+
+/** 401 corridor bounds: Southern Ontario */
+const INITIAL_BOUNDS = {
+  north: 45.5,
+  south: 42.5,
+  east: -78,
+  west: -82.5,
+};
+
+declare global {
+  interface Window {
+    __facilityMapViewListing?: (id: string) => void;
+  }
+}
 
 export default function FacilityMapPage() {
   const mapElRef = useRef<HTMLDivElement>(null);
+  const [listings, setListings] = useState<ListingWithCoordinates[]>([]);
+  const [selectedListing, setSelectedListing] = useState<ListingWithCoordinates | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams({
+      north: String(INITIAL_BOUNDS.north),
+      south: String(INITIAL_BOUNDS.south),
+      east: String(INITIAL_BOUNDS.east),
+      west: String(INITIAL_BOUNDS.west),
+    });
+    fetch(`/api/listings/map?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : { listings: [] }))
+      .then((data) => {
+        const list = (data.listings ?? []).map((l: Record<string, unknown>) => ({
+          ...l,
+          latitude: l.latitude as number,
+          longitude: l.longitude as number,
+        }));
+        setListings(list);
+      })
+      .catch(() => setListings([]));
+  }, []);
+
+  useEffect(() => {
+    window.__facilityMapViewListing = (id: string) => {
+      const listing = listings.find((l) => l.id === id);
+      if (listing) setSelectedListing(listing);
+    };
+    return () => {
+      delete window.__facilityMapViewListing;
+    };
+  }, [listings]);
+
   const { mapRef, markersByFacilityIdRef, mapReady } = useFacilityMap(
     mapElRef,
-    FACILITIES
+    FACILITIES,
+    listings
   );
 
   const handleSearchSelect = (facility: Facility) => {
     mapRef.current?.flyTo([facility.lat, facility.lng], 15);
     markersByFacilityIdRef.current[facility.id]?.openPopup();
+  };
+
+  const handleSelectListing = (listing: ListingWithCoordinates) => {
+    mapRef.current?.flyTo([listing.latitude, listing.longitude], 15);
+    setSelectedListing(listing);
   };
 
   return (
@@ -41,17 +97,47 @@ export default function FacilityMapPage() {
         </p>
         <FacilitySearch
           facilities={FACILITIES}
+          listings={listings}
           onSelect={handleSearchSelect}
+          onSelectListing={handleSelectListing}
           mapReady={mapReady}
         />
       </div>
 
-      {/* Map fills available space */}
-      <div className="flex-1 min-h-[400px] relative z-0">
-        <div ref={mapElRef} className="absolute inset-0" />
+      {/* Map (full width) - overflow-hidden clips markers so they don't overlap footer */}
+      <div className="relative z-0 flex min-h-[600px] flex-1 overflow-hidden">
+        <div ref={mapElRef} className="absolute inset-0 h-full w-full bg-muted/30" />
+        {!mapReady && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/50">
+            <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <p className="text-sm font-medium text-muted-foreground">
+              Loading map...
+            </p>
+          </div>
+        )}
         <FacilityMapLegend />
         <FacilityMapCTA />
       </div>
+
+      {/* Listing detail sheet (slides in from right) */}
+      <Sheet
+        open={!!selectedListing}
+        onOpenChange={(open) => !open && setSelectedListing(null)}
+      >
+        <SheetContent
+          side="right"
+          className="flex w-full flex-col overflow-hidden p-0 sm:max-w-lg"
+        >
+          <SheetTitle className="sr-only">Listing details</SheetTitle>
+          {selectedListing && (
+            <ListingDetailPanel
+              listing={selectedListing}
+              onClose={() => setSelectedListing(null)}
+              variant="sheet"
+            />
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
