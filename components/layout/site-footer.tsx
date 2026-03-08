@@ -46,10 +46,10 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Lock className="size-3.5" aria-hidden />
             <span>PIPEDA & PHIPA COMPLIANT</span>
-          </div>
+          </div> */}
           <p>© {new Date().getFullYear()} SCRUBHUB INC.</p>
         </div>
       </div>

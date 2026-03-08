@@ -409,7 +409,7 @@ export default function HousingPage() {
         <div className="mt-16 rounded-2xl border border-[#d0d9e8] bg-white p-10 text-center shadow-sm">
           <p className="text-2xl font-extrabold text-[#0F172A] mb-2">Don&apos;t see what you need?</p>
           <p className="text-[#4a5568] mb-6 max-w-md mx-auto">
-            Create a free account and let MIA match you to verified listings near your hospital or clinic.
+            Create a free account and let ScrubHub match you to verified listings near your hospital or clinic.
           </p>
           <Link
             href="/signup"

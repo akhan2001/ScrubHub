@@ -36,9 +36,6 @@ export function MarketingFooter() {
           </div>
         </div>
         <div className="mt-16 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-primary-foreground/60">
-          <div className="flex items-center gap-4">
-            <Lock className="size-3.5" /> PIPEDA & PHIPA COMPLIANT
-          </div>
           <p>© 2026 SCRUBHUB INC.</p>
         </div>
       </div>
