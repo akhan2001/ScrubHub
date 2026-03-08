@@ -1,28 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle, X, Zap, Building2, Crown, MessageSquare, Shield, BarChart3 } from 'lucide-react';
-
-const FEATURES = [
-  { label: 'Browse verified listings', pro: true, ent: true },
-  { label: 'Instant booking (24/7)', pro: true, ent: true },
-  { label: 'Practitioner-verified units only', pro: true, ent: true },
-  { label: 'Interactive facility map access', pro: true, ent: true },
-  { label: 'Proximity map per listing', pro: true, ent: true },
-  { label: 'Direct hospital-proximity filter', pro: true, ent: true },
-  { label: 'LIAISON concierge (AI assistant)', pro: true, ent: true },
-  { label: 'Saved searches & alerts', pro: true, ent: true },
-  { label: 'Staffing board access', pro: true, ent: true },
-  { label: 'Priority LIAISON queue', pro: false, ent: true },
-  { label: 'Multi-seat / team accounts', pro: false, ent: true },
-  { label: 'Bulk housing booking (locum groups)', pro: false, ent: true },
-  { label: 'Dedicated account manager', pro: false, ent: true },
-  { label: 'Custom onboarding & SLA', pro: false, ent: true },
-  { label: 'Usage analytics & reporting', pro: false, ent: true },
-  { label: 'API access for scheduling systems', pro: false, ent: true },
-  { label: 'Branded listing pages', pro: false, ent: true },
-  { label: 'Volume staffing posting (unlimited)', pro: false, ent: true },
-];
+import { Zap, MessageSquare, Shield, BarChart3 } from 'lucide-react';
+import { ROLES } from '@/lib/roles';
+import { RoleCard } from '@/components/onboarding/role-card';
 
 const TRUST = [
   { icon: Shield, label: 'PIPEDA Compliant', sub: 'All data is stored on Canadian soil.' },
@@ -57,114 +38,15 @@ export default function PlansPage() {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 max-w-4xl mx-auto mb-20">
-          <div className="relative flex flex-col rounded-2xl border border-[#d0d9e8] bg-white p-8 shadow-[0_4px_20px_rgba(0,31,63,0.07)]">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-[#eff6ff]">
-                <Crown className="size-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-primary">Professional</p>
-                <p className="text-sm text-[#6b7280]">For individual practitioners</p>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-end gap-2">
-                <span className="text-5xl font-extrabold text-[#0F172A]">$149</span>
-                <span className="text-[#6b7280] mb-1.5 text-sm">/month</span>
-              </div>
-              <p className="text-xs text-[#6b7280] mt-1">Billed monthly. Cancel anytime. No contracts.</p>
-            </div>
-
-            <ul className="space-y-3 mb-8 flex-1">
-              {FEATURES.filter((f) => f.pro).map((f) => (
-                <li key={f.label} className="flex items-start gap-2.5 text-sm text-[#374151]">
-                  <CheckCircle className="size-4 text-primary shrink-0 mt-0.5" />
-                  {f.label}
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              href="/signup"
-              className="block text-center rounded-xl border-2 border-primary bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3.5 transition-all shadow-md hover:shadow-lg"
-            >
-              Get Started Free →
-            </Link>
-            <p className="text-xs text-center text-[#6b7280] mt-3">14-day free trial · No credit card required</p>
-          </div>
-
-          <div className="relative flex flex-col rounded-2xl border-2 border-[#0F172A] bg-[#0F172A] p-8 shadow-[0_4px_32px_rgba(0,31,63,0.22)]">
-            <div className="absolute -top-3.5 left-8">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1 text-xs font-bold uppercase tracking-widest text-primary-foreground shadow">
-                Most Chosen by Hospitals
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-white/10">
-                <Building2 className="size-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-primary">Enterprise</p>
-                <p className="text-sm text-white/60">For hospitals & health networks</p>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-end gap-2">
-                <span className="text-5xl font-extrabold text-white">Custom</span>
-              </div>
-              <p className="text-xs text-white/50 mt-1">Volume pricing · Dedicated SLA · Annual contract</p>
-            </div>
-
-            <ul className="space-y-3 mb-8 flex-1">
-              {FEATURES.map((f) => (
-                <li key={f.label} className="flex items-start gap-2.5 text-sm text-white/80">
-                  <CheckCircle className="size-4 text-blue-300 shrink-0 mt-0.5" />
-                  {f.label}
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              href="mailto:enterprise@scrubhub.ca"
-              className="block text-center rounded-xl border-2 border-white/20 bg-white/10 hover:bg-white/20 text-white font-bold py-3.5 transition-all"
-            >
-              Book a Demo →
-            </Link>
-            <p className="text-xs text-center text-white/40 mt-3">Usually responds within 1 business day</p>
-          </div>
-        </div>
-
-        <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-2xl font-extrabold text-foreground text-center mb-8">Full Feature Comparison</h2>
-          <div className="rounded-2xl border border-[#d0d9e8] bg-white overflow-hidden shadow-sm">
-            <div className="grid grid-cols-3 bg-[#f8fafd] border-b border-[#d0d9e8]">
-              <div className="px-6 py-4 text-sm font-bold text-foreground">Feature</div>
-              <div className="px-6 py-4 text-sm font-bold text-primary text-center">Professional</div>
-              <div className="px-6 py-4 text-sm font-bold text-foreground text-center">Enterprise</div>
-            </div>
-            {FEATURES.map((f, i) => (
-              <div
-                key={f.label}
-                className={`grid grid-cols-3 border-b border-[#eef2f7] last:border-0 ${i % 2 === 0 ? 'bg-white' : 'bg-[#fafcff]'}`}
-              >
-                <div className="px-6 py-3.5 text-sm text-[#374151]">{f.label}</div>
-                <div className="px-6 py-3.5 flex justify-center items-center">
-                  {f.pro ? (
-                    <CheckCircle className="size-4 text-primary" />
-                  ) : (
-                    <X className="size-4 text-muted-foreground/50" />
-                  )}
-                </div>
-                <div className="px-6 py-3.5 flex justify-center items-center">
-                  <CheckCircle className="size-4 text-primary" />
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="grid gap-4 sm:grid-cols-3 max-w-4xl mx-auto mb-20">
+          {ROLES.map((role) => (
+            <RoleCard
+              key={role.id}
+              as="link"
+              role={role}
+              href={role.id === 'enterprise' ? 'mailto:enterprise@scrubhub.ca' : `/signup?role=${role.id}`}
+            />
+          ))}
         </div>
 
         <div className="max-w-4xl mx-auto mb-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

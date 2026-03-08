@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { href: '/housing', label: 'Practitioner Housing' },
   { href: '/staffing', label: 'Staffing' },
   { href: '/facility-map', label: 'Facility Map' },
-  { href: '/plans', label: 'Membership Plans' },
+  { href: '/plans', label: 'Pricing' },
   { href: '/listings', label: 'Listings' },
 ] as const;
 
