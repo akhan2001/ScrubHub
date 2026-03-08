@@ -37,8 +37,8 @@ export function SiteHeader({ user }: { user?: User | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-white/95 backdrop-blur-md shadow-sm">
-      <nav className="mx-auto flex w-full max-w-[88rem] items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b border-border/60 bg-white/95 backdrop-blur-md shadow-sm">
+      <nav className="mx-auto flex w-full max-w-[88rem] items-center justify-between gap-4 px-4 py-0 sm:px-6">
         <Link
           href="/"
           className="flex items-center gap-2.5 select-none shrink-0 group"

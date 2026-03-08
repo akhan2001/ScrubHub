@@ -1,4 +1,10 @@
-import { insertJobApplication } from '@/server/repositories/job-applications.repository';
+import {
+  insertJobApplication,
+  fetchApplicationsByOrgId,
+  type JobApplicationWithJob,
+} from '@/server/repositories/job-applications.repository';
+import { fetchOrgMemberships } from '@/server/repositories/organizations.repository';
+import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
 import { getJobPostById } from '@/server/services/job-posts.service';
 import { jobApplicationSchema } from '@/lib/validations/job-application';
 import { ValidationError } from '@/server/errors/app-error';
@@ -10,6 +16,16 @@ export interface CreateJobApplicationInput {
   phone: string;
   resumeUrl: string;
   coverMessage?: string | null;
+}
+
+export type ApplicationWithJobTitle = JobApplicationWithJob & { job_title: string };
+
+export async function getApplicationsForOrg(orgId: string): Promise<ApplicationWithJobTitle[]> {
+  const rows = await fetchApplicationsByOrgId(orgId);
+  return rows.map((row) => ({
+    ...row,
+    job_title: row.job_posts?.title ?? 'Unknown job',
+  }));
 }
 
 export async function createJobApplication(input: CreateJobApplicationInput) {
@@ -29,7 +45,7 @@ export async function createJobApplication(input: CreateJobApplicationInput) {
     throw new ValidationError('Job not found or not accepting applications');
   }
 
-  return insertJobApplication({
+  const application = await insertJobApplication({
     job_post_id: input.jobPostId,
     user_id: input.userId,
     email: input.email,
@@ -37,4 +53,28 @@ export async function createJobApplication(input: CreateJobApplicationInput) {
     resume_url: input.resumeUrl,
     cover_message: input.coverMessage ?? null,
   });
+
+  const members = await fetchOrgMemberships(job.org_id);
+  const adminsAndManagers = members.filter((m) => m.role === 'admin' || m.role === 'manager');
+  const title = 'New job application';
+  const body = `${input.email} applied for "${job.title}".`;
+  const metadata = {
+    job_post_id: input.jobPostId,
+    application_id: application.id,
+    applicant_email: input.email,
+  };
+
+  await Promise.all(
+    adminsAndManagers.map((m) =>
+      insertNotificationLog({
+        user_id: m.user_id,
+        event_type: 'job_application_submitted',
+        title,
+        body,
+        metadata,
+      })
+    )
+  );
+
+  return application;
 }

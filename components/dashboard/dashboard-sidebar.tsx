@@ -64,6 +64,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
       items: [
         { href: '/dashboard/enterprise', label: 'Overview', icon: Home },
         { href: '/dashboard/enterprise/jobs', label: 'Job posts', icon: ReceiptText },
+        { href: '/dashboard/enterprise/applications', label: 'Applications', icon: ClipboardList },
         { href: '/dashboard/enterprise/team', label: 'Team access', icon: Users },
       ],
     },

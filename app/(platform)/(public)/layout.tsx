@@ -1,7 +1,7 @@
 import { SiteHeaderWrapper } from "@/components/layout/site-header-wrapper";
 import { SiteFooter } from "@/components/layout/site-footer";
 
-export default function WWWLayout({
+export default function PublicPlatformLayout({
   children,
 }: {
   children: React.ReactNode;

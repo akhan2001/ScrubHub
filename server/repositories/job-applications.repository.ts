@@ -45,6 +45,20 @@ export async function fetchApplicationsByJobId(
   return data ?? [];
 }
 
+export async function fetchApplicationById(
+  id: string
+): Promise<(JobApplication & { job_posts: { title: string; org_id: string } | null }) | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('job_applications')
+    .select('*, job_posts(title, org_id)')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as (JobApplication & { job_posts: { title: string; org_id: string } | null }) | null;
+}
+
 export async function fetchApplicationByJobAndUser(
   jobPostId: string,
   userId: string
@@ -59,4 +73,20 @@ export async function fetchApplicationByJobAndUser(
 
   if (error) throw error;
   return data;
+}
+
+export type JobApplicationWithJob = JobApplication & { job_posts: { title: string } | null };
+
+export async function fetchApplicationsByOrgId(
+  orgId: string
+): Promise<JobApplicationWithJob[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('job_applications')
+    .select('*, job_posts!inner(title, org_id)')
+    .eq('job_posts.org_id', orgId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as JobApplicationWithJob[];
 }
