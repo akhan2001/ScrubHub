@@ -46,6 +46,23 @@ export function getAppDashboardUrl(): string {
   return '/dashboard?host=app';
 }
 
+/**
+ * Full URL for the OAuth callback. Used as redirectTo for signInWithOAuth.
+ * On localhost: always uses current origin so OAuth redirects back to localhost.
+ * In production: uses NEXT_PUBLIC_APP_URL.
+ */
+export function getAppAuthCallbackUrl(): string {
+  if (typeof window !== 'undefined') {
+    const isLocalhost =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) return `${window.location.origin}/auth/callback`;
+  }
+  const base = getAppUrl();
+  if (base) return `${base}/auth/callback`;
+  if (typeof window !== 'undefined') return `${window.location.origin}/auth/callback`;
+  return '/auth/callback';
+}
+
 export function getAppListingsUrl(): string {
   const base = getAppUrl();
   if (base) return `${base}/facility-map`;

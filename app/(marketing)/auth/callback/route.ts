@@ -1,15 +1,18 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getAppDashboardUrl, getAppUrl } from '@/lib/app-url';
+import { getAppUrl } from '@/lib/app-url';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectToParam = searchParams.get('redirectTo');
+  const redirectTo =
+    redirectToParam && redirectToParam.startsWith('/') ? redirectToParam : '/dashboard';
   const origin = request.nextUrl.origin;
-
-  const appUrl = getAppUrl();
+  const isLocalhost =
+    request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1';
+  const appUrl = isLocalhost ? '' : getAppUrl();
 
   function buildRedirect(path: string): string {
     if (path.startsWith('http')) return path;
@@ -17,7 +20,8 @@ export async function GET(request: NextRequest) {
     return `${origin}${path.startsWith('/') ? path : `/${path}`}`;
   }
 
-  const response = NextResponse.redirect(buildRedirect('/dashboard'));
+  const successRedirect = buildRedirect(redirectTo);
+  const response = NextResponse.redirect(successRedirect);
 
   if (code) {
     const supabase = createServerClient(
@@ -42,7 +46,7 @@ export async function GET(request: NextRequest) {
       if (user) {
         await supabase.from('profiles').update({ verification_state: 'verified' }).eq('id', user.id);
       }
-      response.headers.set('Location', buildRedirect('/auth/confirm-success'));
+      response.headers.set('Location', successRedirect);
       return response;
     }
   }
