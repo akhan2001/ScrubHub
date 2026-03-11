@@ -1,5 +1,6 @@
 import {
   insertJobApplication,
+  fetchApplicationByJobAndUser,
   fetchApplicationsByOrgId,
   type JobApplicationWithJob,
 } from '@/server/repositories/job-applications.repository';
@@ -45,6 +46,11 @@ export async function createJobApplication(input: CreateJobApplicationInput) {
     throw new ValidationError('Job not found or not accepting applications');
   }
 
+  const existing = await fetchApplicationByJobAndUser(input.jobPostId, input.userId);
+  if (existing) {
+    throw new ValidationError('You have already applied for this job');
+  }
+
   const application = await insertJobApplication({
     job_post_id: input.jobPostId,
     user_id: input.userId,
@@ -64,17 +70,21 @@ export async function createJobApplication(input: CreateJobApplicationInput) {
     applicant_email: input.email,
   };
 
-  await Promise.all(
-    adminsAndManagers.map((m) =>
-      insertNotificationLog({
-        user_id: m.user_id,
-        event_type: 'job_application_submitted',
-        title,
-        body,
-        metadata,
-      })
-    )
-  );
+  try {
+    await Promise.all(
+      adminsAndManagers.map((m) =>
+        insertNotificationLog({
+          user_id: m.user_id,
+          event_type: 'job_application_submitted',
+          title,
+          body,
+          metadata,
+        })
+      )
+    );
+  } catch {
+    // Notification creation is non-critical; application was saved successfully
+  }
 
   return application;
 }

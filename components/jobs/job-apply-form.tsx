@@ -62,8 +62,8 @@ export function JobApplyForm({
       });
       toast.success('Application submitted successfully');
       onSuccess?.();
-    } catch {
-      toast.error('Failed to submit application. Please try again.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to submit application. Please try again.');
     }
   }
 
