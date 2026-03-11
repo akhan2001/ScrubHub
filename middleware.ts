@@ -18,6 +18,17 @@ function withSupabaseCookies(base: NextResponse, target: NextResponse): NextResp
 }
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const code = request.nextUrl.searchParams.get('code');
+
+  // Supabase OAuth sometimes redirects to Site URL (root) instead of /auth/callback.
+  // Redirect root with ?code= to /auth/callback so the session can be exchanged.
+  if (pathname === '/' && code) {
+    const callbackUrl = new URL('/auth/callback', request.url);
+    request.nextUrl.searchParams.forEach((v, k) => callbackUrl.searchParams.set(k, v));
+    return NextResponse.redirect(callbackUrl);
+  }
+
   let APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
   if (!APP_URL) {
@@ -25,7 +36,6 @@ export async function middleware(request: NextRequest) {
     APP_URL = `${url.protocol}//${url.host}`;
   }
 
-  const pathname = request.nextUrl.pathname;
   const isApp = isAppHost(request);
   const isWww = !isApp;
 

@@ -48,8 +48,9 @@ export function getAppDashboardUrl(): string {
 
 /**
  * Full URL for the OAuth callback. Used as redirectTo for signInWithOAuth.
- * On localhost: always uses current origin so OAuth redirects back to localhost.
- * In production: uses NEXT_PUBLIC_APP_URL.
+ * Uses app domain in production so the session is established on app.scrubhub.ca
+ * (where the dashboard lives). On localhost, uses current origin.
+ * Must be in Supabase Dashboard → Auth → URL Configuration → Redirect URLs.
  */
 export function getAppAuthCallbackUrl(): string {
   if (typeof window !== 'undefined') {
