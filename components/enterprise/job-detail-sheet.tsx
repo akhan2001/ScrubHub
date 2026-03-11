@@ -79,6 +79,7 @@ export function JobDetailSheet({
     job.facility_name || job.location || payRange || job.start_date || job.role_type || job.contract_type || job.contract_length;
 
   async function handleDelete() {
+    if (!job) return;
     setIsDeleting(true);
     try {
       await deleteJobPost(job.id);
