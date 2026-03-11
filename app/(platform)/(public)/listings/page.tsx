@@ -1,13 +1,5 @@
-import { getPublishedListings } from '@/server/services/listings.service';
-import { AppPublicShell } from '@/components/layout/app-public-shell';
-import { ListingsMarketplace } from '@/components/listings/ListingsMarketplace';
+import { redirect } from 'next/navigation';
 
-export default async function ListingsPage() {
-  const listings = await getPublishedListings();
-
-  return (
-    <AppPublicShell>
-      <ListingsMarketplace listings={listings} />
-    </AppPublicShell>
-  );
+export default function ListingsPage() {
+  redirect('/facility-map');
 }

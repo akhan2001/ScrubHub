@@ -3,6 +3,7 @@ import {
   fetchBookingsForLandlord,
   fetchBookingsForLandlordWithTenantProfile,
   fetchBookingsForTenant,
+  fetchBookingsForTenantWithListing,
   fetchPaymentByBookingId,
   insertBooking,
   insertBookingEvent,
@@ -20,6 +21,10 @@ import type { BookingStatus } from '@/types/database';
 
 export async function getTenantBookings(tenantUserId: string) {
   return fetchBookingsForTenant(tenantUserId);
+}
+
+export async function getTenantBookingsWithListing(tenantUserId: string) {
+  return fetchBookingsForTenantWithListing(tenantUserId);
 }
 
 export async function getLandlordBookings(landlordUserId: string) {

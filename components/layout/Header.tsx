@@ -13,7 +13,7 @@ export async function Header() {
         </Link>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/listings">Listings</Link>
+            <Link href="/facility-map">Listings</Link>
           </Button>
           {user ? (
             <>

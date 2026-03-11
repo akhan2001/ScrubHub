@@ -10,7 +10,10 @@ export default async function TenantProfilePage() {
 
   return (
     <DashboardSection
-      breadcrumb={[{ label: 'Dashboard', href: '/dashboard/tenant' }, { label: 'Tenant profile' }]}
+      breadcrumb={[
+        { label: 'Dashboard', href: '/dashboard/tenant/bookings' },
+        { label: 'Profile' },
+      ]}
       title="Tenant profile"
       description="Manage identity and verification details."
     >

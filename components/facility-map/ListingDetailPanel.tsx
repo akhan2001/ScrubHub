@@ -14,6 +14,7 @@ import {
 import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
 import { FACILITIES } from '@/lib/map/facilities';
 import { Badge } from '@/components/ui/badge';
+import { FacilityMapListingApply } from '@/components/facility-map/FacilityMapListingApply';
 import { cn } from '@/lib/utils';
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
@@ -41,9 +42,11 @@ type NearbyFacility = { id: number; name: string; type: string; dist: number };
 function ListingDetailContent({
   listing,
   nearby,
+  ctaSlot,
 }: {
   listing: ListingWithCoordinates;
   nearby: NearbyFacility[];
+  ctaSlot?: React.ReactNode;
 }) {
   const [imageIndex, setImageIndex] = useState(0);
   const images = listing.images ?? [];
@@ -262,18 +265,22 @@ function ListingDetailContent({
 
         {/* CTAs */}
         <div className="mt-6 space-y-2 border-t border-border pt-4">
-          <Link
-            href={`/listings/${listing.id}`}
-            className="block rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            View Listing
-          </Link>
-          <Link
-            href="/signup"
-            className="block rounded-xl border border-primary px-4 py-3 text-center text-sm font-bold text-primary transition-colors hover:bg-primary/5"
-          >
-            Sign Up to Apply
-          </Link>
+          {ctaSlot ?? (
+            <>
+              <Link
+                href={`/facility-map?listing=${listing.id}`}
+                className="block rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                View Listing
+              </Link>
+              <Link
+                href="/signup"
+                className="block rounded-xl border border-primary px-4 py-3 text-center text-sm font-bold text-primary transition-colors hover:bg-primary/5"
+              >
+                Sign Up to Apply
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -308,6 +315,10 @@ interface ListingDetailPanelProps {
   className?: string;
   /** When "sheet", hides header and close button (sheet provides its own) */
   variant?: 'panel' | 'sheet';
+  /** When true, shows auth-aware apply flow instead of View Listing / Sign Up (for tenants) */
+  showApplyFlow?: boolean;
+  /** Path to redirect to after login (for FacilityMapListingApply) */
+  redirectPath?: string;
 }
 
 export function ListingDetailPanel({
@@ -315,6 +326,8 @@ export function ListingDetailPanel({
   onClose,
   className,
   variant = 'panel',
+  showApplyFlow = false,
+  redirectPath = '/dashboard/listings',
 }: ListingDetailPanelProps) {
   const nearby = listing
     ? FACILITIES.map((f) => ({
@@ -355,7 +368,18 @@ export function ListingDetailPanel({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {listing ? (
-          <ListingDetailContent listing={listing} nearby={nearby} />
+          <ListingDetailContent
+            listing={listing}
+            nearby={nearby}
+            ctaSlot={
+              showApplyFlow ? (
+                <FacilityMapListingApply
+                  listingId={listing.id}
+                  redirectPath={redirectPath}
+                />
+              ) : undefined
+            }
+          />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
             <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-muted">

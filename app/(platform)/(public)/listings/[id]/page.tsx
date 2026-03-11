@@ -6,5 +6,5 @@ export default async function ListingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  redirect(`/listings?listing=${id}&view=detail`);
+  redirect(`/facility-map?listing=${id}`);
 }

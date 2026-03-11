@@ -30,6 +30,8 @@ interface JobApplicationSheetProps {
   application: JobApplicationForSheet | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Optional: use a different resume fetcher (e.g. for tenant viewing own application) */
+  getResumeUrl?: (applicationId: string) => Promise<string | null>;
 }
 
 function InfoRow({
@@ -62,6 +64,7 @@ export function JobApplicationSheet({
   application,
   open,
   onOpenChange,
+  getResumeUrl = getResumeSignedUrl,
 }: JobApplicationSheetProps) {
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   const [resumeLoading, setResumeLoading] = useState(false);
@@ -72,10 +75,10 @@ export function JobApplicationSheet({
       return;
     }
     setResumeLoading(true);
-    getResumeSignedUrl(application.id)
+    getResumeUrl(application.id)
       .then(setResumeUrl)
       .finally(() => setResumeLoading(false));
-  }, [open, application?.id]);
+  }, [open, application?.id, getResumeUrl]);
 
   if (!application) return null;
 

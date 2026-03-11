@@ -3,15 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  Briefcase,
   Building2,
   CircleCheckBig,
   ClipboardList,
   FileText,
-  FileWarning,
   Home,
   MapPin,
   ReceiptText,
-  Search,
   ShieldCheck,
   Users,
   UserRound,
@@ -27,16 +26,9 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
     {
       label: 'Main',
       items: [
-        { href: '/dashboard/tenant', label: 'Overview', icon: Home },
-        { href: '/dashboard/listings', label: 'Search listings', icon: Search },
-        { href: '/dashboard/tenant/bookings', label: 'My bookings', icon: ClipboardList },
-        { href: '/dashboard/tenant/tenancy', label: 'My tenancy', icon: FileText },
-        { href: '/dashboard/tenant/n9', label: 'N9 Form', icon: FileWarning },
-      ],
-    },
-    {
-      label: 'Account',
-      items: [
+        { href: '/dashboard/tenant/job-applications', label: 'Job Applications', icon: Briefcase },
+        { href: '/dashboard/tenant/bookings', label: 'Booking Applications', icon: ClipboardList },
+        { href: '/dashboard/tenant/tenancy', label: 'Tenancy', icon: FileText },
         { href: '/dashboard/profile', label: 'Profile', icon: UserRound },
       ],
     },
@@ -47,7 +39,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
       items: [
         { href: '/dashboard/landlord', label: 'Overview', icon: Home },
         { href: '/dashboard/landlord/listings', label: 'Listings', icon: Building2 },
-        { href: '/dashboard/facility-map', label: 'Facility Map', icon: MapPin },
+        { href: '/dashboard/facility-map', label: 'Listings', icon: MapPin },
         { href: '/dashboard/landlord/approvals', label: 'Approvals', icon: CircleCheckBig },
         { href: '/dashboard/landlord/notices', label: 'Notices', icon: FileText },
         { href: '/dashboard/landlord/screening-rules', label: 'Screening rules', icon: ShieldCheck },

@@ -3,7 +3,7 @@ import type { AppRole } from '@/types/database';
 export function resolveDashboardRoute(role: AppRole): string {
   switch (role) {
     case 'tenant':
-      return '/dashboard/tenant';
+      return '/dashboard/tenant/bookings';
     case 'landlord':
       return '/dashboard/landlord';
     case 'enterprise':

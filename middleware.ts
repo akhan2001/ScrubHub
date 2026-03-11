@@ -84,8 +84,17 @@ export async function middleware(request: NextRequest) {
     // Redirect app-specific paths to App domain
     if (isDashboardPath || isListingsPath) {
       const target = new URL(APP_URL);
-      target.pathname = pathname;
-      target.search = request.nextUrl.search;
+      // /listings and /listings/[id] now redirect to /facility-map
+      if (pathname === '/listings') {
+        target.pathname = '/facility-map';
+      } else if (pathname.startsWith('/listings/')) {
+        const id = pathname.replace(/^\/listings\//, '').replace(/\/$/, '');
+        target.pathname = '/facility-map';
+        target.searchParams.set('listing', id);
+      } else {
+        target.pathname = pathname;
+      }
+      request.nextUrl.searchParams.forEach((v, k) => target.searchParams.set(k, v));
       
       // Fallback for local dev without subdomain support
       if (!process.env.NEXT_PUBLIC_APP_URL) {
