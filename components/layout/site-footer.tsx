@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Lock } from 'lucide-react';
 import { getAppLoginUrl } from '@/lib/app-url';
 
 export function SiteFooter() {
@@ -46,10 +45,14 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          {/* <div className="flex items-center gap-2">
-            <Lock className="size-3.5" aria-hidden />
-            <span>PIPEDA & PHIPA COMPLIANT</span>
-          </div> */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">
+              Terms of Service
+            </Link>
+          </div>
           <p>© {new Date().getFullYear()} SCRUBHUB INC.</p>
         </div>
       </div>
