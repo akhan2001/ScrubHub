@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Menu } from 'lucide-react';
+import { Bell, ExternalLink, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { AppRole } from '@/types/database';
@@ -51,6 +51,7 @@ function getInitials(fullName: string | null, role: AppRole): string {
 type DashboardHeaderUser = {
   fullName: string | null;
   avatarUrl: string | null;
+  email: string | null;
 };
 
 export function DashboardHeader({
@@ -65,7 +66,7 @@ export function DashboardHeader({
   const initials = getInitials(user.fullName, role);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
+    <header className="sticky top-0 z-[1100] flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
       <div className="flex items-center gap-3">
         <Sheet>
           <SheetTrigger asChild>
@@ -133,7 +134,27 @@ export function DashboardHeader({
               </span>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="z-[1200] w-64">
+            <div className="px-2 py-2">
+              <p className="text-sm font-medium text-foreground truncate">
+                {user.fullName ?? ROLE_LABELS[role]}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {ROLE_LABELS[role]}
+              </p>
+              {user.email && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                  {user.email}
+                </p>
+              )}
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="https://www.scrubhub.ca" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                <ExternalLink className="size-4" />
+                Go to Website
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/dashboard/profile">Settings</Link>
             </DropdownMenuItem>

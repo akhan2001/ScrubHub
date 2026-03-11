@@ -5,6 +5,7 @@ import type { AppRole } from '@/types/database';
 type DashboardUser = {
   fullName: string | null;
   avatarUrl: string | null;
+  email: string | null;
 };
 
 export function DashboardShell({

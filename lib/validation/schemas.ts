@@ -16,7 +16,7 @@ export const updateBookingStatusSchema = z.object({
 });
 
 export const screeningRulesSchema = z.object({
-  minimumScore: z.coerce.number().int().min(0).max(100),
+  minimumScore: z.coerce.number().int().min(0).max(850),
   notes: z.string().max(1000).optional(),
   autoApprove: z.boolean(),
   listingId: z.string().uuid().optional(),

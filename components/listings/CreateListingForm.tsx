@@ -98,9 +98,19 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
   async function handleGenerateDescription() {
     const [description, address, title, bedrooms, bathrooms, squareFootage, monthlyRent, isFurnished, arePetsAllowed, leaseTermsVal, amenitiesVal] = watched;
     const hasTitle = typeof title === 'string' && title.trim().length > 0;
+    const hasAddress = typeof address === 'string' && address.trim().length > 0;
+    const hasDetails =
+      hasTitle ||
+      hasAddress ||
+      (typeof bedrooms === 'number' && !Number.isNaN(bedrooms)) ||
+      (typeof bathrooms === 'number' && !Number.isNaN(bathrooms)) ||
+      (typeof squareFootage === 'number' && !Number.isNaN(squareFootage)) ||
+      (typeof monthlyRent === 'number' && !Number.isNaN(monthlyRent)) ||
+      (Array.isArray(leaseTermsVal) && leaseTermsVal.length > 0) ||
+      (Array.isArray(amenitiesVal) && amenitiesVal.length > 0);
     const hasDescription = typeof description === 'string' && description.trim().length > 0;
-    if (!hasTitle && !hasDescription) {
-      toast.error('Add a title or some description to generate from.');
+    if (!hasDetails && !hasDescription) {
+      toast.error('Fill in property details above (e.g. title, address, bedrooms) before generating.');
       return;
     }
     setIsGenerating(true);
@@ -201,37 +211,6 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
           <Label htmlFor="title">Listing Title</Label>
           <Input id="title" {...register('title')} placeholder="Stylish 2BR in downtown" />
           {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            {...register('description')}
-            rows={4}
-            placeholder="Describe the property or add notes..."
-            className="min-h-[100px] w-full resize-y"
-          />
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleGenerateDescription}
-              disabled={isGenerating}
-              className="text-violet-500 hover:text-violet-600 hover:bg-transparent border-0 p-0 h-auto min-h-0 font-medium"
-              aria-label={isGenerating ? 'Generating description…' : 'Generate description with AI'}
-            >
-              {isGenerating ? (
-                <Loader2 className="size-4 animate-spin text-violet-500" />
-              ) : (
-                <Sparkles className="size-4 text-violet-500" />
-              )}
-              <span>{isGenerating ? 'Generating…' : 'Generate with AI'}</span>
-            </Button>
-            <span className="text-xs text-muted-foreground">
-              Uses your details below to draft a description
-            </span>
-          </div>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="space-y-2">
@@ -366,6 +345,44 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
               <option value="draft">Draft</option>
               <option value="published">Published</option>
             </select>
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* --- Description --- */}
+      <section className="space-y-4">
+        <h3 className="text-base font-semibold text-foreground">Description</h3>
+        <div className="space-y-2">
+          <Label htmlFor="description">Listing Description</Label>
+          <Textarea
+            id="description"
+            {...register('description')}
+            rows={4}
+            placeholder="Describe the property or add notes..."
+            className="min-h-[100px] w-full resize-y"
+          />
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleGenerateDescription}
+              disabled={isGenerating}
+              className="text-violet-500 hover:text-violet-600 hover:bg-transparent border-0 p-0 h-auto min-h-0 font-medium"
+              aria-label={isGenerating ? 'Generating description…' : 'Generate description with AI'}
+            >
+              {isGenerating ? (
+                <Loader2 className="size-4 animate-spin text-violet-500" />
+              ) : (
+                <Sparkles className="size-4 text-violet-500" />
+              )}
+              <span>{isGenerating ? 'Generating…' : 'Generate with AI'}</span>
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Uses your property details above to draft a description
+            </span>
           </div>
         </div>
       </section>

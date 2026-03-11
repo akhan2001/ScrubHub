@@ -51,7 +51,8 @@ export function ScreeningRulesForm(props: {
           name="minimum_score"
           type="number"
           min={0}
-          max={100}
+          max={850}
+          placeholder="e.g. 650 (typically 300–850)"
           defaultValue={props.minimumScore}
         />
       </div>

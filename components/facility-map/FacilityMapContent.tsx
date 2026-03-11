@@ -8,7 +8,6 @@ import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
 import { useFacilityMap } from '@/hooks/use-facility-map';
 import { FacilitySearch } from '@/components/facility-map/FacilitySearch';
 import { FacilityMapLegend } from '@/components/facility-map/FacilityMapLegend';
-import { FacilityMapCTA } from '@/components/facility-map/FacilityMapCTA';
 import { ListingDetailPanel } from '@/components/facility-map/ListingDetailPanel';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
@@ -86,46 +85,79 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
   return (
     <div className="flex flex-1 flex-col">
       {/* Header */}
-      <div className="relative z-[500] shrink-0 border-b border-[#d8e4f0] bg-white px-6 py-4">
+      <div
+        className={
+          isDashboard
+            ? 'relative z-10 shrink-0 border-b border-border bg-card px-4 py-6 md:px-8 md:py-8'
+            : 'relative z-[500] shrink-0 border-b border-[#d8e4f0] bg-white px-6 py-4'
+        }
+      >
         {isDashboard ? (
-          <nav aria-label="Breadcrumb" className="mb-1 text-sm text-muted-foreground">
-            <ol className="flex items-center gap-1.5">
-              <li>
-                <Link href="/dashboard" className="font-semibold text-primary hover:underline">
-                  Dashboard
-                </Link>
-              </li>
-              <li aria-hidden className="select-none text-muted-foreground/80">
-                &gt;
-              </li>
-              <li>
-                <span className="text-muted-foreground">Facility Map</span>
-              </li>
-            </ol>
-          </nav>
+          <div className="mx-auto flex w-full max-w-[var(--container-max)] flex-col gap-4">
+            <nav aria-label="Breadcrumb" className="text-sm">
+              <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
+                <li>
+                  <Link
+                    href="/dashboard"
+                    className="font-semibold text-primary transition-colors hover:underline"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+                <li aria-hidden className="select-none text-muted-foreground/80">
+                  &gt;
+                </li>
+                <li>
+                  <span className="text-muted-foreground">Facility Map</span>
+                </li>
+              </ol>
+            </nav>
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div className="min-w-0 space-y-1">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
+                  Facility Map
+                </h1>
+                <p className="max-w-3xl text-base text-muted-foreground md:text-lg">
+                  {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to
+                  view details and book a space.
+                </p>
+              </div>
+              <div className="w-full shrink-0 md:w-80">
+                <FacilitySearch
+                  facilities={FACILITIES}
+                  listings={listings}
+                  onSelect={handleSearchSelect}
+                  onSelectListing={handleSelectListing}
+                  mapReady={mapReady}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
-          <p className="mb-0.5 text-xs text-[#6b7280]">
-            <Link href="/" className="text-primary hover:underline">
-              Home
-            </Link>
-            <span className="mx-1.5">›</span>
-            Facility Map
-          </p>
+          <>
+            <p className="mb-0.5 text-xs text-[#6b7280]">
+              <Link href="/" className="text-primary hover:underline">
+                Home
+              </Link>
+              <span className="mx-1.5">›</span>
+              Facility Map
+            </p>
+            <h1 className="text-2xl font-extrabold tracking-tight text-[#0F172A]">
+              401 Corridor — Live Facility Map
+            </h1>
+            <p className="mb-4 text-sm text-[#6b7280]">
+              {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to view
+              details and book a space.
+            </p>
+            <FacilitySearch
+              facilities={FACILITIES}
+              listings={listings}
+              onSelect={handleSearchSelect}
+              onSelectListing={handleSelectListing}
+              mapReady={mapReady}
+            />
+          </>
         )}
-        <h1 className="text-2xl font-extrabold tracking-tight text-[#0F172A]">
-          401 Corridor — Live Facility Map
-        </h1>
-        <p className="mb-4 text-sm text-[#6b7280]">
-          {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to view
-          details and book a space.
-        </p>
-        <FacilitySearch
-          facilities={FACILITIES}
-          listings={listings}
-          onSelect={handleSearchSelect}
-          onSelectListing={handleSelectListing}
-          mapReady={mapReady}
-        />
       </div>
 
       {/* Map */}
@@ -138,7 +170,6 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
           </div>
         )}
         <FacilityMapLegend />
-        <FacilityMapCTA />
       </div>
 
       {/* Listing detail sheet */}

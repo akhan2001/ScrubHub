@@ -52,12 +52,12 @@ export async function generateListingDescription(params: {
           {
             role: 'system',
             content:
-              'You are a real estate copywriter. Generate a concise, professional rental listing description. Output only the description text, no headings or labels.',
+              'You are a real estate copywriter. Generate a concise, professional rental listing description. CRITICAL: Only use the property details provided below. Do not invent or assume any features, amenities, or characteristics not explicitly listed (e.g. no "finished backyard" unless listed). Output only the description text, no headings or labels.',
           },
           { role: 'user', content: userContent },
         ],
         max_tokens: 500,
-        temperature: 0.7,
+        temperature: 0.45,
       }),
     });
 

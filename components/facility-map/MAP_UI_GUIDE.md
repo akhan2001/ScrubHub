@@ -12,7 +12,6 @@ A short guide for customizing the facility map components.
 | **Cluster colors/sizes** | `hooks/use-facility-map.ts` — `iconCreateFunction` inside `L.markerClusterGroup` |
 | **Legend items** | `components/facility-map/FacilityMapLegend.tsx` — the arrays of `{ col, label }` |
 | **Search bar** | `components/facility-map/FacilitySearch.tsx` — input, dropdown, and result styling |
-| **CTA card** | `components/facility-map/FacilityMapCTA.tsx` |
 | **Map height** | `app/(marketing)/facility-map/page.tsx` — the `min-h-[600px]` class on the map container |
 
 ## Quick Examples

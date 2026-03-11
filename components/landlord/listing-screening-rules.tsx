@@ -65,12 +65,13 @@ export function ListingScreeningRules({ listingId, rules }: ListingScreeningRule
             name="minimum_score"
             type="number"
             min={0}
-            max={100}
-            defaultValue={rules?.minimum_score ?? 60}
+            max={850}
+            placeholder="e.g. 650 (typically 300–850)"
+            defaultValue={rules?.minimum_score ?? 650}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="max_ratio">Max Income-to-Rent Ratio</Label>
+          <Label htmlFor="max_ratio">Income-to-rent guideline (optional)</Label>
           <Input
             id="max_ratio"
             name="max_ratio"
@@ -80,6 +81,9 @@ export function ListingScreeningRules({ listingId, rules }: ListingScreeningRule
             placeholder="e.g. 3.0"
             defaultValue={rules?.max_income_to_rent_ratio ?? ''}
           />
+          <p className="text-xs text-muted-foreground">
+            Rough guideline only. Actual affordability depends on tenant debt and other expenses.
+          </p>
         </div>
       </div>
 

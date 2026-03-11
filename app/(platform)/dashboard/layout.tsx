@@ -16,6 +16,7 @@ export default async function DashboardLayout({
       user={{
         fullName: profile?.full_name ?? null,
         avatarUrl: profile?.avatar_url ?? null,
+        email: session.email ?? null,
       }}
     >
       {children}
