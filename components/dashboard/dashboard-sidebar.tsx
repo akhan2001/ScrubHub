@@ -9,6 +9,7 @@ import {
   FileText,
   FileWarning,
   Home,
+  MapPin,
   ReceiptText,
   Search,
   ShieldCheck,
@@ -46,6 +47,7 @@ const NAV_BY_ROLE: Record<AppRole, NavSection[]> = {
       items: [
         { href: '/dashboard/landlord', label: 'Overview', icon: Home },
         { href: '/dashboard/landlord/listings', label: 'Listings', icon: Building2 },
+        { href: '/dashboard/facility-map', label: 'Facility Map', icon: MapPin },
         { href: '/dashboard/landlord/approvals', label: 'Approvals', icon: CircleCheckBig },
         { href: '/dashboard/landlord/notices', label: 'Notices', icon: FileText },
         { href: '/dashboard/landlord/screening-rules', label: 'Screening rules', icon: ShieldCheck },

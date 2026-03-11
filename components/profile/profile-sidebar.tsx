@@ -1,6 +1,7 @@
 'use client';
 
-import { CheckCircle2, X, ShieldCheck, CalendarDays } from 'lucide-react';
+import { CheckCircle2, X, ShieldCheck, CalendarDays, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DonutChart } from './donut-chart';
 import type { ProfileSection } from '@/types/profile';
@@ -105,6 +106,14 @@ export function ProfileSidebar({
           )}
         </CardContent>
       </Card>
+
+      <Link
+        href="/onboarding?change=1"
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <RefreshCw className="size-4" />
+        Change role?
+      </Link>
 
       {isComplete && isVerified && (
         <Card>

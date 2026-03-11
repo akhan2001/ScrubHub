@@ -1,17 +1,14 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { Bell, Check, Menu, Plus } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import type { AppRole } from '@/types/database';
-import { updateProfileRole } from '@/actions/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -26,7 +23,6 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { NotificationsPanel } from '@/components/dashboard/notifications-panel';
 import { IconButton } from '@/components/ui/icon-button';
-import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const ROLE_LABELS: Record<AppRole, string> = {
@@ -40,8 +36,6 @@ const ROLE_SHORT: Record<AppRole, string> = {
   landlord: 'Landlord',
   enterprise: 'Enterprise',
 };
-
-const ALL_ROLES: AppRole[] = ['tenant', 'landlord', 'enterprise'];
 
 function getInitials(fullName: string | null, role: AppRole): string {
   if (fullName?.trim()) {
@@ -67,24 +61,8 @@ export function DashboardHeader({
   user: DashboardHeaderUser;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const pageTitle = pathname.split('/').at(-1)?.replace(/-/g, ' ') ?? 'overview';
   const initials = getInitials(user.fullName, role);
-  const [isSwitching, startTransition] = useTransition();
-  const otherRoles = ALL_ROLES.filter((r) => r !== role);
-
-  function handleSwitchRole(newRole: AppRole) {
-    if (isSwitching) return;
-    startTransition(async () => {
-      try {
-        await updateProfileRole(newRole);
-        router.push('/dashboard');
-        router.refresh();
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to switch role');
-      }
-    });
-  }
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
@@ -156,28 +134,6 @@ export function DashboardHeader({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              Active Role
-            </DropdownMenuLabel>
-            <DropdownMenuItem disabled className="font-medium">
-              <Check className="mr-2 size-3.5" />
-              {ROLE_LABELS[role]}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              Switch Role
-            </DropdownMenuLabel>
-            {otherRoles.map((r) => (
-              <DropdownMenuItem
-                key={r}
-                disabled={isSwitching}
-                onSelect={() => handleSwitchRole(r)}
-              >
-                <Plus className="mr-2 size-3.5" />
-                {ROLE_LABELS[r]}
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard/profile">Settings</Link>
             </DropdownMenuItem>

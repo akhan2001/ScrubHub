@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { confirmRoleSelection } from '@/actions/auth';
 import type { AppRole } from '@/types/database';
 import { ROLES } from '@/lib/roles';
 import { RoleCard } from './role-card';
 
-export function RoleSelection() {
+type Props = { isChangingRole?: boolean };
+
+export function RoleSelection({ isChangingRole }: Props) {
   const [selected, setSelected] = useState<AppRole | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -25,10 +28,12 @@ export function RoleSelection() {
           S
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          I&apos;m joining ScrubHub as&hellip;
+          {isChangingRole ? 'Change your role' : "I'm joining ScrubHub as…"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Choose the role that best describes you. You can add more roles later.
+          {isChangingRole
+            ? 'Select the role you want to switch to.'
+            : 'Choose the role that best describes you. You can change it anytime from your profile.'}
         </p>
       </div>
 
@@ -47,8 +52,20 @@ export function RoleSelection() {
       </div>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        You can always add a role later from your dashboard settings.
+        {isChangingRole
+          ? 'You’ll be redirected to your dashboard after selecting.'
+          : 'You can change your role anytime from your profile.'}
       </p>
+      {isChangingRole && (
+        <p className="mt-4 text-center">
+          <Link
+            href="/dashboard/profile"
+            className="text-sm text-muted-foreground underline hover:text-foreground"
+          >
+            Back to profile
+          </Link>
+        </p>
+      )}
     </div>
   );
 }
