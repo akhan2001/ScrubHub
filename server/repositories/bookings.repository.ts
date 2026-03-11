@@ -15,6 +15,57 @@ export async function fetchBookingsForTenant(
   return data ?? [];
 }
 
+export interface BookingWithListing {
+  id: string;
+  listing_id: string;
+  status: BookingStatus;
+  requested_at: string;
+  move_in_date_requested: string | null;
+  message_to_landlord: string | null;
+  listing_title: string | null;
+  listing_address: string | null;
+  listing_price_cents: number | null;
+}
+
+export async function fetchBookingsForTenantWithListing(
+  tenantUserId: string
+): Promise<BookingWithListing[]> {
+  const supabase = await createClient();
+  const { data: bookings, error: bookingsErr } = await supabase
+    .from('bookings')
+    .select('id, listing_id, status, requested_at, move_in_date_requested, message_to_landlord')
+    .eq('tenant_user_id', tenantUserId)
+    .order('requested_at', { ascending: false });
+
+  if (bookingsErr) throw bookingsErr;
+  if (!bookings || bookings.length === 0) return [];
+
+  const listingIds = [...new Set(bookings.map((b) => b.listing_id))];
+  const { data: listings } = await supabase
+    .from('listings')
+    .select('id, title, address, price_cents')
+    .in('id', listingIds);
+
+  const listingMap = new Map(
+    (listings ?? []).map((l: Record<string, unknown>) => [l.id as string, l])
+  );
+
+  return bookings.map((row) => {
+    const listing = listingMap.get(row.listing_id);
+    return {
+      id: row.id,
+      listing_id: row.listing_id,
+      status: row.status as BookingStatus,
+      requested_at: row.requested_at,
+      move_in_date_requested: row.move_in_date_requested,
+      message_to_landlord: row.message_to_landlord,
+      listing_title: (listing?.title as string) ?? null,
+      listing_address: (listing?.address as string) ?? null,
+      listing_price_cents: (listing?.price_cents as number) ?? null,
+    };
+  });
+}
+
 export async function fetchBookingsForLandlord(
   landlordUserId: string
 ): Promise<Pick<Booking, 'id' | 'listing_id' | 'status' | 'requested_at' | 'tenant_user_id'>[]> {

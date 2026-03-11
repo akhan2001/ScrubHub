@@ -27,6 +27,19 @@ export async function getResumeSignedUrl(applicationId: string): Promise<string 
   return data?.signedUrl ?? null;
 }
 
+export async function getResumeSignedUrlForTenant(applicationId: string): Promise<string | null> {
+  const user = await requireRole('tenant');
+  const application = await fetchApplicationById(applicationId);
+  if (!application || application.user_id !== user.id) return null;
+
+  const supabase = await createClient();
+  const { data } = await supabase.storage
+    .from(RESUMES_BUCKET)
+    .createSignedUrl(application.resume_url, 60 * 60); // 1 hour
+
+  return data?.signedUrl ?? null;
+}
+
 export async function applyForJob(input: {
   jobId: string;
   email: string;
@@ -61,4 +74,5 @@ export async function applyForJob(input: {
   revalidatePath('/jobs');
   revalidatePath(`/jobs/${input.jobId}`);
   revalidatePath('/dashboard/enterprise/applications');
+  revalidatePath('/dashboard/tenant/job-applications');
 }

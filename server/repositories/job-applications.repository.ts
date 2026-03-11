@@ -90,3 +90,17 @@ export async function fetchApplicationsByOrgId(
   if (error) throw error;
   return (data ?? []) as JobApplicationWithJob[];
 }
+
+export async function fetchApplicationsByUserId(
+  userId: string
+): Promise<JobApplicationWithJob[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('job_applications')
+    .select('*, job_posts(title)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as JobApplicationWithJob[];
+}

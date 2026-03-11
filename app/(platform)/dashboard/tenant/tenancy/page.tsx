@@ -10,10 +10,10 @@ export default async function TenantTenancyPage() {
   return (
     <DashboardSection
       breadcrumb={[
-        { label: 'Dashboard', href: '/dashboard/tenant' },
-        { label: 'My tenancy' },
+        { label: 'Dashboard', href: '/dashboard/tenant/bookings' },
+        { label: 'Tenancy' },
       ]}
-      title="My tenancy"
+      title="Tenancy"
       description="View your active leases and manage your tenancy."
     >
       <TenancyPageClient leases={leases} />

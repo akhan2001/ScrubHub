@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Facility Map | ScrubHub',
-  description: '401 Corridor — Live facility map with hospitals, clinics, and healthcare listings.',
+  title: 'Listings | ScrubHub',
+  description: '401 Corridor — Healthcare listings with hospitals, clinics, and healthcare spaces.',
 };
 
 export default function FacilityMapLayout({

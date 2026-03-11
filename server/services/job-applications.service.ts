@@ -2,6 +2,7 @@ import {
   insertJobApplication,
   fetchApplicationByJobAndUser,
   fetchApplicationsByOrgId,
+  fetchApplicationsByUserId,
   type JobApplicationWithJob,
 } from '@/server/repositories/job-applications.repository';
 import { fetchOrgMemberships } from '@/server/repositories/organizations.repository';
@@ -23,6 +24,14 @@ export type ApplicationWithJobTitle = JobApplicationWithJob & { job_title: strin
 
 export async function getApplicationsForOrg(orgId: string): Promise<ApplicationWithJobTitle[]> {
   const rows = await fetchApplicationsByOrgId(orgId);
+  return rows.map((row) => ({
+    ...row,
+    job_title: row.job_posts?.title ?? 'Unknown job',
+  }));
+}
+
+export async function getApplicationsForTenant(userId: string): Promise<ApplicationWithJobTitle[]> {
+  const rows = await fetchApplicationsByUserId(userId);
   return rows.map((row) => ({
     ...row,
     job_title: row.job_posts?.title ?? 'Unknown job',

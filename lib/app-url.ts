@@ -48,14 +48,14 @@ export function getAppDashboardUrl(): string {
 
 export function getAppListingsUrl(): string {
   const base = getAppUrl();
-  if (base) return `${base}/listings`;
-  return '/listings?host=app';
+  if (base) return `${base}/facility-map`;
+  return '/facility-map';
 }
 
 export function getAppListingUrl(id: string): string {
   const base = getAppUrl();
-  if (base) return `${base}/listings/${id}`;
-  return `/listings/${id}?host=app`;
+  if (base) return `${base}/facility-map?listing=${id}`;
+  return `/facility-map?listing=${id}`;
 }
 
 export function getAppJobUrl(id: string): string {

@@ -9,10 +9,9 @@ import type { User } from '@supabase/supabase-js';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { href: '/facility-map', label: 'Facility Map' },
+  { href: '/facility-map', label: 'Listings' },
   { href: '/staffing', label: 'Staffing' },
   { href: '/plans', label: 'Pricing' },
-  { href: '/listings', label: 'Listings' },
 ] as const;
 
 type NavLabel = (typeof NAV_LINKS)[number]['label'];

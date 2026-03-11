@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import type { Facility } from '@/lib/map/facilities';
 import { FACILITIES } from '@/lib/map/facilities';
 import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
@@ -10,6 +11,7 @@ import { FacilitySearch } from '@/components/facility-map/FacilitySearch';
 import { FacilityMapLegend } from '@/components/facility-map/FacilityMapLegend';
 import { ListingDetailPanel } from '@/components/facility-map/ListingDetailPanel';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { getTenantApplicationContext } from '@/actions/tenant-application';
 
 /** 401 corridor bounds: Southern Ontario */
 const INITIAL_BOUNDS = {
@@ -31,8 +33,16 @@ type FacilityMapContentProps = {
 
 export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContentProps) {
   const mapElRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
   const [listings, setListings] = useState<ListingWithCoordinates[]>([]);
   const [selectedListing, setSelectedListing] = useState<ListingWithCoordinates | null>(null);
+  const [appContext, setAppContext] = useState<
+    Awaited<ReturnType<typeof getTenantApplicationContext>> | undefined
+  >(undefined);
+
+  useEffect(() => {
+    getTenantApplicationContext().then(setAppContext);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams({
@@ -53,6 +63,14 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
       })
       .catch(() => setListings([]));
   }, []);
+
+  useEffect(() => {
+    const listingId = searchParams.get('listing');
+    if (listingId && listings.length > 0) {
+      const match = listings.find((l) => l.id === listingId);
+      if (match) setSelectedListing(match);
+    }
+  }, [searchParams, listings]);
 
   useEffect(() => {
     window.__facilityMapViewListing = (id: string) => {
@@ -108,14 +126,14 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
                   &gt;
                 </li>
                 <li>
-                  <span className="text-muted-foreground">Facility Map</span>
+                  <span className="text-muted-foreground">Listings</span>
                 </li>
               </ol>
             </nav>
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div className="min-w-0 space-y-1">
                 <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
-                  Facility Map
+                  Listings
                 </h1>
                 <p className="max-w-3xl text-base text-muted-foreground md:text-lg">
                   {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to
@@ -140,10 +158,10 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
                 Home
               </Link>
               <span className="mx-1.5">›</span>
-              Facility Map
+              Listings
             </p>
             <h1 className="text-2xl font-extrabold tracking-tight text-[#0F172A]">
-              401 Corridor — Live Facility Map
+              401 Corridor — Healthcare Listings
             </h1>
             <p className="mb-4 text-sm text-[#6b7280]">
               {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to view
@@ -187,6 +205,8 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
               listing={selectedListing}
               onClose={() => setSelectedListing(null)}
               variant="sheet"
+              showApplyFlow={appContext?.role === 'tenant'}
+              redirectPath={isDashboard ? '/dashboard/facility-map' : '/facility-map'}
             />
           )}
         </SheetContent>

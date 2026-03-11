@@ -21,7 +21,7 @@ type ListingPanelProps = {
 
 function formatPrice(cents: number | null) {
   if (!cents) return "Price on request";
-  return `$${Math.round(cents / 100)} / night`;
+  return `$${Math.round(cents / 100)}/mo`;
 }
 
 export function ListingPanel({
