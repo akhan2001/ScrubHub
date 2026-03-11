@@ -1,18 +1,22 @@
 import { createClient } from '@/lib/supabase/server';
 import type { JobPost, JobStatus } from '@/types/database';
 
-export async function fetchJobPostsByOrg(
-  orgId: string
-): Promise<Pick<JobPost, 'id' | 'title' | 'status' | 'created_at'>[]> {
+export async function fetchJobPostsByOrg(orgId: string): Promise<JobPost[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('job_posts')
-    .select('id, title, status, created_at')
+    .select('*')
     .eq('org_id', orgId)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
   return data ?? [];
+}
+
+export async function deleteJobPost(id: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.from('job_posts').delete().eq('id', id);
+  if (error) throw error;
 }
 
 export async function fetchPublishedJobPosts(): Promise<JobPost[]> {

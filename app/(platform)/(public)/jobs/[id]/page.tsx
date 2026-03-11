@@ -2,16 +2,32 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getJobPostById } from '@/server/services/job-posts.service';
 import { getPublishedListing } from '@/server/services/listings.service';
+import { getAuthUser } from '@/server/auth/get-auth-user';
+import { getProfile } from '@/server/services/profiles.service';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { JobApplyButton } from '@/components/jobs/job-apply-button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, DollarSign, Calendar, Building2, Home, ArrowLeft, BedDouble } from 'lucide-react';
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const job = await getJobPostById(id);
+  const [job, user] = await Promise.all([
+    getJobPostById(id),
+    getAuthUser(),
+  ]);
   if (!job || job.status !== 'published') notFound();
+
+  const profile = user ? await getProfile(user.id) : null;
+  const applyUser = user && profile
+    ? {
+        id: user.id,
+        email: user.email ?? undefined,
+        phone: profile.phone_number ?? undefined,
+        role: profile.role,
+      }
+    : null;
 
   const linkedListing = job.linked_listing_id
     ? await getPublishedListing(job.linked_listing_id)
@@ -117,17 +133,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         <Separator />
 
         <div className="flex items-center gap-3">
-          {linkedListing ? (
-            <Button asChild size="lg">
-              <Link href={`/listings/${linkedListing.id}?apply=true`}>
-                Apply for this Job
-              </Link>
-            </Button>
-          ) : (
-            <Button size="lg" disabled>
-              Apply (Coming Soon)
-            </Button>
-          )}
+          <JobApplyButton
+            jobId={job.id}
+            redirectTo={`/jobs/${job.id}`}
+            user={applyUser}
+          />
         </div>
       </div>
     </div>

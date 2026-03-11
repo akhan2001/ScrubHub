@@ -4,6 +4,7 @@ import {
   fetchJobPostById,
   insertJobPost,
   updateJobPost,
+  deleteJobPost as deleteJobPostRepo,
   type InsertJobPostInput,
 } from '@/server/repositories/job-posts.repository';
 
@@ -51,4 +52,8 @@ export async function editJobPost(
   input: Partial<Omit<InsertJobPostInput, 'org_id' | 'created_by'>>
 ) {
   await updateJobPost(id, input);
+}
+
+export async function deleteJobPost(id: string) {
+  await deleteJobPostRepo(id);
 }

@@ -58,5 +58,7 @@ export async function applyForJob(input: {
 
   revalidatePath('/staffing');
   revalidatePath(`/staffing/jobs/${input.jobId}`);
+  revalidatePath('/jobs');
+  revalidatePath(`/jobs/${input.jobId}`);
   revalidatePath('/dashboard/enterprise/applications');
 }

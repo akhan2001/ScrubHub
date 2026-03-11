@@ -51,6 +51,11 @@ export const jobPostSchema = z.object({
   linkedListingId: z.string().uuid().optional(),
 });
 
+export const updateJobPostSchema = jobPostSchema.omit({ orgId: true }).partial().extend({
+  title: z.string().min(3).max(180).optional(),
+  description: z.string().min(3).max(5000).optional(),
+});
+
 export const createPaymentSchema = z.object({
   bookingId: z.string().uuid(),
   amountCents: z.coerce.number().int().positive(),
