@@ -46,6 +46,24 @@ export function getAppDashboardUrl(): string {
   return '/dashboard?host=app';
 }
 
+/**
+ * Full URL for the OAuth callback. Used as redirectTo for signInWithOAuth.
+ * Uses app domain in production so the session is established on app.scrubhub.ca
+ * (where the dashboard lives). On localhost, uses current origin.
+ * Must be in Supabase Dashboard → Auth → URL Configuration → Redirect URLs.
+ */
+export function getAppAuthCallbackUrl(): string {
+  if (typeof window !== 'undefined') {
+    const isLocalhost =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) return `${window.location.origin}/auth/callback`;
+  }
+  const base = getAppUrl();
+  if (base) return `${base}/auth/callback`;
+  if (typeof window !== 'undefined') return `${window.location.origin}/auth/callback`;
+  return '/auth/callback';
+}
+
 export function getAppListingsUrl(): string {
   const base = getAppUrl();
   if (base) return `${base}/facility-map`;
