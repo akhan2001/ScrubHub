@@ -291,7 +291,7 @@ export function LandingClient({ user }: { user: User | null }) {
                 <div className="w-full aspect-[4/3] rounded-2xl border border-[#c8c8c8] shadow-[0_30px_60px_rgba(0,31,63,0.12)] bg-white p-2 hover:scale-[1.01] transition-transform duration-500 overflow-hidden relative">
                   <div className="absolute inset-2 rounded-xl bg-[#f0f4fa] border border-[#e0e0e0] overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80"
+                      src="/images/hyperlocal_map.png"
                       alt="Map View of the Corridor"
                       className="w-full h-full object-cover"
                     />
