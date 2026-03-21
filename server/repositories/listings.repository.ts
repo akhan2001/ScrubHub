@@ -155,7 +155,7 @@ export type MapListingRow = Pick<
   Listing,
   'id' | 'title' | 'description' | 'address' | 'price_cents' | 'status' | 'created_at' |
   'latitude' | 'longitude' | 'bedrooms' | 'bathrooms' | 'square_footage' |
-  'is_furnished' | 'are_pets_allowed' | 'images' | 'lease_terms'
+  'is_furnished' | 'are_pets_allowed' | 'images' | 'lease_terms' | 'available_date'
 >;
 
 export async function fetchPublishedListingsInBounds(
@@ -164,7 +164,7 @@ export async function fetchPublishedListingsInBounds(
   const supabase = await createClient();
   let query = supabase
     .from('listings')
-    .select('id, title, description, address, price_cents, status, created_at, latitude, longitude, bedrooms, bathrooms, square_footage, is_furnished, are_pets_allowed, images, lease_terms')
+    .select('id, title, description, address, price_cents, status, created_at, latitude, longitude, bedrooms, bathrooms, square_footage, is_furnished, are_pets_allowed, images, lease_terms, available_date')
     .eq('status', 'published')
     .not('latitude', 'is', null)
     .not('longitude', 'is', null)

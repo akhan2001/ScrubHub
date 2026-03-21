@@ -37,6 +37,7 @@ export type ListingWithCoordinates = Pick<
   | "are_pets_allowed"
   | "images"
   | "lease_terms"
+  | "available_date"
 > & {
   latitude: number;
   longitude: number;

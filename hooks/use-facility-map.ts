@@ -5,10 +5,49 @@ import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import type { Facility } from '@/lib/map/facilities';
 import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
+import {
+  createListingPopupHTML,
+  createPricePinHTML,
+  type ListingStatusBadge,
+} from '@/components/map/ListingMapPopup';
 
-function formatPrice(cents: number | null) {
-  if (!cents) return 'N/A';
-  return `$${Math.round(cents / 100)}`;
+function haversineKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function findNearestFacility(
+  lat: number,
+  lng: number,
+  facilities: Facility[]
+): { facility: Facility; distanceKm: number } | null {
+  if (facilities.length === 0) return null;
+  let nearest: { facility: Facility; distanceKm: number } | null = null;
+  for (const f of facilities) {
+    const d = haversineKm(lat, lng, f.lat, f.lng);
+    if (!nearest || d < nearest.distanceKm) {
+      nearest = { facility: f, distanceKm: d };
+    }
+  }
+  return nearest;
+}
+
+function mapStatusToBadge(status: string | undefined): ListingStatusBadge {
+  if (status === 'published') return 'available';
+  if (status === 'draft') return 'under_review';
+  return 'available';
 }
 
 export function useFacilityMap(
@@ -153,45 +192,47 @@ export function useFacilityMap(
       listingMarkersRef.current = [];
 
       list.forEach((listing) => {
-        const priceLabel = formatPrice(listing.price_cents);
+        const nearest = findNearestFacility(
+          listing.latitude,
+          listing.longitude,
+          facilities
+        );
+
         const icon = L.divIcon({
-          html: `<div style="
-            font-family:Inter,sans-serif;
-            font-size:11px;font-weight:600;
-            padding:4px 8px;
-            border-radius:999px;
-            border:2px solid #0f172a;
-            background:#fff;
-            color:#0f172a;
-            box-shadow:0 1px 4px rgba(0,0,0,0.2);
-            white-space:nowrap;
-          ">${priceLabel}</div>`,
+          html: createPricePinHTML(
+            listing.price_cents,
+            mapStatusToBadge(listing.status)
+          ),
           className: '',
           iconSize: [60, 24],
           iconAnchor: [30, 12],
         });
 
-        const listingId = String(listing.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        const popup = `
-          <div style="font-family:Inter,sans-serif;min-width:180px;padding:4px 2px;">
-            <h4 style="margin:0 0 6px;font-size:13px;font-weight:700;color:#0F172A;">${(listing.title ?? 'Listing').replace(/</g, '&lt;')}</h4>
-            <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">${priceLabel}/mo</p>
-            <button type="button" onclick="event.preventDefault();var fn=window.__facilityMapViewListing;if(fn)fn('${listingId}');" style="
-              display:block;width:100%;text-align:center;background:#2563eb;color:white;
-              border-radius:8px;padding:6px 0;font-size:12px;font-weight:600;
-              border:none;cursor:pointer;
-            ">View Listing →</button>
-          </div>`;
+        const popupHtml = createListingPopupHTML({
+          id: listing.id,
+          title: listing.title ?? 'Listing',
+          monthlyRent: listing.price_cents,
+          beds: listing.bedrooms,
+          baths: listing.bathrooms,
+          sqft: listing.square_footage,
+          furnished: listing.is_furnished ?? false,
+          status: mapStatusToBadge(listing.status),
+          availableDate: listing.available_date ?? null,
+          distanceToFacility: nearest?.distanceKm ?? null,
+          facilityName: nearest?.facility.name ?? null,
+          photoUrl: listing.images?.[0] ?? null,
+          onViewListingId: listing.id,
+        });
 
         const marker = L.marker([listing.latitude, listing.longitude], { icon })
-          .bindPopup(popup, { maxWidth: 240 })
+          .bindPopup(popupHtml, { maxWidth: 300 })
           .addTo(map);
 
         listingMarkersRef.current.push(marker);
       });
     };
     addListingMarkers(mapRef.current, listings);
-  }, [mapReady, listings]);
+  }, [mapReady, listings, facilities]);
 
   return { mapRef, markersByFacilityIdRef, mapReady };
 }
