@@ -65,6 +65,7 @@ export function withMockCoordinates(
       are_pets_allowed: false,
       images: null,
       lease_terms: null,
+      available_date: null,
     };
   });
 }

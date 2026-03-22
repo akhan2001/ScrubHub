@@ -15,7 +15,7 @@ type ListingsMarketplaceProps = {
     Listing,
     | "id" | "title" | "description" | "address" | "price_cents" | "status" | "created_at"
     | "latitude" | "longitude" | "bedrooms" | "bathrooms" | "square_footage"
-    | "is_furnished" | "are_pets_allowed" | "images" | "lease_terms"
+    | "is_furnished" | "are_pets_allowed" | "images" | "lease_terms" | "available_date"
   >[];
 };
 
@@ -53,6 +53,7 @@ export function ListingsMarketplace({ listings: initialListings }: ListingsMarke
         are_pets_allowed: l.are_pets_allowed ?? false,
         images: l.images ?? null,
         lease_terms: l.lease_terms ?? null,
+        available_date: l.available_date ?? null,
       }));
   }, [initialListings, dynamicListings]);
 
