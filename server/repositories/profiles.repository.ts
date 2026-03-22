@@ -7,7 +7,7 @@ export async function fetchProfileById(userId: string): Promise<Profile | null> 
     .from('profiles')
     .select('*')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   if (!data) return null;
@@ -154,7 +154,7 @@ export async function fetchUserOnboardingStatus(userId: string): Promise<{
     supabase.from('landlord_profiles').select('id').eq('id', userId).maybeSingle(),
     supabase.from('organizations').select('id').eq('owner_user_id', userId).maybeSingle(),
     supabase.from('org_memberships').select('id').eq('user_id', userId).maybeSingle(),
-    supabase.from('profiles').select('job_title').eq('id', userId).single(),
+    supabase.from('profiles').select('job_title').eq('id', userId).maybeSingle(),
     supabase.from('listings').select('id', { count: 'exact', head: true }).eq('user_id', userId)
   ]);
 

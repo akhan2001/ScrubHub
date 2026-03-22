@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { AddressAutocomplete } from '@/components/map/address-autocomplete';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { cn } from '@/lib/utils';
 import type { JobPost } from '@/types/database';
 import type { Listing } from '@/types/database';
@@ -60,7 +61,7 @@ export function EditJobPostForm({ job, orgListings = [], onSuccess, onCancel }: 
       onSuccess?.();
     } catch (err) {
       unstable_rethrow(err);
-      toast.error(err instanceof Error ? err.message : 'Unable to update job post');
+      toast.error(getUserFacingErrorMessage(err, "We couldn't update this job post. Please try again."));
     } finally {
       setLoading(false);
     }

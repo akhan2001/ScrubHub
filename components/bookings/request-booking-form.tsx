@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createBooking } from '@/actions/bookings';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -23,7 +24,9 @@ export function RequestBookingForm({ listingId }: { listingId: string }) {
       setMessage('Booking request submitted.');
       form.reset();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit booking request.');
+      setError(
+        getUserFacingErrorMessage(err, "We couldn't send your booking request. Please try again.")
+      );
     } finally {
       setLoading(false);
     }

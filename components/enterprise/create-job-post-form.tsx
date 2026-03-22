@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { AddressAutocomplete } from '@/components/map/address-autocomplete';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { cn } from '@/lib/utils';
 import type { Listing } from '@/types/database';
 
@@ -64,7 +65,7 @@ export function CreateJobPostForm({ orgId, orgListings = [], onSuccess }: Create
       onSuccess?.();
     } catch (err) {
       unstable_rethrow(err);
-      toast.error(err instanceof Error ? err.message : 'Unable to create job post');
+      toast.error(getUserFacingErrorMessage(err, "We couldn't create this job post. Please try again."));
     } finally {
       setLoading(false);
     }

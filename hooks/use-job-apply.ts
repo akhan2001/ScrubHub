@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { uploadResume } from '@/lib/integrations/supabase-storage';
 import { applyForJob } from '@/actions/job-applications';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import type { JobApplicationData } from '@/lib/validations/job-application';
 
 export function useJobApply(jobId: string) {
@@ -22,7 +23,9 @@ export function useJobApply(jobId: string) {
         coverMessage: data.coverMessage,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit application');
+      setError(
+        getUserFacingErrorMessage(err, "We couldn't submit your application. Please try again.")
+      );
       throw err;
     } finally {
       setIsSubmitting(false);

@@ -2,6 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getAppUrl } from '@/lib/app-url';
+import { voidSendWelcomeEmail } from '@/lib/email/send-transactional';
+import { emailAppPath } from '@/lib/email/urls';
 
 /**
  * OAuth callback handler. Supabase redirects here after Google sign-in.
@@ -51,7 +53,21 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('verification_state, full_name')
+          .eq('id', user.id)
+          .maybeSingle();
+        const wasNotVerified = prof?.verification_state !== 'verified';
         await supabase.from('profiles').update({ verification_state: 'verified' }).eq('id', user.id);
+        if (wasNotVerified && user.email) {
+          voidSendWelcomeEmail({
+            userId: user.id,
+            email: user.email,
+            userName: prof?.full_name ?? user.user_metadata?.full_name ?? user.email,
+            dashboardUrl: emailAppPath('/dashboard'),
+          });
+        }
       }
       response.headers.set('Location', successRedirect);
       return response;

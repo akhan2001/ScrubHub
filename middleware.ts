@@ -105,12 +105,15 @@ export async function middleware(request: NextRequest) {
         target.pathname = pathname;
       }
       request.nextUrl.searchParams.forEach((v, k) => target.searchParams.set(k, v));
-      
-      // Fallback for local dev without subdomain support
-      if (!process.env.NEXT_PUBLIC_APP_URL) {
+
+      // Single-origin dev (e.g. NEXT_PUBLIC_APP_URL=http://localhost:3000): without ?host=app,
+      // we'd redirect /dashboard → same URL and ERR_TOO_MANY_REDIRECTS. Real app subdomain
+      // (target origin ≠ request origin) does not need the query param.
+      const sameOrigin = target.origin === request.nextUrl.origin;
+      if (sameOrigin && !target.hostname.startsWith('app.') && target.searchParams.get('host') !== 'app') {
         target.searchParams.set('host', 'app');
       }
-      
+
       return withSupabaseCookies(response, NextResponse.redirect(target));
     }
 

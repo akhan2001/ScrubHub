@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/table';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import type { Listing } from '@/types/database';
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
@@ -52,7 +53,7 @@ export function ListingsTable({ listings }: { listings: Listing[] }) {
         await publishListing(id);
         toast.success('Listing published');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to publish');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't publish this listing. Please try again."));
       }
     });
   }
@@ -63,7 +64,7 @@ export function ListingsTable({ listings }: { listings: Listing[] }) {
         await unpublishListing(id);
         toast.success('Listing unpublished');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to unpublish');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't unpublish this listing. Please try again."));
       }
     });
   }
@@ -76,7 +77,7 @@ export function ListingsTable({ listings }: { listings: Listing[] }) {
         toast.success('Listing archived');
         setArchiveTarget(null);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to archive');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't archive this listing. Please try again."));
       }
     });
   }
@@ -89,7 +90,7 @@ export function ListingsTable({ listings }: { listings: Listing[] }) {
         toast.success('Listing deleted');
         setDeleteTarget(null);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to delete');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't delete this listing. Please try again."));
       }
     });
   }

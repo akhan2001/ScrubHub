@@ -7,6 +7,9 @@ import {
 } from '@/server/repositories/job-applications.repository';
 import { fetchOrgMemberships } from '@/server/repositories/organizations.repository';
 import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
+import { fetchProfileById } from '@/server/repositories/profiles.repository';
+import { voidSendJobApplicationToAdmin } from '@/lib/email/send-transactional';
+import { emailAppPath } from '@/lib/email/urls';
 import { getJobPostById } from '@/server/services/job-posts.service';
 import { jobApplicationSchema } from '@/lib/validations/job-application';
 import { ValidationError } from '@/server/errors/app-error';
@@ -80,19 +83,30 @@ export async function createJobApplication(input: CreateJobApplicationInput) {
   };
 
   try {
-    await Promise.all(
-      adminsAndManagers.map((m) =>
-        insertNotificationLog({
-          user_id: m.user_id,
-          event_type: 'job_application_submitted',
-          title,
-          body,
-          metadata,
-        })
-      )
-    );
+    for (const m of adminsAndManagers) {
+      await insertNotificationLog({
+        user_id: m.user_id,
+        event_type: 'job_application_submitted',
+        title,
+        body,
+        metadata,
+      });
+    }
   } catch {
     // Notification creation is non-critical; application was saved successfully
+  }
+
+  const applicationsUrl = emailAppPath('/dashboard/enterprise/applications');
+  for (const m of adminsAndManagers) {
+    const profile = await fetchProfileById(m.user_id);
+    voidSendJobApplicationToAdmin({
+      adminUserId: m.user_id,
+      adminEmail: profile?.email,
+      adminName: profile?.full_name,
+      applicantEmail: input.email,
+      jobTitle: job.title,
+      applicationsUrl,
+    });
   }
 
   return application;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { upsertLandlordScreeningRules } from '@/actions/screening-rules';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,7 +35,7 @@ export function ScreeningRulesForm(props: {
       });
       setSuccess('Screening rules saved.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save rules.');
+      setError(getUserFacingErrorMessage(err, "We couldn't save screening rules. Please try again."));
     } finally {
       setLoading(false);
     }

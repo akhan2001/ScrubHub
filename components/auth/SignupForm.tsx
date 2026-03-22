@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { getAppAuthCallbackUrl } from '@/lib/app-url';
+import { sendSignupFollowUpEmail } from '@/actions/signup-email';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,6 +46,9 @@ export function SignupForm({ defaultRedirectTo = '/dashboard' }: SignupFormProps
     if (err) {
       setError(ERROR_MESSAGES[err.message] ?? err.message);
       return;
+    }
+    if (data.user?.id) {
+      void sendSignupFollowUpEmail(data.user.id);
     }
     if (data.session) {
       setSuccess('signed_in');

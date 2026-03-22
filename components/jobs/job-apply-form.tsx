@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { FileText, Loader2 } from 'lucide-react';
 import { useJobApply } from '@/hooks/use-job-apply';
 
@@ -63,7 +64,9 @@ export function JobApplyForm({
       toast.success('Application submitted successfully');
       onSuccess?.();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to submit application. Please try again.');
+      toast.error(
+        getUserFacingErrorMessage(err, "We couldn't submit your application. Please try again.")
+      );
     }
   }
 

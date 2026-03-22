@@ -16,6 +16,7 @@ import { AddressAutocomplete } from '@/components/map/address-autocomplete';
 import { PhotoUpload } from '@/components/listings/photo-upload';
 import { AmenityTags } from '@/components/listings/amenity-tags';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { Sparkles, Loader2 } from 'lucide-react';
 import type { Listing } from '@/types/database';
 
@@ -161,7 +162,12 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
       }
     } catch (err) {
       unstable_rethrow(err);
-      toast.error(err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} listing`);
+      toast.error(
+        getUserFacingErrorMessage(
+          err,
+          `We couldn't ${isEditing ? 'update' : 'create'} this listing. Please try again.`
+        )
+      );
     }
   }
 

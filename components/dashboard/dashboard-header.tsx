@@ -49,6 +49,7 @@ function getInitials(fullName: string | null, role: AppRole): string {
 }
 
 type DashboardHeaderUser = {
+  id: string;
   fullName: string | null;
   avatarUrl: string | null;
   email: string | null;
@@ -115,7 +116,7 @@ export function DashboardHeader({
           </SheetTrigger>
           <SheetContent side="right" className="w-full flex flex-col p-0 sm:max-w-md">
             <SheetTitle className="sr-only">Notifications</SheetTitle>
-            <NotificationsPanel />
+            <NotificationsPanel userId={user.id} />
           </SheetContent>
         </Sheet>
         <DropdownMenu>

@@ -11,6 +11,8 @@ import {
 import { fetchLeaseById, updateLeaseStatus } from '@/server/repositories/leases.repository';
 import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
 import { logAuditEvent } from '@/server/services/audit.service';
+import { voidSendN9AcknowledgedToTenant, voidSendN9ReceivedToLandlord } from '@/lib/email/send-transactional';
+import { emailAppPath } from '@/lib/email/urls';
 import { getLeaseWithDetails } from '@/server/services/leases.service';
 import { calculateTerminationDate } from '@/lib/n9/termination-date';
 import { generateN9Pdf } from '@/lib/n9/generate-n9-pdf';
@@ -88,6 +90,9 @@ export async function signAndDeliverN9(input: {
   signatureFirstName: string;
   signatureLastName: string;
   signatureIp: string;
+  /** Resolved in actions — do not look up landlord email inside this flow. */
+  landlordEmail?: string | null;
+  landlordNameForEmail?: string | null;
   formOverrides?: {
     landlordName?: string;
     tenantName?: string;
@@ -142,9 +147,15 @@ export async function signAndDeliverN9(input: {
 
   const { data: urlData } = await supabase.storage
     .from(N9_BUCKET)
-    .createSignedUrl(pdfPath, 60 * 60 * 24 * 365); // 1 year
+    .createSignedUrl(pdfPath, 60 * 60 * 24 * 365); // 1 year (stored on notice)
 
   const pdfUrl = urlData?.signedUrl ?? '';
+
+  const { data: emailUrlData } = await supabase.storage
+    .from(N9_BUCKET)
+    .createSignedUrl(pdfPath, 60 * 60 * 24 * 7); // 7 days — email only, not logged
+
+  const pdfUrlForEmail = emailUrlData?.signedUrl ?? '';
 
   const fullSignatureName = `${input.signatureFirstName} ${input.signatureLastName}`;
   const formattedTermDate = termDate.toLocaleDateString('en-CA', {
@@ -175,6 +186,19 @@ export async function signAndDeliverN9(input: {
     },
   });
 
+  voidSendN9ReceivedToLandlord({
+    landlordUserId: leaseDetails.landlord_user_id,
+    landlordEmail: input.landlordEmail,
+    landlordName:
+      input.landlordNameForEmail ??
+      input.formOverrides?.landlordName ??
+      leaseDetails.landlord_name,
+    tenantName: input.formOverrides?.tenantName || leaseDetails.tenant_name || 'Your tenant',
+    terminationDate: formattedTermDate,
+    viewNoticeUrl: pdfUrlForEmail || pdfUrl,
+    dashboardUrl: emailAppPath('/dashboard/landlord/notices'),
+  });
+
   await logAuditEvent({
     actorUserId: input.tenantUserId,
     source: 'n9.service',
@@ -193,6 +217,9 @@ export async function acknowledgeN9(input: {
   noticeId: string;
   landlordUserId: string;
   notes?: string;
+  /** Resolved in actions. */
+  tenantEmail?: string | null;
+  tenantNameForEmail?: string | null;
 }) {
   const notice = await fetchN9NoticeById(input.noticeId);
   if (!notice) throw new Error('N9 notice not found');
@@ -215,6 +242,13 @@ export async function acknowledgeN9(input: {
     title: 'N9 Notice Acknowledged',
     body: 'Your landlord has acknowledged your N9 termination notice.',
     metadata: { noticeId: input.noticeId, leaseId: notice.lease_id },
+  });
+
+  voidSendN9AcknowledgedToTenant({
+    tenantUserId: notice.tenant_user_id,
+    tenantEmail: input.tenantEmail,
+    tenantName: input.tenantNameForEmail,
+    tenancyUrl: emailAppPath('/dashboard/tenant/tenancy'),
   });
 
   await logAuditEvent({

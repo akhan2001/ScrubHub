@@ -3,6 +3,7 @@ import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import type { AppRole } from '@/types/database';
 
 type DashboardUser = {
+  id: string;
   fullName: string | null;
   avatarUrl: string | null;
   email: string | null;

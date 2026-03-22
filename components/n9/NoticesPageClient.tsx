@@ -12,6 +12,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import type { N9Notice, N9Status } from '@/types/database';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -133,7 +134,9 @@ function NoticeCard({ notice }: { notice: EnrichedNotice }) {
         toast.success('N9 notice acknowledged.');
         router.refresh();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to acknowledge');
+        toast.error(
+          getUserFacingErrorMessage(err, "We couldn't acknowledge this notice. Please try again.")
+        );
       }
     });
   }

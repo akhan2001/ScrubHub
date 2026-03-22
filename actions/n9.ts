@@ -13,7 +13,8 @@ import {
   getAllN9NoticesForLandlord,
 } from '@/server/services/n9.service';
 import { generateN9Pdf } from '@/lib/n9/generate-n9-pdf';
-import { fetchN9NoticesForLease } from '@/server/repositories/n9-notices.repository';
+import { fetchN9NoticesForLease, fetchN9NoticeById } from '@/server/repositories/n9-notices.repository';
+import { fetchProfileById } from '@/server/repositories/profiles.repository';
 import { insertSavedN9Form, fetchSavedN9FormsForTenant } from '@/server/repositories/saved-n9-forms.repository';
 import { createClient } from '@/lib/supabase/server';
 import type { N9Reason } from '@/types/database';
@@ -71,12 +72,26 @@ export async function signN9Action(noticeId: string, formFields: N9FormFields) {
     hdrs.get('x-real-ip') ??
     'unknown';
 
+  const notice = await fetchN9NoticeById(noticeId);
+  let landlordEmail: string | null | undefined;
+  let landlordNameForEmail: string | null | undefined;
+  if (notice) {
+    const lease = await getLeaseWithDetails(notice.lease_id);
+    if (lease) {
+      const landlordProfile = await fetchProfileById(lease.landlord_user_id);
+      landlordEmail = landlordProfile?.email;
+      landlordNameForEmail = landlordProfile?.full_name;
+    }
+  }
+
   const result = await signAndDeliverN9({
     noticeId,
     tenantUserId: user.id,
     signatureFirstName: formFields.signatureFirstName,
     signatureLastName: formFields.signatureLastName,
     signatureIp: ip,
+    landlordEmail,
+    landlordNameForEmail,
     formOverrides: {
       landlordName: formFields.landlordName,
       tenantName: formFields.tenantName,
@@ -92,10 +107,15 @@ export async function signN9Action(noticeId: string, formFields: N9FormFields) {
 
 export async function acknowledgeN9Action(noticeId: string, notes?: string) {
   const user = await requireRole('landlord');
+  const notice = await fetchN9NoticeById(noticeId);
+  const tenantProfile = notice ? await fetchProfileById(notice.tenant_user_id) : null;
+
   await acknowledgeN9({
     noticeId,
     landlordUserId: user.id,
     notes,
+    tenantEmail: tenantProfile?.email,
+    tenantNameForEmail: tenantProfile?.full_name,
   });
   revalidatePath('/dashboard/landlord');
   revalidatePath('/dashboard/landlord/notices');

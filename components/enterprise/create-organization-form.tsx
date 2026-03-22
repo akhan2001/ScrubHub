@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createOrganization } from '@/actions/enterprise';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,7 +24,9 @@ export function CreateOrganizationForm() {
       await createOrganization({ name, domain });
       setSuccess('Organization created.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to create organization');
+      setError(
+        getUserFacingErrorMessage(err, "We couldn't create your organization. Please try again.")
+      );
     } finally {
       setLoading(false);
     }

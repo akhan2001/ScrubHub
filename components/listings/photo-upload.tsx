@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { ImagePlus, GripVertical, X, Loader2 } from 'lucide-react';
 import { uploadListingPhoto } from '@/lib/integrations/supabase-storage';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { cn } from '@/lib/utils';
 
 interface PhotoUploadProps {
@@ -30,8 +31,7 @@ export function PhotoUpload({ value, onChange, max = 20 }: PhotoUploadProps) {
         const urls = await Promise.all(batch.map((f) => uploadListingPhoto(f)));
         onChange([...value, ...urls]);
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Upload failed';
-        toast.error(message);
+        toast.error(getUserFacingErrorMessage(err, "We couldn't upload that photo. Please try again."));
       } finally {
         setUploading(false);
       }

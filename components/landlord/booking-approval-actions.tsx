@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { updateBookingStatus } from '@/actions/bookings';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { Button } from '@/components/ui/button';
 
 export function BookingApprovalActions({ bookingId }: { bookingId: string }) {
@@ -14,7 +15,9 @@ export function BookingApprovalActions({ bookingId }: { bookingId: string }) {
     try {
       await updateBookingStatus({ bookingId, status });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to update booking status');
+      setError(
+        getUserFacingErrorMessage(err, "We couldn't update the booking. Please try again.")
+      );
     } finally {
       setLoading(false);
     }

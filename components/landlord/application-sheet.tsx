@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { updateBookingStatus } from '@/actions/bookings';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, XCircle, AlertTriangle, ExternalLink, Minus } from 'lucide-react';
 import type { BookingWithTenantProfile } from '@/server/repositories/bookings.repository';
@@ -90,7 +91,9 @@ export function ApplicationSheet({ booking, open, onOpenChange }: ApplicationShe
         onOpenChange(false);
         router.refresh();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to update');
+        toast.error(
+          getUserFacingErrorMessage(err, "We couldn't update this application. Please try again.")
+        );
       } finally {
         setLoading(false);
       }

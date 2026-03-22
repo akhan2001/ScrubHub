@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { createBooking } from '@/actions/bookings';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 
 const applicationSchema = z.object({
   moveInDate: z.string().refine((v) => !isNaN(Date.parse(v)), 'Invalid date'),
@@ -51,7 +52,9 @@ export function ApplicationForm({ listingId, onCancel, onSuccess }: ApplicationF
       toast.success('Application submitted successfully');
       onSuccess();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to submit application');
+      toast.error(
+        getUserFacingErrorMessage(err, "We couldn't submit your application. Please try again.")
+      );
     }
   }
 

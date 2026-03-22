@@ -24,6 +24,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { ListingScreeningRules } from '@/components/landlord/listing-screening-rules';
 import { ListingModal } from '@/components/listings/ListingModal';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import type { Listing, ScreeningRule } from '@/types/database';
 import type { BookingWithTenantProfile } from '@/server/repositories/bookings.repository';
 
@@ -65,7 +66,7 @@ export function ListingDetailView({
         await publishListing(listing.id);
         toast.success('Listing published');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to publish');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't publish this listing. Please try again."));
       }
     });
   }
@@ -76,7 +77,7 @@ export function ListingDetailView({
         await unpublishListing(listing.id);
         toast.success('Listing unpublished');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to unpublish');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't unpublish this listing. Please try again."));
       }
     });
   }
@@ -88,7 +89,7 @@ export function ListingDetailView({
         toast.success('Listing archived');
         router.push('/dashboard/landlord/listings');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to archive');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't archive this listing. Please try again."));
       }
     });
   }
@@ -100,7 +101,7 @@ export function ListingDetailView({
         toast.success('Listing deleted');
         router.push('/dashboard/landlord/listings');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to delete');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't delete this listing. Please try again."));
       }
     });
   }

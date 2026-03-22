@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import type { ScreeningRule } from '@/types/database';
 
 interface ListingScreeningRulesProps {
@@ -47,7 +48,7 @@ export function ListingScreeningRules({ listingId, rules }: ListingScreeningRule
       });
       toast.success('Screening rules saved');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save rules');
+      toast.error(getUserFacingErrorMessage(err, "We couldn't save screening rules. Please try again."));
     } finally {
       setLoading(false);
     }

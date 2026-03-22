@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing-error';
 import type { Lease, N9Reason } from '@/types/database';
 import {
   Sheet,
@@ -174,7 +175,9 @@ export function N9Wizard({ lease, open, onOpenChange, standalone = false }: N9Wi
         setExplanation(result.explanation);
         setStep('date');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to calculate termination date');
+        toast.error(
+          getUserFacingErrorMessage(err, "We couldn't calculate the termination date. Please try again.")
+        );
       }
     });
   }
@@ -187,7 +190,7 @@ export function N9Wizard({ lease, open, onOpenChange, standalone = false }: N9Wi
         setNoticeId(result.noticeId);
         setStep('review');
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to create N9 draft');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't create the N9 draft. Please try again."));
       }
     });
   }
@@ -208,7 +211,7 @@ export function N9Wizard({ lease, open, onOpenChange, standalone = false }: N9Wi
         handleClose();
         router.refresh();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Failed to sign N9');
+        toast.error(getUserFacingErrorMessage(err, "We couldn't sign the N9 notice. Please try again."));
       }
     });
   }
@@ -242,8 +245,7 @@ export function N9Wizard({ lease, open, onOpenChange, standalone = false }: N9Wi
         setGeneratedPdfUrl(url);
         toast.success('N9 form generated. Download your PDF below.');
       } catch (err) {
-        const msg = err instanceof Error ? err.message : (err as { message?: string })?.message ?? 'Failed to generate N9 PDF';
-        toast.error(msg);
+        toast.error(getUserFacingErrorMessage(err, "We couldn't generate the N9 PDF. Please try again."));
       }
     });
   }
