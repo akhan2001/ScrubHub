@@ -98,6 +98,8 @@ export interface LandlordProfile {
   ein_number: string | null;
   business_address: string | null;
   uses_property_management_software: boolean;
+  /** Last four digits of saved payout card (hint only). */
+  payout_method_last4: string | null;
   created_at: string;
   updated_at: string;
 }

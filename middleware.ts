@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server';
 function isAppHost(request: NextRequest): boolean {
   const host = request.headers.get('host') ?? '';
   const hostParam = request.nextUrl.searchParams.get('host');
+  if (hostParam === 'www') return false;
   if (host.startsWith('app.')) return true;
   if (hostParam === 'app') return true;
   return false;
@@ -64,7 +65,7 @@ export async function middleware(request: NextRequest) {
     pathname === '/forgot-password' ||
     pathname === '/auth/reset-password' ||
     pathname === '/auth/callback';
-  
+
   const isDashboardPath = pathname.startsWith('/dashboard');
   const isListingsPath = pathname.startsWith('/listings');
 
@@ -81,9 +82,9 @@ export async function middleware(request: NextRequest) {
 
     // Protect dashboard routes
     if (isDashboardPath && !user) {
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirectTo', `${APP_URL}${pathname}`);
-        return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectTo', `${APP_URL}${pathname}`);
+      return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
     }
 
     // Allow all other routes to resolve naturally
@@ -94,7 +95,6 @@ export async function middleware(request: NextRequest) {
     // Redirect app-specific paths to App domain
     if (isDashboardPath || isListingsPath) {
       const target = new URL(APP_URL);
-      // /listings and /listings/[id] now redirect to /facility-map
       if (pathname === '/listings') {
         target.pathname = '/facility-map';
       } else if (pathname.startsWith('/listings/')) {
@@ -104,13 +104,21 @@ export async function middleware(request: NextRequest) {
       } else {
         target.pathname = pathname;
       }
-      request.nextUrl.searchParams.forEach((v, k) => target.searchParams.set(k, v));
-      
-      // Fallback for local dev without subdomain support
-      if (!process.env.NEXT_PUBLIC_APP_URL) {
+
+      request.nextUrl.searchParams.forEach((v, k) => {
+        if (k !== 'host') target.searchParams.set(k, v);
+      });
+
+      // Same origin (typical local dev): add ?host=app once; avoid redirect loop when already ?host=app
+      if (target.host === request.nextUrl.host) {
+        target.searchParams.set('host', 'app');
+        if (request.nextUrl.searchParams.get('host') === 'app') {
+          return response;
+        }
+      } else if (!process.env.NEXT_PUBLIC_APP_URL) {
         target.searchParams.set('host', 'app');
       }
-      
+
       return withSupabaseCookies(response, NextResponse.redirect(target));
     }
 

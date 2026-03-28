@@ -194,7 +194,7 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
   const personalComplete = !!(profile.full_name && profile.phone_number && profile.date_of_birth);
   const businessComplete = !!(lp?.entity_type && lp?.business_name);
   const identityComplete = !!(lp?.identity_document_url);
-  const payoutComplete = true; // Mocked for now — no real charges
+  const payoutComplete = !!lp?.payout_method_last4;
 
   const statuses: boolean[] = [personalComplete, businessComplete, identityComplete, payoutComplete];
 
@@ -241,7 +241,10 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
       weight: 15,
       status: getStatus(3),
       fields: [
-        { label: 'Payout Method', value: '•••• 4242 (Verified)' },
+        {
+          label: 'Payout Method',
+          value: lp?.payout_method_last4 ? `Card ending in ${lp.payout_method_last4}` : null,
+        },
       ],
     },
   ];

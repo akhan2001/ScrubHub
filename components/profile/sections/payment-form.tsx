@@ -9,13 +9,22 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { CreditCard } from 'lucide-react';
-import type { WorkerProfile } from '@/types/database';
+import type { LandlordProfile, WorkerProfile } from '@/types/database';
+
+function last4OnFile(
+  workerProfile: WorkerProfile | null,
+  landlordProfile: LandlordProfile | null
+): string | null {
+  return workerProfile?.payment_method_last4 ?? landlordProfile?.payout_method_last4 ?? null;
+}
 
 export function PaymentForm({
   workerProfile,
+  landlordProfile,
   onSaved,
 }: {
   workerProfile: WorkerProfile | null;
+  landlordProfile?: LandlordProfile | null;
   onSaved: () => void;
 }) {
   const {
@@ -44,9 +53,10 @@ export function PaymentForm({
             <CreditCard className="size-4 shrink-0" />
             <span>Stripe card vault is not wired yet. Saving stores only the last four digits on your profile.</span>
           </div>
-          {workerProfile?.payment_method_last4 ? (
+          {last4OnFile(workerProfile, landlordProfile ?? null) ? (
             <p className="pl-6 text-xs text-foreground">
-              Card on file: <span className="font-mono">•••• {workerProfile.payment_method_last4}</span>
+              Card on file:{' '}
+              <span className="font-mono">•••• {last4OnFile(workerProfile, landlordProfile ?? null)}</span>
             </p>
           ) : null}
         </div>

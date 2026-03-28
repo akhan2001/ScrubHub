@@ -9,6 +9,6 @@ export function resolveDashboardRoute(role: AppRole): string {
     case 'enterprise':
       return '/dashboard/enterprise';
     default:
-      return '/dashboard';
+      return '/onboarding';
   }
 }

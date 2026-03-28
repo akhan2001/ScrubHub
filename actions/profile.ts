@@ -148,7 +148,7 @@ export async function saveOrgInfo(data: unknown) {
 export async function savePaymentMethod(data: unknown) {
   const userId = await getAuthUserId();
   const profile = await getProfile(userId);
-  if (profile?.role !== 'tenant') {
+  if (profile?.role !== 'tenant' && profile?.role !== 'landlord') {
     revalidatePath('/dashboard/profile');
     return { success: true };
   }
@@ -160,7 +160,12 @@ export async function savePaymentMethod(data: unknown) {
     throw new Error('Enter a valid card number');
   }
 
-  await upsertWorkerProfile(userId, { payment_method_last4: last4 });
+  if (profile.role === 'tenant') {
+    await upsertWorkerProfile(userId, { payment_method_last4: last4 });
+  } else {
+    await upsertLandlordProfile(userId, { payout_method_last4: last4 });
+  }
+
   revalidatePath('/dashboard/profile');
   return { success: true };
 }
