@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getJobPostById } from '@/server/services/job-posts.service';
 import { getPublishedListing } from '@/server/services/listings.service';
 import { getAuthUser } from '@/server/auth/get-auth-user';
@@ -11,6 +12,41 @@ import { Separator } from '@/components/ui/separator';
 import { JobApplyButton } from '@/components/jobs/job-apply-button';
 import { MapPin, DollarSign, Calendar, Building2, Home, ArrowLeft, BedDouble } from 'lucide-react';
 import { getAppListingUrl } from '@/lib/app-url';
+import { MARKETING_SITE_URL } from '@/lib/marketing-site';
+
+function metaDescriptionFromJob(description: string, title: string, location: string): string {
+  const text = description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const base = text.length > 0 ? text : `Apply for ${title} — ${location}.`;
+  return base.length > 160 ? `${base.slice(0, 157)}…` : base;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const job = await getJobPostById(id);
+  if (!job || job.status !== 'published') {
+    return { title: 'Job' };
+  }
+  const location = job.facility_name || job.location || '401 Corridor';
+  const description = metaDescriptionFromJob(job.description, job.title, location);
+  const ogTitle = `${job.title} | ScrubHub`;
+  return {
+    title: job.title,
+    description,
+    openGraph: {
+      url: `${MARKETING_SITE_URL}/staffing/jobs/${id}`,
+      title: ogTitle,
+      description,
+    },
+    twitter: {
+      title: ogTitle,
+      description,
+    },
+  };
+}
 
 export default async function StaffingJobDetailPage({
   params,

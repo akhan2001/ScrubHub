@@ -1,5 +1,24 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getPublishedJobPosts } from '@/server/services/job-posts.service';
+import { MARKETING_SITE_URL } from '@/lib/marketing-site';
+
+export const metadata: Metadata = {
+  title: 'Staffing & jobs',
+  description:
+    'Open locum, contract, and permanent roles at hospitals and clinics along the 401 Corridor. Apply through ScrubHub.',
+  openGraph: {
+    url: `${MARKETING_SITE_URL}/staffing`,
+    title: 'Staffing & jobs | ScrubHub',
+    description:
+      'Healthcare jobs across Ontario—browse open positions and apply in one place.',
+  },
+  twitter: {
+    title: 'Staffing & jobs | ScrubHub',
+    description:
+      'Healthcare jobs across Ontario—browse open positions and apply in one place.',
+  },
+};
 import { StaffingJobsGrid } from '@/components/jobs/staffing-jobs-grid';
 import { getAppLoginUrl, getAppSignupUrl } from '@/lib/app-url';
 

@@ -1,9 +1,17 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { MARKETING_SITE_URL } from '@/lib/marketing-site';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'ScrubHub Privacy Policy. How we collect, use, and protect your personal information. PIPEDA and PHIPA compliant.',
+  description:
+    'How ScrubHub collects, uses, and protects your personal information. PIPEDA-aligned practices; PHIPA considerations where health information applies.',
+  openGraph: {
+    url: `${MARKETING_SITE_URL}/privacy`,
+    title: 'Privacy Policy | ScrubHub',
+    description:
+      'How ScrubHub handles your data—access, correction, deletion, and consent—in line with Canadian privacy law.',
+  },
 };
 
 export default function PrivacyPage() {

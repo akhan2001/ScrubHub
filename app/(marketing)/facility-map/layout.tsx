@@ -1,8 +1,21 @@
 import type { Metadata } from 'next';
+import { MARKETING_SITE_URL } from '@/lib/marketing-site';
 
 export const metadata: Metadata = {
-  title: 'Listings | ScrubHub',
-  description: '401 Corridor — Healthcare listings with hospitals, clinics, and healthcare spaces.',
+  title: 'Listings & map',
+  description:
+    'Browse healthcare-friendly housing near hospitals and clinics on an interactive 401 Corridor map. Filter by location, price, and availability.',
+  openGraph: {
+    url: `${MARKETING_SITE_URL}/facility-map`,
+    title: 'Listings & map | ScrubHub',
+    description:
+      'Browse healthcare-friendly housing near hospitals and clinics on an interactive 401 Corridor map.',
+  },
+  twitter: {
+    title: 'Listings & map | ScrubHub',
+    description:
+      'Browse healthcare-friendly housing near hospitals and clinics on an interactive 401 Corridor map.',
+  },
 };
 
 export default function FacilityMapLayout({

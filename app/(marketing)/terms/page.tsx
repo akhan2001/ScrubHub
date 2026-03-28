@@ -1,9 +1,17 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { MARKETING_SITE_URL } from '@/lib/marketing-site';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'ScrubHub Terms of Service. Rules and guidelines for using the healthcare housing and staffing platform.',
+  description:
+    'Terms governing your use of ScrubHub’s healthcare housing and staffing marketplace—including listings, bookings, and job applications.',
+  openGraph: {
+    url: `${MARKETING_SITE_URL}/terms`,
+    title: 'Terms of Service | ScrubHub',
+    description:
+      'Rules and responsibilities for tenants, landlords, and employers using ScrubHub.',
+  },
 };
 
 export default function TermsPage() {
