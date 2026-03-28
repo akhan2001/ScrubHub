@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { getAppLoginUrl } from '@/lib/app-url';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 export function SiteFooter() {
   return (
@@ -9,8 +10,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[88rem] px-4 py-12 sm:px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-center md:text-left">
-            <Link href="/" className="text-xl font-extrabold text-foreground tracking-tight hover:text-primary transition-colors">
-              ScrubHub
+            <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
+              <ScrubHubLogo variant="light" className="h-9 w-auto max-w-[200px] object-contain object-left" />
             </Link>
             <p className="mt-1 text-sm text-muted-foreground">
               The Premium Healthcare Space Network

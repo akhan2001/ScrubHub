@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Lock } from 'lucide-react';
 import { getAppLoginUrl } from '@/lib/app-url';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 export function MarketingFooter() {
   return (
@@ -10,8 +11,10 @@ export function MarketingFooter() {
       <div className="mx-auto max-w-[88rem] px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-10">
           <div>
-            <h3 className="font-sans text-2xl mb-2">ScrubHub</h3>
-            <p className="text-primary-foreground/70 text-sm">The Premium Healthcare Space Network</p>
+            <Link href="/" className="inline-block rounded-lg bg-white/95 p-2 shadow-sm hover:bg-white transition-colors">
+              <ScrubHubLogo variant="light" className="h-9 w-auto max-w-[200px] object-contain object-left" />
+            </Link>
+            <p className="mt-3 text-primary-foreground/70 text-sm">The Premium Healthcare Space Network</p>
           </div>
 
           <div className="flex flex-wrap gap-8 text-sm font-medium">

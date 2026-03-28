@@ -23,7 +23,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { NotificationsPanel } from '@/components/dashboard/notifications-panel';
 import { IconButton } from '@/components/ui/icon-button';
-import { cn } from '@/lib/utils';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 const ROLE_LABELS: Record<AppRole, string> = {
   tenant: 'Tenant',
@@ -85,13 +85,8 @@ export function DashboardHeader({
           </SheetContent>
         </Sheet>
         <div className="flex items-center gap-2.5">
-          <div
-            className={cn(
-              'flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground'
-            )}
-            aria-hidden
-          >
-            S
+          <div className="shrink-0" aria-hidden>
+            <ScrubHubLogo variant="light" className="h-8 w-auto max-w-[140px] object-contain object-left" />
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">

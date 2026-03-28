@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { getAppLoginUrl, getAppSignupUrl, getAppDashboardUrl } from '@/lib/app-url';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 import type { User } from '@supabase/supabase-js';
 
 const NAV_LINKS = [
@@ -22,13 +23,8 @@ export function ScrubHubNav({
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-white/80 backdrop-blur-xl">
       <nav className="mx-auto flex w-full max-w-[88rem] items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 select-none shrink-0">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-primary">
-            <rect width="28" height="28" rx="8" fill="currentColor" />
-            <path d="M14 6v16M10 10h8M10 18h8" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="14" cy="14" r="2" fill="white" />
-          </svg>
-          <span className="text-xl font-extrabold text-foreground tracking-tight">ScrubHub</span>
+        <Link href="/" className="flex select-none shrink-0 items-center">
+          <ScrubHubLogo variant="light" className="h-9 w-auto max-w-[200px] object-contain object-left" />
         </Link>
 
         <div className="hidden lg:flex items-center gap-8">

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 type AuthPanelProps = {
   mode: 'login' | 'signup';
@@ -30,7 +31,10 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-slate-900/70 to-blue-900/60" aria-hidden />
         <div className="relative z-10 flex flex-1 flex-col justify-between">
-          <div>
+          <div className="space-y-6">
+            <Link href="/" className="inline-block" aria-label="ScrubHub Home">
+              <ScrubHubLogo variant="dark" className="h-10 w-auto max-w-[220px] object-contain object-left" />
+            </Link>
             <Link
               href={backLink}
               className="text-sm text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1"

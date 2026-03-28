@@ -231,4 +231,9 @@ export const FACILITIES: Facility[] = [
   { id: 198, name: 'Listowel Memorial Hospital', lat: 43.7292, lng: -80.9566, type: 'hospital', status: 'live' },
   { id: 199, name: 'Palmerston Medical', lat: 43.8353, lng: -80.8418, type: 'clinic', status: 'live' },
   { id: 200, name: 'Shelburne Medical Centre', lat: 44.0782, lng: -80.2044, type: 'clinic', status: 'live' },
+  { id: 201, name: 'Milton District Hospital', lat: 43.5241, lng: -79.8831, type: 'hospital', status: 'live' },
+  { id: 202, name: 'Milton Health Centre', lat: 43.5188, lng: -79.8820, type: 'clinic', status: 'live' },
+  { id: 203, name: 'Georgetown Hospital', lat: 43.6444, lng: -79.9344, type: 'hospital', status: 'live' },
+  { id: 204, name: 'Oakville Trafalgar Memorial Hospital', lat: 43.4539, lng: -79.6740, type: 'hospital', status: 'live' },
+  { id: 205, name: 'Halton Hills Medical Centre', lat: 43.6560, lng: -79.9190, type: 'clinic', status: 'live' },
 ];

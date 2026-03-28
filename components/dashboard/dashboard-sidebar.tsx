@@ -16,6 +16,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import type { AppRole } from '@/types/database';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 import { cn } from '@/lib/utils';
 
 type NavItem = { href: string; label: string; icon: React.ComponentType<{ className?: string }> };
@@ -90,8 +91,8 @@ export function DashboardSidebar({
   return (
     <aside className={cn("h-full border-r border-border bg-card", className)}>
       <div className="flex h-16 items-center border-b border-border px-4">
-        <Link href="/dashboard" onClick={onNavigate} className="text-base font-semibold text-foreground">
-          ScrubHub
+        <Link href="/dashboard" onClick={onNavigate} className="block py-1">
+          <ScrubHubLogo variant="light" className="h-7 w-auto max-w-[160px] object-contain object-left" />
         </Link>
       </div>
       <nav className="space-y-6 p-4">

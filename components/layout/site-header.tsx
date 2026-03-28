@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 import { getAppLoginUrl, getAppSignupUrl, getAppDashboardUrl } from '@/lib/app-url';
 import type { User } from '@supabase/supabase-js';
 import { cn } from '@/lib/utils';
+import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 const NAV_LINKS = [
   { href: '/facility-map', label: 'Listings' },
@@ -39,16 +40,10 @@ export function SiteHeader({ user }: { user?: User | null }) {
       <nav className="mx-auto flex w-full max-w-[88rem] items-center justify-between gap-4 px-4 py-0 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2.5 select-none shrink-0 group"
+          className="flex select-none shrink-0 items-center transition-opacity hover:opacity-90"
           aria-label="ScrubHub Home"
         >
-          <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
-            <svg width="20" height="20" viewBox="0 0 28 28" fill="none" className="text-primary-foreground">
-              <path d="M14 6v16M10 10h8M10 18h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="14" cy="14" r="2" fill="currentColor" />
-            </svg>
-          </div>
-          <span className="text-xl font-extrabold text-foreground tracking-tight">ScrubHub</span>
+          <ScrubHubLogo variant="light" priority className="h-9 w-auto max-w-[200px] object-contain object-left" />
         </Link>
 
         <div className="hidden lg:flex items-center gap-1">
