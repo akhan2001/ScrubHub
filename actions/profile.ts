@@ -10,6 +10,7 @@ import {
   businessSchema,
   landlordIdentitySchema,
   orgInfoSchema,
+  paymentSchema,
 } from '@/lib/validations/profile';
 import {
   updateProfile,
@@ -19,6 +20,7 @@ import {
   fetchOrganizationByOwner,
 } from '@/server/repositories/profiles.repository';
 import { createOrganizationForUser } from '@/server/services/organizations.service';
+import { getProfile } from '@/server/services/profiles.service';
 import { requireRole } from '@/server/guards/require-role';
 
 async function getAuthUserId(): Promise<string> {
@@ -143,10 +145,22 @@ export async function saveOrgInfo(data: unknown) {
   return { success: true };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for API compatibility; mock impl
-export async function savePaymentMethod(_data?: unknown) {
-  // Mocked — in production this would create/update a Stripe payment method
-  await getAuthUserId();
+export async function savePaymentMethod(data: unknown) {
+  const userId = await getAuthUserId();
+  const profile = await getProfile(userId);
+  if (profile?.role !== 'tenant') {
+    revalidatePath('/dashboard/profile');
+    return { success: true };
+  }
+
+  const parsed = paymentSchema.parse(data);
+  const digits = parsed.cardNumber.replace(/\D/g, '');
+  const last4 = digits.slice(-4);
+  if (last4.length !== 4) {
+    throw new Error('Enter a valid card number');
+  }
+
+  await upsertWorkerProfile(userId, { payment_method_last4: last4 });
   revalidatePath('/dashboard/profile');
   return { success: true };
 }

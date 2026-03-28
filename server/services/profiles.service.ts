@@ -112,7 +112,7 @@ export function computeTenantSections(profile: Profile, wp: WorkerProfile | null
   const credentialsComplete = !!(wp?.healthcare_role && wp?.license_number && wp?.license_state);
   const housingComplete = !!(wp?.move_in_date && wp?.budget_min != null && wp?.budget_max != null);
   const identityComplete = !!(wp?.id_document_url && wp?.background_check_consent);
-  const paymentComplete = false;
+  const paymentComplete = !!wp?.payment_method_last4;
 
   const statuses: boolean[] = [personalComplete, credentialsComplete, housingComplete, identityComplete, paymentComplete];
 
@@ -177,7 +177,10 @@ export function computeTenantSections(profile: Profile, wp: WorkerProfile | null
       weight: 10,
       status: getStatus(4),
       fields: [
-        { label: 'Payment Method', value: null },
+        {
+          label: 'Payment Method',
+          value: wp?.payment_method_last4 ? `Card ending in ${wp.payment_method_last4}` : null,
+        },
       ],
     },
   ];

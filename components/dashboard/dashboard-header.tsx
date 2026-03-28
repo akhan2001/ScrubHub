@@ -3,7 +3,7 @@
 import { Bell, ExternalLink, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { AppRole } from '@/types/database';
+import type { AppRole, NotificationLog } from '@/types/database';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -49,6 +49,7 @@ function getInitials(fullName: string | null, role: AppRole): string {
 }
 
 type DashboardHeaderUser = {
+  id: string;
   fullName: string | null;
   avatarUrl: string | null;
   email: string | null;
@@ -57,9 +58,13 @@ type DashboardHeaderUser = {
 export function DashboardHeader({
   role,
   user,
+  notificationLogs,
+  notificationCount,
 }: {
   role: AppRole;
   user: DashboardHeaderUser;
+  notificationLogs: NotificationLog[];
+  notificationCount: number;
 }) {
   const pathname = usePathname();
   const pageTitle = pathname.split('/').at(-1)?.replace(/-/g, ' ') ?? 'overview';
@@ -108,14 +113,22 @@ export function DashboardHeader({
       </div>
       <div className="flex items-center gap-2">
         <Sheet>
-          <SheetTrigger asChild>
-            <IconButton variant="subtle" aria-label="Notifications">
-              <Bell className="size-4" />
-            </IconButton>
-          </SheetTrigger>
+          <div className="relative inline-flex">
+            <SheetTrigger asChild>
+              <IconButton variant="subtle" aria-label="Notifications">
+                <Bell className="size-4" />
+              </IconButton>
+            </SheetTrigger>
+            {notificationCount > 0 ? (
+              <span
+                className="pointer-events-none absolute -right-0.5 -top-0.5 min-h-[10px] min-w-[10px] rounded-full border-2 border-card bg-destructive"
+                aria-hidden
+              />
+            ) : null}
+          </div>
           <SheetContent side="right" className="w-full flex flex-col p-0 sm:max-w-md">
             <SheetTitle className="sr-only">Notifications</SheetTitle>
-            <NotificationsPanel />
+            <NotificationsPanel role={role} notificationLogs={notificationLogs} />
           </SheetContent>
         </Sheet>
         <DropdownMenu>

@@ -86,7 +86,7 @@ export function ProfilePage({
         }
         return <IdentityForm workerProfile={workerProfile} onSaved={handleSaved} />;
       case 'payment':
-        return <PaymentForm onSaved={handleSaved} />;
+        return <PaymentForm workerProfile={workerProfile} onSaved={handleSaved} />;
       case 'business':
         return <BusinessForm landlordProfile={landlordProfile} onSaved={handleSaved} />;
       case 'organization':

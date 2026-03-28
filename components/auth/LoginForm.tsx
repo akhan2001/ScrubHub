@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -37,6 +37,20 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
     if (!err) return null;
     return ERROR_MESSAGES[err] ?? 'Something went wrong. Please try again.';
   }, [searchParams]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let cancelled = false;
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled || !session) return;
+      if (!searchParams.get('error')) return;
+      router.replace(redirectTo);
+      router.refresh();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [redirectTo, router, searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

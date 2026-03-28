@@ -16,17 +16,22 @@ export const credentialsSchema = z.object({
   employerContact: z.string().optional(),
 });
 
-export const housingSchema = z.object({
-  moveInDate: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
-  leaseTerm: z.enum(['Short-term', 'Standard', 'Long-term', 'Flexible']),
-  locationPreference: z.string().optional(),
-  unitType: z.enum(['Studio', '1BR', '2BR', 'Shared', 'Flexible']),
-  furnished: z.enum(['Furnished', 'Unfurnished', 'No preference']),
-  budgetMin: z.number().min(0, 'Budget must be positive'),
-  budgetMax: z.number().min(0, 'Budget must be positive'),
-  hasPets: z.boolean(),
-  petDetails: z.string().optional(),
-});
+export const housingSchema = z
+  .object({
+    moveInDate: z.string().refine((val) => !isNaN(Date.parse(val)), 'Invalid date'),
+    leaseTerm: z.enum(['Short-term', 'Standard', 'Long-term', 'Flexible']),
+    locationPreference: z.string().optional(),
+    unitType: z.enum(['Studio', '1BR', '2BR', 'Shared', 'Flexible']),
+    furnished: z.enum(['Furnished', 'Unfurnished', 'No preference']),
+    budgetMin: z.number().min(0, 'Budget must be positive'),
+    budgetMax: z.number().min(0, 'Budget must be positive'),
+    hasPets: z.boolean(),
+    petDetails: z.string().optional(),
+  })
+  .refine((d) => d.budgetMax >= d.budgetMin, {
+    message: 'Maximum budget must be greater than or equal to minimum',
+    path: ['budgetMax'],
+  });
 
 export const identitySchema = z.object({
   idDocumentUrl: z.string().min(1, 'ID document is required'),

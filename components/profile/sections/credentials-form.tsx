@@ -110,8 +110,16 @@ export function CredentialsForm({
           {errors.employerName && <p className="text-sm text-destructive">{errors.employerName.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="employerContact">Employer Contact</Label>
-          <Input id="employerContact" {...register('employerContact')} placeholder="Name + Phone/Email" />
+          <Label htmlFor="employerContact">Employer contact (verification)</Label>
+          <Input
+            id="employerContact"
+            {...register('employerContact')}
+            placeholder="Supervisor phone or work email"
+            autoComplete="off"
+          />
+          <p className="text-xs text-muted-foreground">
+            Use a contact your employer can verify — not a duplicate of the employer name above.
+          </p>
           {errors.employerContact && <p className="text-sm text-destructive">{errors.employerContact.message}</p>}
         </div>
       </div>

@@ -124,13 +124,13 @@ export function HousingForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="budgetMin">Min Budget ($)</Label>
-          <Input id="budgetMin" type="number" {...register('budgetMin', { valueAsNumber: true })} />
+          <Label htmlFor="budgetMin">Minimum monthly budget ($)</Label>
+          <Input id="budgetMin" type="number" min={0} {...register('budgetMin', { valueAsNumber: true })} />
           {errors.budgetMin && <p className="text-sm text-destructive">{errors.budgetMin.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="budgetMax">Max Budget ($)</Label>
-          <Input id="budgetMax" type="number" {...register('budgetMax', { valueAsNumber: true })} />
+          <Label htmlFor="budgetMax">Maximum monthly budget ($)</Label>
+          <Input id="budgetMax" type="number" min={0} {...register('budgetMax', { valueAsNumber: true })} />
           {errors.budgetMax && <p className="text-sm text-destructive">{errors.budgetMax.message}</p>}
         </div>
       </div>

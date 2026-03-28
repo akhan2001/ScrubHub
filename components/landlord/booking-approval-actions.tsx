@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { updateBookingStatus } from '@/actions/bookings';
 import { Button } from '@/components/ui/button';
 
 export function BookingApprovalActions({ bookingId }: { bookingId: string }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,6 +15,7 @@ export function BookingApprovalActions({ bookingId }: { bookingId: string }) {
     setError(null);
     try {
       await updateBookingStatus({ bookingId, status });
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update booking status');
     } finally {

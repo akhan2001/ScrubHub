@@ -17,6 +17,7 @@ import { sendSms } from '@/lib/integrations/twilio';
 import { logAuditEvent } from '@/server/services/audit.service';
 import { evaluateApplication } from '@/server/services/screening.service';
 import { tryCreateLeaseFromApproval } from '@/server/services/leases.service';
+import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
 import type { BookingStatus } from '@/types/database';
 
 export async function getTenantBookings(tenantUserId: string) {
@@ -100,6 +101,31 @@ export async function setBookingStatus(input: {
     event_type: 'booking_status_updated',
     payload: { status: input.nextStatus },
   });
+
+  try {
+    if (input.nextStatus === 'approved' || input.nextStatus === 'rejected') {
+      await insertNotificationLog({
+        user_id: booking.tenant_user_id,
+        event_type: `booking_status_${input.nextStatus}`,
+        title: input.nextStatus === 'approved' ? 'Booking approved' : 'Booking declined',
+        body:
+          input.nextStatus === 'approved'
+            ? 'Your booking request was approved.'
+            : 'Your booking request was declined.',
+        metadata: { bookingId: input.bookingId, listingId: booking.listing_id },
+      });
+    } else if (input.nextStatus === 'withdrawn' && booking.tenant_user_id === input.actorUserId) {
+      await insertNotificationLog({
+        user_id: booking.landlord_user_id,
+        event_type: 'booking_status_withdrawn',
+        title: 'Booking withdrawn',
+        body: 'A tenant withdrew their booking request.',
+        metadata: { bookingId: input.bookingId, listingId: booking.listing_id },
+      });
+    }
+  } catch {
+    // In-app notifications are non-critical
+  }
 
   if (input.nextStatus === 'approved') {
     try {

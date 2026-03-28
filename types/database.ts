@@ -74,8 +74,20 @@ export interface WorkerProfile {
   background_check_consent: boolean;
   id_document_url: string | null;
   ssn_last_4: string | null;
+  /** Last four digits of the saved card (hint only; no full PAN stored). */
+  payment_method_last4: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface NotificationLog {
+  id: string;
+  user_id: string | null;
+  channel: string;
+  template_key: string;
+  status: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
 }
 
 export interface LandlordProfile {

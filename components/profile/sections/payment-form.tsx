@@ -9,8 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { CreditCard } from 'lucide-react';
+import type { WorkerProfile } from '@/types/database';
 
-export function PaymentForm({ onSaved }: { onSaved: () => void }) {
+export function PaymentForm({
+  workerProfile,
+  onSaved,
+}: {
+  workerProfile: WorkerProfile | null;
+  onSaved: () => void;
+}) {
   const {
     register,
     handleSubmit,
@@ -32,9 +39,16 @@ export function PaymentForm({ onSaved }: { onSaved: () => void }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CreditCard className="size-4" />
-          <span>Mocked Stripe integration — no real charges will be made</span>
+        <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <CreditCard className="size-4 shrink-0" />
+            <span>Stripe card vault is not wired yet. Saving stores only the last four digits on your profile.</span>
+          </div>
+          {workerProfile?.payment_method_last4 ? (
+            <p className="pl-6 text-xs text-foreground">
+              Card on file: <span className="font-mono">•••• {workerProfile.payment_method_last4}</span>
+            </p>
+          ) : null}
         </div>
       </div>
 

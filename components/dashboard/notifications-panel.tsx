@@ -4,113 +4,150 @@ import Link from 'next/link';
 import { SlidersHorizontal } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { IconButton } from '@/components/ui/icon-button';
-import { cn } from '@/lib/utils';
+import type { AppRole, NotificationLog } from '@/types/database';
 
-export type NotificationItem = {
-  id: string;
-  from: string;
-  fromHref?: string;
-  action: string;
-  context?: string;
-  time: string;
-  unread?: boolean;
-  initials?: string;
+function getMetadataTitleBody(log: NotificationLog): { title: string; body: string } {
+  const meta = log.metadata && typeof log.metadata === 'object' ? log.metadata : {};
+  const title =
+    typeof meta.title === 'string' ? meta.title : log.template_key.replace(/_/g, ' ');
+  const body = typeof meta.body === 'string' ? meta.body : '';
+  return { title, body };
+}
+
+function resolveNotificationHref(templateKey: string, role: AppRole): string | undefined {
+  switch (templateKey) {
+    case 'booking_requested':
+      return role === 'landlord' ? '/dashboard/landlord/approvals' : undefined;
+    case 'booking_submitted':
+      return role === 'tenant' ? '/dashboard/tenant/bookings' : undefined;
+    case 'application_needs_review':
+      return role === 'landlord' ? '/dashboard/landlord/approvals' : undefined;
+    case 'application_auto_approved':
+      if (role === 'tenant') return '/dashboard/tenant/bookings';
+      if (role === 'landlord') return '/dashboard/landlord/approvals';
+      return undefined;
+    case 'booking_status_approved':
+    case 'booking_status_rejected':
+    case 'booking_status_cancelled':
+      return role === 'tenant' ? '/dashboard/tenant/bookings' : undefined;
+    case 'booking_status_withdrawn':
+      return role === 'landlord' ? '/dashboard/landlord/approvals' : undefined;
+    case 'job_application_submitted':
+      return role === 'enterprise' ? '/dashboard/enterprise/applications' : undefined;
+    case 'n9_notice_received':
+      return role === 'landlord' ? '/dashboard/landlord/notices' : undefined;
+    case 'n9_notice_acknowledged':
+      return role === 'tenant' ? '/dashboard/tenant/n9' : undefined;
+    default:
+      if (role === 'tenant') return '/dashboard/tenant/bookings';
+      if (role === 'landlord') return '/dashboard/landlord/approvals';
+      if (role === 'enterprise') return '/dashboard/enterprise';
+      return '/dashboard';
+  }
+}
+
+function formatRelativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const sec = Math.floor((now - then) / 1000);
+  if (sec < 45) return 'Just now';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} min ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} hr ago`;
+  const day = Math.floor(hr / 24);
+  if (day === 1) return 'Yesterday';
+  if (day < 7) return `${day} days ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+function startOfLocalDay(d: Date): number {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x.getTime();
+}
+
+function partitionByRecency(logs: NotificationLog[]) {
+  const todayStart = startOfLocalDay(new Date());
+  const weekAgo = todayStart - 7 * 24 * 60 * 60 * 1000;
+  const today: NotificationLog[] = [];
+  const thisWeek: NotificationLog[] = [];
+  const older: NotificationLog[] = [];
+  for (const log of logs) {
+    const t = new Date(log.created_at).getTime();
+    if (t >= todayStart) today.push(log);
+    else if (t >= weekAgo) thisWeek.push(log);
+    else older.push(log);
+  }
+  return { today, thisWeek, older };
+}
+
+type RowProps = {
+  log: NotificationLog;
+  role: AppRole;
 };
 
-const MOCK_TODAY: NotificationItem[] = [
-  {
-    id: '1',
-    from: 'Booking request',
-    action: 'New booking request for your listing.',
-    context: 'Sunny 2BR — Downtown',
-    time: '2 min ago',
-    unread: true,
-    initials: 'BR',
-  },
-  {
-    id: '2',
-    from: 'System',
-    action: 'Screening rules updated successfully.',
-    context: 'Approvals',
-    time: '1 hour ago',
-    unread: true,
-    initials: 'S',
-  },
-  {
-    id: '3',
-    from: 'Application',
-    action: 'Tenant completed verification.',
-    context: 'Listing: Riverside Suite',
-    time: '3 hours ago',
-    unread: false,
-    initials: 'A',
-  },
-];
+function NotificationRow({ log, role }: RowProps) {
+  const { title, body } = getMetadataTitleBody(log);
+  const href = resolveNotificationHref(log.template_key, role);
+  const initials = title.slice(0, 2).toUpperCase();
 
-const MOCK_THIS_WEEK: NotificationItem[] = [
-  {
-    id: '4',
-    from: 'Booking',
-    action: 'Payment received for approved stay.',
-    context: 'May 12–19',
-    time: 'Yesterday',
-    unread: false,
-    initials: 'B',
-  },
-  {
-    id: '5',
-    from: 'System',
-    action: 'Your listing was published.',
-    context: 'Garden View Unit',
-    time: '2 days ago',
-    unread: false,
-    initials: 'S',
-  },
-];
-
-function NotificationRow({ item }: { item: NotificationItem }) {
   return (
-    <div
-      className={cn(
-        'flex gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted/60',
-        item.unread && 'bg-primary/5'
-      )}
-    >
+    <div className="flex gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted/60">
       <div className="relative shrink-0">
         <Avatar className="h-10 w-10 border-2 border-background">
-          <AvatarFallback className="text-xs font-medium text-muted-foreground">
-            {item.initials ?? item.from.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback className="text-xs font-medium text-muted-foreground">{initials}</AvatarFallback>
         </Avatar>
-        {item.unread ? (
-          <span
-            className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-destructive"
-            aria-hidden
-          />
-        ) : null}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm text-foreground">
-          {item.fromHref ? (
-            <Link href={item.fromHref} className="font-medium text-primary hover:underline">
-              {item.from}
+          {href ? (
+            <Link href={href} className="font-medium text-primary hover:underline">
+              {title}
             </Link>
           ) : (
-            <span className="font-medium text-foreground">{item.from}</span>
+            <span className="font-medium text-foreground">{title}</span>
           )}{' '}
-          {item.action}
+          {body}
         </p>
-        {item.context ? (
-          <p className="mt-0.5 text-xs text-muted-foreground">{item.context}</p>
-        ) : null}
-        <p className="mt-1 text-xs text-muted-foreground">{item.time}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(log.created_at)}</p>
       </div>
     </div>
   );
 }
 
-export function NotificationsPanel() {
-  const totalToday = MOCK_TODAY.length;
+function Section({
+  heading,
+  logs,
+  role,
+}: {
+  heading: string;
+  logs: NotificationLog[];
+  role: AppRole;
+}) {
+  if (logs.length === 0) return null;
+  return (
+    <div className="px-4 py-3">
+      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{heading}</h3>
+      <div className="space-y-0.5">
+        {logs.map((log) => (
+          <NotificationRow key={log.id} log={log} role={role} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function NotificationsPanel({
+  role,
+  notificationLogs,
+}: {
+  role: AppRole;
+  notificationLogs: NotificationLog[];
+}) {
+  const { today, thisWeek, older } = partitionByRecency(notificationLogs);
+  const totalToday = today.length;
+  const hasAny = notificationLogs.length > 0;
 
   return (
     <div className="flex h-full flex-col">
@@ -119,43 +156,47 @@ export function NotificationsPanel() {
           <div>
             <h2 className="text-lg font-semibold text-foreground">Notifications</h2>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              You have{' '}
-              <span className="font-semibold text-primary">
-                {totalToday} notification{totalToday !== 1 ? 's' : ''}
-              </span>{' '}
-              today.
+              {hasAny ? (
+                <>
+                  You have{' '}
+                  <span className="font-semibold text-primary">
+                    {totalToday} notification{totalToday !== 1 ? 's' : ''}
+                  </span>{' '}
+                  today.
+                </>
+              ) : (
+                'No notifications yet.'
+              )}
             </p>
           </div>
           <IconButton
             variant="subtle"
             className="size-8 shrink-0"
             aria-label="Filter or sort notifications"
+            disabled
           >
             <SlidersHorizontal className="size-4" />
           </IconButton>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-3">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Today
-          </h3>
-          <div className="space-y-0.5">
-            {MOCK_TODAY.map((item) => (
-              <NotificationRow key={item.id} item={item} />
-            ))}
-          </div>
-        </div>
-        <div className="border-t border-border px-4 py-3">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            This week
-          </h3>
-          <div className="space-y-0.5">
-            {MOCK_THIS_WEEK.map((item) => (
-              <NotificationRow key={item.id} item={item} />
-            ))}
-          </div>
-        </div>
+        {!hasAny ? (
+          <p className="px-4 py-6 text-sm text-muted-foreground">
+            When something needs your attention, it will show up here.
+          </p>
+        ) : (
+          <>
+            <Section heading="Today" logs={today} role={role} />
+            <div className="border-t border-border">
+              <Section heading="This week" logs={thisWeek} role={role} />
+            </div>
+            {older.length > 0 ? (
+              <div className="border-t border-border">
+                <Section heading="Earlier" logs={older} role={role} />
+              </div>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   );

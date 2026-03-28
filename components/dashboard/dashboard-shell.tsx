@@ -1,8 +1,9 @@
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
-import type { AppRole } from '@/types/database';
+import type { AppRole, NotificationLog } from '@/types/database';
 
 type DashboardUser = {
+  id: string;
   fullName: string | null;
   avatarUrl: string | null;
   email: string | null;
@@ -11,10 +12,14 @@ type DashboardUser = {
 export function DashboardShell({
   role,
   user,
+  notificationLogs,
+  notificationCount,
   children,
 }: {
   role: AppRole;
   user: DashboardUser;
+  notificationLogs: NotificationLog[];
+  notificationCount: number;
   children: React.ReactNode;
 }) {
   return (
@@ -24,7 +29,12 @@ export function DashboardShell({
           <DashboardSidebar role={role} />
         </div>
         <div className="flex min-w-0 flex-col">
-          <DashboardHeader role={role} user={user} />
+          <DashboardHeader
+            role={role}
+            user={user}
+            notificationLogs={notificationLogs}
+            notificationCount={notificationCount}
+          />
           <main className="flex-1 flex flex-col">{children}</main>
         </div>
       </div>
