@@ -3,17 +3,18 @@
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import {
-  Search, Heart, Bed, Bath, Square, MapPin, ArrowRight, ArrowLeft,
-  Home, Building2, Briefcase, Calendar, BadgeCheck, Menu,
+  Heart, Bed, Bath, Square, MapPin, ArrowRight, ArrowLeft,
+  Calendar, BadgeCheck, Menu,
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { getAppSignupUrl } from '@/lib/app-url';
+import { HeroSearchCard } from '@/components/www/hero-search-card';
 
 // =====================================================================
 // ScrubHub — Marketing landing page
 // Warm residential real-estate magazine feel:
 //   - Off-white paper background (#F7F4EE)
-//   - Existing brand --primary blue kept for CTAs
+//   - Primary / CTAs: clinical blue (--primary) vs ink headings (--ink)
 //   - Editorial italic display moments via Instrument Serif (loaded below)
 //   - Mono captions via system mono stack
 // All sizing/spacing via Tailwind.  Tokens added inline so this drops in
@@ -48,31 +49,10 @@ function Eyebrow({ children, className = '' }: { children: React.ReactNode; clas
   );
 }
 
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <button className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFD2] bg-transparent px-3.5 py-1.5 text-xs font-medium text-[#3A4759] transition hover:border-[#0E1A2B] hover:text-[#0E1A2B]">
-      {children}
-    </button>
-  );
-}
-
 // =====================================================================
 // HERO
 // =====================================================================
 function HeroSearch() {
-  const [tab, setTab] = useState<'stay' | 'suite' | 'staff'>('stay');
-  const tabs = [
-    { id: 'stay'  as const, label: 'Stay',  sub: 'Furnished housing for travel & locum staff', Icon: Home },
-    { id: 'suite' as const, label: 'Suite', sub: 'Clinical suites by the day or week',          Icon: Building2 },
-    { id: 'staff' as const, label: 'Staff', sub: 'Locum, contract & permanent roles',           Icon: Briefcase },
-  ];
-
-  const fields: Record<typeof tab, Array<[string, string]>> = {
-    stay:  [['Where','Toronto · Downtown Core'],['Move in','May 14, 2026'],['Length','12 weeks'],['Hospital','Toronto General']],
-    suite: [['Where','GTA · Any'],['Date','Tomorrow'],['Duration','Half-day'],['Specialty','Family Med · Exam']],
-    staff: [['Role','Registered Nurse'],['Region','Greater Toronto'],['Type','Locum · 8–12 weeks'],['Start','Within 2 weeks']],
-  };
-
   return (
     <section className="pt-12 pb-16">
       <div className="mx-auto max-w-[1320px] px-8">
@@ -98,7 +78,7 @@ function HeroSearch() {
 
         {/* Hero photo + overlap search */}
         <div className="relative">
-          <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-primary to-[#1a3a5c]" style={{ aspectRatio: '21/9', minHeight: 420, maxHeight: 560 }}>
+          <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-primary to-[#0d4a9e]" style={{ aspectRatio: '21/9', minHeight: 420, maxHeight: 560 }}>
             <img
               src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2200&q=85"
               alt=""
@@ -121,60 +101,7 @@ function HeroSearch() {
             </div>
           </div>
 
-          {/* Search bar — overlaps photo */}
-          <div className="relative mx-auto -mt-11 max-w-[1100px] rounded-3xl border border-[#E5DFD2] bg-[#F7F4EE] p-3.5 shadow-[0_30px_80px_rgba(14,26,43,0.14),0_4px_12px_rgba(14,26,43,0.06)]">
-            {/* Tabs */}
-            <div className="flex gap-1.5 mb-3 px-1.5 items-center">
-              {tabs.map(t => (
-                <button key={t.id} onClick={() => setTab(t.id)}
-                  className={`inline-flex items-center gap-2 h-11 px-5 rounded-full text-sm font-semibold transition ${
-                    tab === t.id
-                      ? 'bg-white text-[#0E1A2B] shadow-[0_6px_18px_rgba(14,26,43,0.08),0_1px_2px_rgba(14,26,43,0.04)]'
-                      : 'bg-transparent text-[#6B7585] hover:text-[#0E1A2B]'
-                  }`}
-                >
-                  <t.Icon className="size-4" />
-                  <span>{t.label}</span>
-                </button>
-              ))}
-              <div className="flex-1" />
-              <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-[#6B7585] pr-2.5">
-                {tabs.find(t => t.id === tab)?.sub}
-              </span>
-            </div>
-
-            {/* Fields */}
-            <div className="flex items-stretch bg-white rounded-2xl border border-[#E5DFD2] overflow-hidden">
-              {fields[tab].map(([label, value], i, a) => (
-                <div key={label}
-                  className={`flex-1 flex flex-col px-4 py-2.5 cursor-pointer hover:bg-[#F0EBDF] transition ${i < a.length - 1 ? 'border-r border-[#E5DFD2]' : ''}`}
-                >
-                  <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#6B7585] font-medium mb-0.5">{label}</span>
-                  <span className="text-[15px] font-medium text-[#0E1A2B]">{value}</span>
-                </div>
-              ))}
-              <div className="flex items-center p-2">
-                <button className="inline-flex items-center justify-center gap-2 h-15 px-7 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition" style={{ height: 60 }}>
-                  <Search className="size-[18px]" />
-                  Search
-                </button>
-              </div>
-            </div>
-
-            {/* Quick chips */}
-            <div className="flex gap-2 px-1.5 pt-3.5 pb-1 flex-wrap items-center">
-              <Chip>Furnished</Chip>
-              <Chip>Pet friendly</Chip>
-              <Chip>Walk to hospital</Chip>
-              <Chip>≤ $3,000/mo</Chip>
-              <Chip>Parking incl.</Chip>
-              <Chip>13-week stays</Chip>
-              <span className="flex-1" />
-              <Link href="/facility-map" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[13px] font-semibold text-[#0E1A2B] hover:gap-2 transition-all">
-                More filters <ArrowRight className="size-3.5" />
-              </Link>
-            </div>
-          </div>
+          <HeroSearchCard />
         </div>
 
         {/* Trust strip */}
@@ -362,7 +289,7 @@ function CorridorMapStylized() {
       </defs>
       <rect width="100" height="70" fill="url(#land)" />
       <rect width="100" height="70" fill="url(#grid)" />
-      <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(37,99,235,0.10)" />
+      <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(22,99,212,0.12)" />
       <path d="M 6 72 Q 30 58 50 50 T 96 22" fill="none" stroke="var(--color-primary)" strokeWidth="0.6" strokeDasharray="0.8 0.8" opacity="0.5" />
       {stays.map((s, i) => (
         <circle key={i} cx={s[0]} cy={s[1]} r="0.55" fill="none" stroke="#B8472E" strokeWidth="0.25" />
@@ -505,36 +432,6 @@ function HostsCTA() {
 }
 
 // =====================================================================
-// LIAISON concierge bubble (kept from previous landing)
-// =====================================================================
-function LiaisonConcierge() {
-  const [open, setOpen] = useState(false);
-  if (!open) {
-    return (
-      <button onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2.5 rounded-full bg-primary text-primary-foreground px-5 py-3 shadow-lg hover:scale-105 transition border border-white/10"
-      >
-        <span className="size-2 rounded-full bg-[#B8472E]" />
-        <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON</span>
-      </button>
-    );
-  }
-  return (
-    <div className="fixed bottom-6 right-6 z-50 w-[340px] rounded-2xl bg-white shadow-[0_24px_60px_rgba(14,26,43,0.22)] border border-[#E5DFD2] overflow-hidden">
-      <div className="bg-primary text-primary-foreground px-5 py-3.5 flex items-center justify-between">
-        <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON · Concierge</span>
-        <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white">×</button>
-      </div>
-      <div className="p-5 bg-[#F7F4EE]">
-        <div className="bg-white border border-[#E5DFD2] rounded-xl p-3.5 text-sm text-[#3A4759]">
-          Hi — looking for a stay near a specific hospital, or a locum role this rotation?
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// =====================================================================
 // PAGE
 // =====================================================================
 export function LandingClient({ user }: { user: User | null }) {
@@ -568,7 +465,6 @@ export function LandingClient({ user }: { user: User | null }) {
         <Neighborhoods />
         <HostsCTA />
       </main>
-      <LiaisonConcierge />
     </div>
   );
 }

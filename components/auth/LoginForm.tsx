@@ -87,35 +87,45 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
     // Supabase redirects to Google
   }
 
+  const fieldLabel =
+    'font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#6B7585]';
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {(error || queryError) && (
-        <Alert variant="destructive">
+        <Alert
+          variant="destructive"
+          className="border-red-200 bg-red-50 text-red-900 [&_svg]:text-red-700"
+        >
           <AlertTitle>Unable to sign in</AlertTitle>
           <AlertDescription>{error ?? queryError}</AlertDescription>
         </Alert>
       )}
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" className={fieldLabel}>
+          Email
+        </Label>
         <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          placeholder="Enter your email"
+          placeholder="you@hospital.org"
           autoComplete="email"
-          className="h-10"
+          className="h-11 rounded-xl border-[#E5DFD2] bg-[#F7F4EE]/50 text-[15px] text-[#0E1A2B] placeholder:text-[#6B7585]/80 focus-visible:border-primary/40 focus-visible:ring-primary/25"
         />
       </div>
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="password" className={fieldLabel}>
+            Password
+          </Label>
           <Link
             href="/forgot-password"
-            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#6B7585] transition-colors hover:text-primary"
           >
-            Forgot password?
+            Forgot?
           </Link>
         </div>
         <div className="relative">
@@ -125,38 +135,44 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            placeholder="Enter your password"
+            placeholder="••••••••"
             autoComplete="current-password"
-            className="h-10 pr-10"
+            className="h-11 rounded-xl border-[#E5DFD2] bg-[#F7F4EE]/50 pr-10 text-[15px] text-[#0E1A2B] placeholder:text-[#6B7585]/80 focus-visible:border-primary/40 focus-visible:ring-primary/25"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7585] hover:text-[#0E1A2B]"
             tabIndex={-1}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
         </div>
       </div>
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[#3A4759]">
           <Checkbox
             checked={rememberMe}
             onCheckedChange={(checked) => setRememberMe(checked === true)}
+            className="border-[#E5DFD2] data-[state=checked]:border-primary data-[state=checked]:bg-primary"
           />
           Remember me
         </label>
       </div>
-      <Button type="submit" disabled={loading} className="w-full h-10">
-        {loading ? 'Signing in…' : 'Login'}
+      <Button
+        type="submit"
+        disabled={loading}
+        className="h-12 w-full rounded-xl text-[15px] font-semibold shadow-[0_6px_18px_rgba(22,99,212,0.28)]"
+      >
+        {loading ? 'Signing in…' : 'Sign in'}
       </Button>
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
+          <span className="w-full border-t border-[#E5DFD2]" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">
+        <div className="relative flex justify-center">
+          <span className="bg-white px-3 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#6B7585]">
             Or continue with
           </span>
         </div>
@@ -164,19 +180,13 @@ export function LoginForm({ defaultRedirectTo = '/dashboard' }: LoginFormProps) 
       <Button
         type="button"
         variant="outline"
-        className="w-full h-10"
+        className="h-12 w-full rounded-xl border-[#E5DFD2] bg-white text-[15px] font-semibold text-[#0E1A2B] hover:bg-[#F7F4EE]"
         onClick={handleGoogleSignIn}
         disabled={loading}
       >
-        <FcGoogle className="size-4 mr-2" />
-        Continue with Google
+        <FcGoogle className="mr-2 size-4" />
+        Google
       </Button>
-      <p className="text-center text-sm text-muted-foreground mt-6">
-        Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-medium text-primary hover:underline">
-          Sign up here
-        </Link>
-      </p>
     </form>
   );
 }
