@@ -56,14 +56,17 @@ export function ListingModal({ listing, open, onOpenChange }: ListingModalProps)
     setImageIndex(0);
   }, [listing?.id]);
 
+  // Tenant context is user-scoped, not listing-scoped — fetch once and reuse
+  // across opens so the apply CTA renders instantly on subsequent modal opens.
   useEffect(() => {
-    if (open) {
-      setAppContext(undefined);
-      getTenantApplicationContext().then(setAppContext);
-    } else {
-      setAppContext(undefined);
-    }
-  }, [open]);
+    let cancelled = false;
+    getTenantApplicationContext().then((ctx) => {
+      if (!cancelled) setAppContext(ctx);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (!listing) return null;
 
