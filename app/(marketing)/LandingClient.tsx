@@ -465,13 +465,13 @@ function Neighborhoods() {
 // =====================================================================
 function HostsCTA() {
   return (
-    <section className="py-16 bg-primary text-primary-foreground">
+    <section className="py-16 bg-[#0E1A2B] text-white">
       <div className="mx-auto max-w-[1320px] px-8 grid lg:grid-cols-[1.4fr_1fr] gap-12 items-center">
         <div>
           <div className="font-mono text-[11px] tracking-[0.18em] uppercase opacity-70 mb-4">For hosts &amp; landlords</div>
           <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(34px, 4vw, 52px)' }}>
             Your unit, full of<br />
-            <span className="italic font-normal" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>verified nurses.</span>
+            <span className="italic font-normal text-[#F0DAB1]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>verified nurses.</span>
           </h2>
           <p className="text-[17px] opacity-75 leading-[1.5] mt-4 max-w-[540px]">
             List once. ScrubHub matches you with credentialed practitioners on 8–13 week contracts,
@@ -481,7 +481,7 @@ function HostsCTA() {
             <Link href={getAppSignupUrl()} className="inline-flex items-center gap-2 h-13 px-6 rounded-full bg-[#F7F4EE] text-[#0E1A2B] font-semibold transition hover:-translate-y-0.5" style={{ height: 52 }}>
               List a unit <ArrowRight className="size-4" />
             </Link>
-            <button className="inline-flex items-center h-13 px-6 rounded-full border border-white/30 text-primary-foreground font-semibold transition hover:border-white/60" style={{ height: 52 }}>
+            <button className="inline-flex items-center h-13 px-6 rounded-full border border-white/30 text-white font-semibold transition hover:border-white/60" style={{ height: 52 }}>
               Talk to LIAISON
             </button>
           </div>
