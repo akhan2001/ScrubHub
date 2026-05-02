@@ -1,308 +1,575 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
-  CheckCircle,
-  ArrowRight,
-  AlertTriangle,
-  Calendar,
-  Clock,
+  Search, Heart, Bed, Bath, Square, ArrowRight, ArrowLeft,
+  Home, Building2, Briefcase, BadgeCheck,
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { getAppSignupUrl } from '@/lib/app-url';
 
-const PLATFORM_STATS = [
-  { value: 284, label: 'Active Rentals', trend: '+12% this month', urgent: false },
-  { value: 47, label: 'Clinical Suites', trend: '+8% this month', urgent: false },
-  { value: 1247, label: 'Staff Placed', trend: '+31% this year', urgent: false },
-  { value: 12, label: 'Urgent Openings', trend: 'Needs Filling', urgent: true },
+// =====================================================================
+// ScrubHub — Marketing landing page
+// Warm residential real-estate magazine feel:
+//   - Off-white paper background (#F7F4EE)
+//   - Existing brand --primary blue kept for CTAs
+//   - Editorial italic display moments via Instrument Serif (loaded below)
+//   - Mono captions via system mono stack
+// =====================================================================
+
+// ----- Featured listings (replace with real data via props later) -----
+const LISTINGS = [
+  { id: 1, title: 'Maple Walk Studio',     address: 'Cabbagetown · 0.6 km to Sherbourne Hospital', price: 2840, beds: 1, baths: 1, sqft: 540, tag: 'New' },
+  { id: 2, title: 'Riverside Loft 4B',     address: 'King West · 1.2 km to Toronto Western',       price: 3210, beds: 2, baths: 1, sqft: 720, tag: 'Verified' },
+  { id: 3, title: 'The Beaches Suite',     address: 'Beaches · 0.9 km to Michael Garron',          price: 2640, beds: 1, baths: 1, sqft: 480, tag: 'Pet OK' },
+  { id: 4, title: 'Lakeshore Pied-à-terre',address: 'Mimico · 1.4 km to Trillium Health',          price: 2990, beds: 1, baths: 1, sqft: 610, tag: 'Editor’s Pick' },
+  { id: 5, title: 'Annex Townhouse',       address: 'The Annex · 0.4 km to Toronto General',       price: 3680, beds: 2, baths: 2, sqft: 880, tag: 'Locum' },
+  { id: 6, title: 'Riverdale Garden',      address: 'Riverdale · 1.0 km to Bridgepoint Health',    price: 2510, beds: 1, baths: 1, sqft: 520, tag: 'New' },
 ];
 
-const NEW_ACTIVITY = [
-  { title: 'Staffing Gap', hospital: 'Rouge Valley ER', time: 'Tonight, 11:00 PM', status: 'CRITICAL', icon: Clock },
-  { title: 'Capacity Alert', hospital: 'Grand River ER', time: 'Ongoing', status: 'WARNING', icon: AlertTriangle },
-  { title: 'Booking Request', hospital: 'Trillium Health', time: 'Tomorrow, 7:00 AM', status: 'PENDING', icon: Calendar },
+const NEIGHBORHOODS = [
+  { name: 'Downtown Core',       count: 84, label: 'Toronto General · Mt Sinai' },
+  { name: 'Mississauga West',    count: 42, label: 'Trillium · Credit Valley' },
+  { name: 'Scarborough',         count: 31, label: 'Sunnybrook · Rouge Valley' },
+  { name: 'Kitchener–Waterloo',  count: 27, label: 'Grand River · St Mary’s' },
+  { name: 'Hamilton',            count: 38, label: 'Juravinski · St Joseph’s' },
+  { name: 'London ON',           count: 22, label: 'Victoria · University' },
 ];
 
-const EDITORIAL_CARDS = [
-  {
-    title: 'Practitioner Housing',
-    description:
-      'Bright, minimalist residential spaces near top healthcare facilities. Fully furnished for seamless transient staffing.',
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80',
-    href: '/facility-map',
-  },
-  {
-    title: 'Clinical Suites',
-    description:
-      'Modern, glass-walled medical offices with luxury finishings. Book by the half-day or week with zero overhead.',
-    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80',
-    href: '/facility-map',
-  },
-  {
-    title: 'The Staffing Protocol',
-    description:
-      'High-caliber contract placing. Connect credentialed professionals directly to critical care hubs in real-time.',
-    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80',
-    href: '/staffing',
-  },
-];
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    OK: 'bg-primary/10 text-primary border-primary/30',
-    PENDING: 'bg-slate-100 text-slate-600 border-slate-200',
-    WARNING: 'bg-amber-50 text-amber-700 border-amber-200',
-    CRITICAL: 'bg-red-50 text-red-700 border-red-200',
-  };
+// ----- Reusable bits -----
+function Eyebrow({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[0.65rem] font-bold tracking-widest uppercase ${styles[status] ?? ''}`}
-    >
-      {status}
-    </span>
+    <div className={`font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] font-medium ${className}`}>
+      {children}
+    </div>
   );
 }
 
-function AnimCounter({ target, duration = 1200 }: { target: number; duration?: number }) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    const start = performance.now();
-    const step = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setVal(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration]);
-  return <span>{val.toLocaleString()}</span>;
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <button className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DFD2] bg-transparent px-3.5 py-1.5 text-xs font-medium text-[#3A4759] transition hover:border-[#0E1A2B] hover:text-[#0E1A2B]">
+      {children}
+    </button>
+  );
 }
 
+// =====================================================================
+// HERO
+// =====================================================================
+function HeroSearch() {
+  const [tab, setTab] = useState<'stay' | 'suite' | 'staff'>('stay');
+  const tabs = [
+    { id: 'stay'  as const, label: 'Stay',  sub: 'Furnished housing for travel & locum staff', Icon: Home },
+    { id: 'suite' as const, label: 'Suite', sub: 'Clinical suites by the day or week',          Icon: Building2 },
+    { id: 'staff' as const, label: 'Staff', sub: 'Locum, contract & permanent roles',           Icon: Briefcase },
+  ];
+
+  const fields: Record<typeof tab, Array<[string, string]>> = {
+    stay:  [['Where','Toronto · Downtown Core'],['Move in','May 14, 2026'],['Length','12 weeks'],['Hospital','Toronto General']],
+    suite: [['Where','GTA · Any'],['Date','Tomorrow'],['Duration','Half-day'],['Specialty','Family Med · Exam']],
+    staff: [['Role','Registered Nurse'],['Region','Greater Toronto'],['Type','Locum · 8–12 weeks'],['Start','Within 2 weeks']],
+  };
+
+  return (
+    <section className="pt-12 pb-16">
+      <div className="mx-auto max-w-[1320px] px-8">
+        {/* Headline */}
+        <div className="max-w-[920px] mb-9">
+          <Eyebrow className="mb-4">
+            <span className="inline-flex items-center gap-2">
+              <span className="size-1.5 rounded-full bg-[#B8472E]" />
+              Ontario · 401 Healthcare Corridor
+            </span>
+          </Eyebrow>
+          <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96] text-[#0E1A2B]" style={{ fontSize: 'clamp(44px, 7.6vw, 104px)' }}>
+            Find your next post.<br />
+            <span className="font-serif italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              Move in by Sunday.
+            </span>
+          </h1>
+          <p className="max-w-[560px] mt-5 text-lg leading-snug text-[#3A4759]">
+            Furnished homes, clinical suites, and locum roles within walking distance of Ontario’s top hospitals.
+            Vetted hosts. No-broker fees. Move-in tonight.
+          </p>
+        </div>
+
+        {/* Hero photo + overlap search */}
+        <div className="relative">
+          <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-primary to-[#1a3a5c]" style={{ aspectRatio: '21/9', minHeight: 420, maxHeight: 560 }}>
+            <img
+              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2200&q=85"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/55 pointer-events-none" />
+            <div className="absolute top-6 left-7 text-white" style={{ mixBlendMode: 'difference' }}>
+              <span className="font-mono text-[11px] tracking-[0.16em] uppercase opacity-85">
+                Fig. 01 — Maple Walk, Cabbagetown
+              </span>
+            </div>
+            <div className="absolute bottom-7 left-7 text-white">
+              <p className="m-0 italic max-w-[520px] leading-[1.25] text-2xl" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+                “Walked to my first shift in seven minutes.”
+              </p>
+              <p className="font-mono text-[11px] tracking-[0.16em] uppercase mt-2.5 opacity-85">
+                Priya N. — RN, Locum, 12-week placement
+              </p>
+            </div>
+          </div>
+
+          {/* Search bar — overlaps photo */}
+          <div className="relative mx-auto -mt-11 max-w-[1100px] rounded-3xl border border-[#E5DFD2] bg-[#F7F4EE] p-3.5 shadow-[0_30px_80px_rgba(14,26,43,0.14),0_4px_12px_rgba(14,26,43,0.06)]">
+            {/* Tabs */}
+            <div className="flex gap-1.5 mb-3 px-1.5 items-center">
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  className={`inline-flex items-center gap-2 h-11 px-5 rounded-full text-sm font-semibold transition ${
+                    tab === t.id
+                      ? 'bg-white text-[#0E1A2B] shadow-[0_6px_18px_rgba(14,26,43,0.08),0_1px_2px_rgba(14,26,43,0.04)]'
+                      : 'bg-transparent text-[#6B7585] hover:text-[#0E1A2B]'
+                  }`}
+                >
+                  <t.Icon className="size-4" />
+                  <span>{t.label}</span>
+                </button>
+              ))}
+              <div className="flex-1" />
+              <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-[#6B7585] pr-2.5">
+                {tabs.find(t => t.id === tab)?.sub}
+              </span>
+            </div>
+
+            {/* Fields */}
+            <div className="flex items-stretch bg-white rounded-2xl border border-[#E5DFD2] overflow-hidden">
+              {fields[tab].map(([label, value], i, a) => (
+                <div key={label}
+                  className={`flex-1 flex flex-col px-4 py-2.5 cursor-pointer hover:bg-[#F0EBDF] transition ${i < a.length - 1 ? 'border-r border-[#E5DFD2]' : ''}`}
+                >
+                  <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#6B7585] font-medium mb-0.5">{label}</span>
+                  <span className="text-[15px] font-medium text-[#0E1A2B]">{value}</span>
+                </div>
+              ))}
+              <div className="flex items-center p-2">
+                <button className="inline-flex items-center justify-center gap-2 h-15 px-7 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm transition" style={{ height: 60 }}>
+                  <Search className="size-[18px]" />
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {/* Quick chips */}
+            <div className="flex gap-2 px-1.5 pt-3.5 pb-1 flex-wrap items-center">
+              <Chip>Furnished</Chip>
+              <Chip>Pet friendly</Chip>
+              <Chip>Walk to hospital</Chip>
+              <Chip>≤ $3,000/mo</Chip>
+              <Chip>Parking incl.</Chip>
+              <Chip>13-week stays</Chip>
+              <span className="flex-1" />
+              <Link href="/facility-map" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[13px] font-semibold text-[#0E1A2B] hover:gap-2 transition-all">
+                More filters <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust strip */}
+        <div className="mt-9 grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-[#E5DFD2]">
+          {[
+            ['1,247', 'Practitioners housed'],
+            ['284',   'Active rentals tonight'],
+            ['47',    'Hospitals served'],
+            ['96%',   'Placed within 14 days'],
+          ].map(([n, l]) => (
+            <div key={l}>
+              <div className="font-medium tracking-[-0.04em] text-[#0E1A2B]" style={{ fontSize: 42 }}>{n}</div>
+              <Eyebrow className="mt-2">{l}</Eyebrow>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =====================================================================
+// FEATURED LISTINGS CAROUSEL
+// =====================================================================
+function FeaturedStays() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [saved, setSaved] = useState<Set<number>>(new Set());
+  const toggle = (id: number) => setSaved(s => {
+    const n = new Set(s);
+    if (n.has(id)) n.delete(id); else n.add(id);
+    return n;
+  });
+  const scroll = (dir: number) => ref.current?.scrollBy({ left: dir * 380, behavior: 'smooth' });
+
+  return (
+    <section className="pt-16 pb-20 border-t border-[#E5DFD2]">
+      <div className="mx-auto max-w-[1320px] px-8">
+        <div className="flex items-end justify-between mb-9 flex-wrap gap-5">
+          <div>
+            <Eyebrow className="mb-3.5">This week · 401 Corridor</Eyebrow>
+            <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
+              Hand-picked stays<br />
+              <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+                near every shift.
+              </span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => scroll(-1)} className="size-11 rounded-full border border-[#E5DFD2] grid place-items-center hover:border-[#0E1A2B] transition">
+              <ArrowLeft className="size-4.5" />
+            </button>
+            <button onClick={() => scroll(1)} className="size-11 rounded-full border border-[#E5DFD2] grid place-items-center hover:border-[#0E1A2B] transition">
+              <ArrowRight className="size-4.5" />
+            </button>
+            <Link href="/facility-map" className="ml-2 inline-flex items-center gap-2 h-11 px-5 rounded-full border border-[#E5DFD2] text-sm font-semibold hover:border-[#0E1A2B] transition">
+              View all 284 stays <ArrowRight className="size-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        <div ref={ref}
+          className="grid grid-flow-col auto-cols-[minmax(320px,1fr)] gap-6 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] snap-x snap-mandatory"
+        >
+          {LISTINGS.map(l => (
+            <article key={l.id} className="snap-start flex flex-col gap-3.5 transition-transform duration-300 hover:-translate-y-1">
+              <div className="relative rounded-2xl overflow-hidden bg-[#EFE9DD]" style={{ aspectRatio: '4/5' }}>
+                <div className="absolute inset-0 flex items-center justify-center font-mono text-[11px] tracking-[0.12em] uppercase text-[#6B7585]"
+                  style={{ background: 'repeating-linear-gradient(135deg, #F0EBDF 0 12px, #EFE9DD 12px 24px)' }}
+                >
+                  <span className="px-2.5 py-1.5 bg-white/70 rounded-md">interior · {l.title}</span>
+                </div>
+                <span className="absolute top-3.5 left-3.5 bg-white text-[#0E1A2B] px-2.5 py-1 rounded-full font-mono text-[10px] tracking-[0.14em] uppercase font-semibold">
+                  {l.tag}
+                </span>
+                <button onClick={() => toggle(l.id)}
+                  className={`absolute top-3 right-3 size-9 rounded-full bg-white/95 grid place-items-center transition hover:scale-110 ${saved.has(l.id) ? 'text-[#B8472E]' : 'text-[#0E1A2B]'}`}
+                >
+                  <Heart className="size-4" fill={saved.has(l.id) ? 'currentColor' : 'none'} />
+                </button>
+              </div>
+              <div>
+                <div className="flex justify-between items-baseline gap-3">
+                  <h3 className="text-lg font-semibold m-0 tracking-[-0.015em]">{l.title}</h3>
+                  <span className="text-lg font-semibold tracking-[-0.02em]">
+                    ${l.price.toLocaleString()}
+                    <span className="text-[13px] font-normal text-[#6B7585]">/mo</span>
+                  </span>
+                </div>
+                <p className="mt-1 mb-3 text-sm text-[#6B7585]">{l.address}</p>
+                <div className="flex gap-4.5 text-[13px] text-[#3A4759]">
+                  <span className="inline-flex items-center gap-1.5"><Bed className="size-4" /> {l.beds} bed</span>
+                  <span className="inline-flex items-center gap-1.5"><Bath className="size-4" /> {l.baths} bath</span>
+                  <span className="inline-flex items-center gap-1.5"><Square className="size-4" /> {l.sqft} sqft</span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =====================================================================
+// CORRIDOR SECTION (Med-Map preview)
+// =====================================================================
+function CorridorSection() {
+  return (
+    <section className="pt-20 pb-24 bg-[#EFE9DD]">
+      <div className="mx-auto max-w-[1320px] px-8">
+        <div className="grid lg:grid-cols-[1fr_1.15fr] gap-16 items-center">
+          <div>
+            <Eyebrow className="mb-4">Med-Map™ · Live</Eyebrow>
+            <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
+              Every hospital on<br />
+              <span className="italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+                one corridor.
+              </span>
+            </h2>
+            <p className="mt-5 max-w-[520px] text-lg leading-[1.55] text-[#3A4759]">
+              From Windsor to Kingston, ScrubHub maps 500+ clinical hubs — with walk-times,
+              transit overlays, and live availability for every furnished unit on the route.
+            </p>
+
+            <div className="flex flex-col gap-3.5 mt-7 mb-8">
+              {[
+                ['Walk-time to facility', 'Filter by minutes from any hospital entrance'],
+                ['Transit overlay', 'GO Transit, TTC, MiWay layered on the map'],
+                ['Verified inventory', 'Every host meets ScrubHub housing protocol'],
+              ].map(([h, s]) => (
+                <div key={h} className="flex gap-3.5 pb-3.5 border-b border-[#E5DFD2]">
+                  <div className="size-8 rounded-full bg-white border border-[#E5DFD2] grid place-items-center shrink-0 text-primary">
+                    <BadgeCheck className="size-4" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-[15px]">{h}</div>
+                    <div className="text-sm text-[#6B7585] mt-0.5">{s}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Link href="/facility-map" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition">
+              Open Med-Map <ArrowRight className="size-4" />
+            </Link>
+          </div>
+
+          <div className="relative rounded-3xl overflow-hidden bg-white border border-[#E5DFD2] shadow-[0_30px_60px_rgba(14,26,43,0.10)]" style={{ aspectRatio: '4/3' }}>
+            <CorridorMapStylized />
+            <div className="absolute top-4 left-5 font-mono text-[10px] tracking-[0.18em] uppercase text-[#6B7585]">
+              Fig. 02 · 401 Corridor
+            </div>
+            <div className="absolute bottom-4 right-5 flex gap-3.5 items-center">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-primary" />
+                <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#3A4759]">Hospitals</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="size-2 rounded-full border-2 border-[#B8472E]" />
+                <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#3A4759]">Stays</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CorridorMapStylized() {
+  const cities = [
+    { x: 8, y: 70, n: 'Windsor' }, { x: 22, y: 64, n: 'London' }, { x: 34, y: 58, n: 'Kitchener' },
+    { x: 46, y: 52, n: 'Hamilton' }, { x: 58, y: 44, n: 'Mississauga' }, { x: 68, y: 38, n: 'Toronto' },
+    { x: 82, y: 32, n: 'Oshawa' }, { x: 94, y: 24, n: 'Kingston' },
+  ];
+  const stays: [number, number][] = [
+    [60,50],[63,35],[70,42],[71,30],[72,46],[55,38],[33,64],[24,70],[12,73],[83,27],[86,36],[47,56],[39,50],[51,60],[78,30],[65,28],[36,47],[27,58],
+  ];
+  return (
+    <svg viewBox="0 0 100 70" preserveAspectRatio="none" className="w-full h-full block">
+      <defs>
+        <pattern id="grid" width="3" height="3" patternUnits="userSpaceOnUse">
+          <path d="M 3 0 L 0 0 0 3" fill="none" stroke="#E5DFD2" strokeWidth="0.1" />
+        </pattern>
+        <linearGradient id="land" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#EFE9DD" />
+          <stop offset="100%" stopColor="#F7F4EE" />
+        </linearGradient>
+      </defs>
+      <rect width="100" height="70" fill="url(#land)" />
+      <rect width="100" height="70" fill="url(#grid)" />
+      <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(37,99,235,0.10)" />
+      <path d="M 6 72 Q 30 58 50 50 T 96 22" fill="none" stroke="var(--color-primary)" strokeWidth="0.6" strokeDasharray="0.8 0.8" opacity="0.5" />
+      {stays.map((s, i) => (
+        <circle key={i} cx={s[0]} cy={s[1]} r="0.55" fill="none" stroke="#B8472E" strokeWidth="0.25" />
+      ))}
+      {cities.map(c => (
+        <g key={c.n}>
+          <circle cx={c.x} cy={c.y} r="1.4" fill="var(--color-primary)" />
+          <circle cx={c.x} cy={c.y} r="2.6" fill="var(--color-primary)" opacity="0.15" />
+          <text x={c.x + 2.2} y={c.y + 0.6} fontSize="2.2" fill="#3A4759" fontFamily="ui-monospace, monospace">{c.n.toUpperCase()}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+// =====================================================================
+// HOW IT WORKS
+// =====================================================================
+function HowItWorks() {
+  const steps: [string, string, string][] = [
+    ['01', 'Search by hospital', 'Pick your facility and shift dates — we surface only listings within a 15-minute walk or transit hop.'],
+    ['02', 'Verify, then book',  'Hosts are credentialed against the ScrubHub housing protocol. License upload, e-sign, deposit — all in one flow.'],
+    ['03', 'Move in tonight',    'Lockbox or smart-lock access. Concierge LIAISON on standby for late shifts and last-minute swaps.'],
+  ];
+  return (
+    <section className="pt-24 pb-24">
+      <div className="mx-auto max-w-[1320px] px-8">
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-12 mb-12 items-end">
+          <div>
+            <Eyebrow className="mb-4">How ScrubHub works</Eyebrow>
+            <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
+              Three steps from<br />
+              <span className="italic font-normal" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+                offer to occupancy.
+              </span>
+            </h2>
+          </div>
+          <p className="text-[17px] leading-[1.55] text-[#3A4759] max-w-[540px] m-0 lg:justify-self-end">
+            We rebuilt the rental flow for the rhythm of clinical work — nights, swaps, and 13-week
+            contracts that don’t fit a 12-month lease.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E5DFD2] border border-[#E5DFD2] rounded-3xl overflow-hidden">
+          {steps.map(([n, t, d]) => (
+            <div key={n} className="bg-[#F7F4EE] p-9 flex flex-col gap-4 min-h-[280px]">
+              <div className="font-mono text-xs tracking-[0.18em] text-[#6B7585]">{n}</div>
+              <h3 className="m-0 italic font-normal text-[34px] leading-[1.05] tracking-[-0.01em]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>{t}</h3>
+              <p className="m-0 text-[15px] leading-[1.6] text-[#3A4759]">{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =====================================================================
+// NEIGHBORHOODS
+// =====================================================================
+function Neighborhoods() {
+  return (
+    <section className="pt-8 pb-24">
+      <div className="mx-auto max-w-[1320px] px-8">
+        <div className="flex items-end justify-between mb-7 flex-wrap gap-5">
+          <div>
+            <Eyebrow className="mb-3.5">By region</Eyebrow>
+            <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(32px, 3.8vw, 44px)' }}>
+              Where to land<br />
+              <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+                this rotation.
+              </span>
+            </h2>
+          </div>
+          <Link href="/facility-map" className="text-sm font-semibold text-[#0E1A2B] inline-flex items-center gap-1.5 hover:gap-2 transition-all">
+            All 18 regions <ArrowRight className="size-3.5" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4.5">
+          {NEIGHBORHOODS.map(n => (
+            <Link key={n.name} href="/facility-map" className="grid grid-cols-[1fr_auto] gap-4.5 items-center px-6 py-5 bg-white border border-[#E5DFD2] rounded-2xl no-underline text-[#0E1A2B] transition hover:border-[#0E1A2B] hover:-translate-y-0.5">
+              <div>
+                <div className="text-lg font-semibold tracking-[-0.01em]">{n.name}</div>
+                <div className="text-[13px] text-[#6B7585] mt-1">{n.label}</div>
+              </div>
+              <div className="text-right">
+                <div className="font-medium tracking-[-0.03em] text-2xl">{n.count}</div>
+                <div className="font-mono text-[9px] tracking-[0.16em] uppercase text-[#6B7585]">stays</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =====================================================================
+// HOSTS CTA
+// =====================================================================
+function HostsCTA() {
+  return (
+    <section className="py-16 bg-primary text-primary-foreground">
+      <div className="mx-auto max-w-[1320px] px-8 grid lg:grid-cols-[1.4fr_1fr] gap-12 items-center">
+        <div>
+          <div className="font-mono text-[11px] tracking-[0.18em] uppercase opacity-70 mb-4">For hosts &amp; landlords</div>
+          <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(34px, 4vw, 52px)' }}>
+            Your unit, full of<br />
+            <span className="italic font-normal" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>verified nurses.</span>
+          </h2>
+          <p className="text-[17px] opacity-75 leading-[1.5] mt-4 max-w-[540px]">
+            List once. ScrubHub matches you with credentialed practitioners on 8–13 week contracts,
+            handles deposits, and pays out within 48 hours of move-in.
+          </p>
+          <div className="flex gap-3 mt-7 flex-wrap">
+            <Link href={getAppSignupUrl()} className="inline-flex items-center gap-2 h-13 px-6 rounded-full bg-[#F7F4EE] text-[#0E1A2B] font-semibold transition hover:-translate-y-0.5" style={{ height: 52 }}>
+              List a unit <ArrowRight className="size-4" />
+            </Link>
+            <button className="inline-flex items-center h-13 px-6 rounded-full border border-white/30 text-primary-foreground font-semibold transition hover:border-white/60" style={{ height: 52 }}>
+              Talk to LIAISON
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3.5">
+          {[
+            ['$3,140', 'Avg. monthly payout'],
+            ['11 days', 'Avg. time to first booking'],
+            ['96%',     'Listing approval rate'],
+            ['48 hrs',  'Payout after move-in'],
+          ].map(([n, l]) => (
+            <div key={l} className="px-5.5 py-5.5 rounded-2xl bg-white/8 border border-white/15" style={{ padding: '22px 22px' }}>
+              <div className="font-medium tracking-[-0.03em] text-[32px]">{n}</div>
+              <div className="font-mono text-[10px] tracking-[0.16em] uppercase opacity-70 mt-1.5">{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =====================================================================
+// LIAISON concierge bubble
+// =====================================================================
 function LiaisonConcierge() {
   const [open, setOpen] = useState(false);
-
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-primary text-primary-foreground px-5 py-3 shadow-lg hover:scale-105 transition-all duration-300 border border-white/10"
+      <button onClick={() => setOpen(true)}
+        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2.5 rounded-full bg-primary text-primary-foreground px-5 py-3 shadow-lg hover:scale-105 transition border border-white/10"
       >
-        <span className="relative flex size-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-          <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
-        </span>
-        <span className="font-semibold text-sm tracking-wide">LIAISON Support</span>
+        <span className="size-2 rounded-full bg-[#B8472E]" />
+        <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON</span>
       </button>
     );
   }
-
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[340px] rounded-2xl bg-white shadow-[0_12px_40px_rgba(0,31,63,0.15)] border border-[#e0e0e0] overflow-hidden flex flex-col reveal-on-scroll reveal-active">
-      <div className="bg-primary text-primary-foreground px-5 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex size-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-primary" />
-          </span>
-          <span className="font-bold tracking-widest text-xs uppercase">LIAISON</span>
-        </div>
-        <button onClick={() => setOpen(false)} className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M1 1l12 12M13 1L1 13" />
-          </svg>
-        </button>
+    <div className="fixed bottom-6 right-6 z-50 w-[340px] rounded-2xl bg-white shadow-[0_24px_60px_rgba(14,26,43,0.22)] border border-[#E5DFD2] overflow-hidden">
+      <div className="bg-primary text-primary-foreground px-5 py-3.5 flex items-center justify-between">
+        <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON · Concierge</span>
+        <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white">×</button>
       </div>
-      <div className="p-5 bg-[#FAFAFA] min-h-[120px] flex flex-col gap-3">
-        <div className="bg-white border border-[#e0e0e0] rounded-xl rounded-tl-sm p-4 text-sm text-[#374151] shadow-sm">
-          Welcome back. How can I assist with your deployment or listing today?
-        </div>
-      </div>
-      <div className="p-3 bg-white border-t border-[#e0e0e0]">
-        <div className="h-10 w-full rounded-lg bg-[#f0f4fa] flex items-center px-4 text-[#a0a0a0] text-sm">
-          Type a message...
+      <div className="p-5 bg-[#F7F4EE]">
+        <div className="bg-white border border-[#E5DFD2] rounded-xl p-3.5 text-sm text-[#3A4759]">
+          Hi — looking for a stay near a specific hospital, or a locum role this rotation?
         </div>
       </div>
     </div>
   );
 }
 
-export function LandingClient({ user }: { user: User | null }) {
+// =====================================================================
+// PAGE
+// =====================================================================
+export function LandingClient({ user: _user }: { user: User | null }) {
+  // Reveal animations
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add('reveal-active');
-        });
-      },
+      (entries) => entries.forEach(e => e.isIntersecting && e.target.classList.add('reveal-active')),
       { threshold: 0.1 }
     );
-    document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
+  // Load Instrument Serif on demand (no global font swap needed)
+  useEffect(() => {
+    if (document.getElementById('instrument-serif-link')) return;
+    const link = document.createElement('link');
+    link.id = 'instrument-serif-link';
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
+    document.head.appendChild(link);
+  }, []);
+
   return (
-    <div className="flex-1 flex flex-col bg-blobs font-sans text-foreground">
+    <div className="flex-1 flex flex-col bg-[#F7F4EE] text-[#0E1A2B] font-sans">
       <main className="flex-1">
-        {/* Hero */}
-        <section className="mx-auto max-w-[88rem] px-6 pt-24 pb-20 reveal-on-scroll">
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/60 px-4 py-1.5 mb-8 shadow-sm backdrop-blur-md">
-                <span className="relative flex size-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex size-2 rounded-full bg-primary" />
-                </span>
-                <span className="text-xs font-bold tracking-wide text-[#374151] uppercase">401 Healthcare Corridor</span>
-              </div>
-
-              <h1 className="text-[3.5rem] sm:text-[4.5rem] lg:text-[5.5rem] text-foreground leading-[1.05] mb-8 font-sans">
-                Your Practice,<br />
-                <span className="italic text-primary">Optimized.</span>
-              </h1>
-
-              <p className="text-lg text-[#4a4a4a] leading-relaxed max-w-lg mb-10">
-                The premium network for credentialed healthcare staffing, bespoke clinical suites, and verified
-                practitioner housing.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href={getAppSignupUrl()}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-base font-bold px-8 py-4 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
-                >
-                  Join the Network
-                </Link>
-                <Link
-                  href="/facility-map"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white/50 backdrop-blur-md text-foreground text-base font-bold px-8 py-4 transition-all duration-300 hover:bg-white hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
-                >
-                  Explore Portfolios
-                </Link>
-              </div>
-            </div>
-
-            <div className="space-y-6 relative">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/80 backdrop-blur-xl border border-[#e0e0e0] rounded-2xl p-6 shadow-lg">
-                  <p className="text-4xl font-sans text-foreground mb-1">
-                    <AnimCounter target={PLATFORM_STATS[0].value} />
-                  </p>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#707070]">Active Rentals</p>
-                </div>
-                <div className="bg-primary rounded-2xl p-6 shadow-xl text-primary-foreground">
-                  <p className="text-4xl font-sans mb-1">
-                    <AnimCounter target={PLATFORM_STATS[2].value} />
-                  </p>
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary-foreground/80">Staff Placed YoY</p>
-                </div>
-              </div>
-
-              <div className="bg-white/90 backdrop-blur-xl border border-[#e0e0e0] rounded-2xl shadow-xl overflow-hidden p-2">
-                <div className="px-4 py-3 border-b border-[#f0f0f0] flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-sm tracking-widest uppercase text-[#001F3F]">Critical Needs</h3>
-                  <span className="text-xs text-[#707070] font-medium">Live Feed</span>
-                </div>
-                <div className="space-y-2">
-                  {NEW_ACTIVITY.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-4 p-3 rounded-xl hover:bg-[#f8f9fa] transition-colors border border-transparent hover:border-[#e0e0e0] cursor-pointer group"
-                    >
-                      <div className="flex size-10 items-center justify-center rounded-lg bg-white shadow-sm border border-[#e0e0e0] shrink-0 text-[#001F3F] group-hover:scale-110 transition-transform">
-                        <item.icon className="size-4" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-0.5">
-                          <p className="text-sm font-bold text-foreground">{item.title}</p>
-                          <StatusBadge status={item.status} />
-                        </div>
-                        <p className="text-xs text-[#707070] font-medium">
-                          {item.hospital} · {item.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Editorial Cards */}
-        <section className="py-24 bg-white border-y border-[#e0e0e0] reveal-on-scroll">
-          <div className="mx-auto max-w-[88rem] px-6">
-            <div className="mb-16 text-center max-w-2xl mx-auto">
-              <h2 className="text-4xl font-sans text-foreground mb-4">A Curated Ecosystem</h2>
-              <p className="text-lg text-[#707070]">
-                Exclusive residential and commercial real estate tailored specifically for the medical community.
-              </p>
-            </div>
-
-            <div className="grid gap-10 md:grid-cols-3">
-              {EDITORIAL_CARDS.map((card) => (
-                <Link href={card.href} key={card.title} className="group flex flex-col items-center">
-                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-md mb-6 relative hover:shadow-[0_20px_40px_rgba(0,31,63,0.15)] hover:scale-[1.02] transition-all duration-500 border border-[#e0e0e0]">
-                    <div className="absolute inset-0 bg-[#f0f0f0]">
-                      <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                    {card.title}
-                  </h3>
-                  <p className="text-center text-[#4a4a4a] text-sm leading-relaxed px-4">{card.description}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Map Frame */}
-        <section className="py-24 reveal-on-scroll">
-          <div className="mx-auto max-w-[88rem] px-6">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <h2 className="text-4xl font-sans text-foreground mb-6">Hyperlocal Intelligence.</h2>
-                <p className="text-lg text-[#4a4a4a] leading-relaxed mb-8">
-                  The Med-Map™ infrastructure visualizes over 500 clinical hubs across the GTA corridor. Pinpoint
-                  proximity to hospitals, specialized clinics, and transit links with absolute precision.
-                </p>
-                <div className="flex flex-col gap-4 mb-10">
-                  {['Filter by Hospital Network', 'Transit Overlay Routing', 'Live Open-Bed Analytics'].map((t) => (
-                    <div key={t} className="flex items-center gap-3">
-                      <div className="flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                        <CheckCircle className="size-3" />
-                      </div>
-                      <span className="font-semibold text-[#374151]">{t}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href="/facility-map"
-                  className="inline-flex items-center gap-2 text-foreground font-bold text-lg hover:gap-3 transition-all"
-                >
-                  Open Med-Map <ArrowRight className="size-5" />
-                </Link>
-              </div>
-
-              <div className="relative pt-6 pl-4">
-                <div className="absolute top-0 left-0 font-sans text-muted-foreground text-sm italic">Fig. 1 — Map View</div>
-                <div className="w-full aspect-[4/3] rounded-2xl border border-[#c8c8c8] shadow-[0_30px_60px_rgba(0,31,63,0.12)] bg-white p-2 hover:scale-[1.01] transition-transform duration-500 overflow-hidden relative">
-                  <div className="absolute inset-2 rounded-xl bg-[#f0f4fa] border border-[#e0e0e0] overflow-hidden">
-                    <img
-                      src="/images/hyperlocal_map.png"
-                      alt="Map View of the Corridor"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HeroSearch />
+        <FeaturedStays />
+        <CorridorSection />
+        <HowItWorks />
+        <Neighborhoods />
+        <HostsCTA />
       </main>
-
       <LiaisonConcierge />
     </div>
   );
