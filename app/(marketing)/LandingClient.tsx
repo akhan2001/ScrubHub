@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import {
-  Search, Heart, Bed, Bath, Square, ArrowRight, ArrowLeft,
-  Home, Building2, Briefcase, BadgeCheck,
+  Search, Heart, Bed, Bath, Square, MapPin, ArrowRight, ArrowLeft,
+  Home, Building2, Briefcase, Calendar, BadgeCheck, Menu,
 } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { getAppSignupUrl } from '@/lib/app-url';
@@ -16,6 +16,8 @@ import { getAppSignupUrl } from '@/lib/app-url';
 //   - Existing brand --primary blue kept for CTAs
 //   - Editorial italic display moments via Instrument Serif (loaded below)
 //   - Mono captions via system mono stack
+// All sizing/spacing via Tailwind.  Tokens added inline so this drops in
+// without touching globals.css; promote to globals.css when convenient.
 // =====================================================================
 
 // ----- Featured listings (replace with real data via props later) -----
@@ -200,11 +202,7 @@ function HeroSearch() {
 function FeaturedStays() {
   const ref = useRef<HTMLDivElement>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
-  const toggle = (id: number) => setSaved(s => {
-    const n = new Set(s);
-    if (n.has(id)) n.delete(id); else n.add(id);
-    return n;
-  });
+  const toggle = (id: number) => setSaved(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const scroll = (dir: number) => ref.current?.scrollBy({ left: dir * 380, behavior: 'smooth' });
 
   return (
@@ -507,7 +505,7 @@ function HostsCTA() {
 }
 
 // =====================================================================
-// LIAISON concierge bubble
+// LIAISON concierge bubble (kept from previous landing)
 // =====================================================================
 function LiaisonConcierge() {
   const [open, setOpen] = useState(false);
@@ -539,7 +537,7 @@ function LiaisonConcierge() {
 // =====================================================================
 // PAGE
 // =====================================================================
-export function LandingClient({ user: _user }: { user: User | null }) {
+export function LandingClient({ user }: { user: User | null }) {
   // Reveal animations
   useEffect(() => {
     const observer = new IntersectionObserver(

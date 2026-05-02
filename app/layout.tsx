@@ -36,6 +36,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
+        />
+      </head>
       <body className={`${inter.variable} antialiased flex flex-col min-h-screen font-sans`}>
         {children}
         <Toaster position="bottom-right" closeButton />

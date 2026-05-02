@@ -1,3 +1,6 @@
+/* =============================================================
+   components/layout/site-footer.tsx — warm residential footer
+   ============================================================= */
 'use client';
 
 import Link from 'next/link';
@@ -6,55 +9,44 @@ import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 export function SiteFooter() {
   return (
-    <footer className="relative z-10 mt-auto border-t border-border bg-slate-50/80">
-      <div className="mx-auto max-w-[88rem] px-4 py-12 sm:px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="text-center md:text-left">
+    <footer className="relative z-10 mt-auto border-t border-[#E5DFD2] bg-[#F7F4EE]">
+      <div className="mx-auto max-w-[1320px] px-6 sm:px-8 py-16">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)] mb-12">
+          <div>
             <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
-              <ScrubHubLogo variant="light" className="h-9 w-auto max-w-[200px] object-contain object-left" />
+              <ScrubHubLogo variant="light" className="h-8 w-auto max-w-[180px] object-contain object-left" />
             </Link>
-            <p className="mt-1 text-sm text-muted-foreground">
-              The Premium Healthcare Space Network
+            <p className="mt-4 text-[14px] leading-[1.6] text-[#6B7585] m-0 max-w-[300px]">
+              Furnished housing, clinical suites and locum staffing along Ontario&rsquo;s 401 healthcare corridor.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium">
-            <Link
-              href="/facility-map"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Housing
-            </Link>
-            <Link
-              href="/staffing"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Staffing
-            </Link>
-            <Link
-              href="/plans"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Pricing
-            </Link>
-            <Link
-              href={getAppLoginUrl()}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
+          {[
+            ['Stay',    [['Browse listings', '/facility-map'], ['Med-Map™', '/facility-map'], ['How it works', '/']]],
+            ['Staff',   [['Open roles', '/staffing'], ['For new grads', '/staffing'], ['Locum board', '/staffing']]],
+            ['Company', [['Pricing', '/plans'], ['Sign in', getAppLoginUrl()], ['Privacy', '/privacy'], ['Terms', '/terms']]],
+          ].map(([h, items]) => (
+            <div key={h as string}>
+              <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#6B7585] mb-4 font-medium">{h as string}</div>
+              <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
+                {(items as [string, string][]).map(([label, href]) => (
+                  <li key={label}>
+                    <Link href={href} className="text-[14px] text-[#3A4759] hover:text-[#0E1A2B] transition-colors">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="mt-10 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">
-              Terms of Service
-            </Link>
+
+        <div className="pt-6 border-t border-[#E5DFD2] flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[#6B7585]">
+          <p className="m-0">© {new Date().getFullYear()} SCRUBHUB INC. · Toronto, ON · PIPEDA-compliant</p>
+          <div className="flex flex-wrap gap-5">
+            <Link href="/privacy" className="hover:text-[#0E1A2B] transition-colors">Privacy</Link>
+            <Link href="/terms"   className="hover:text-[#0E1A2B] transition-colors">Terms</Link>
           </div>
-          <p>© {new Date().getFullYear()} SCRUBHUB INC.</p>
         </div>
       </div>
     </footer>

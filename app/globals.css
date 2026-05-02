@@ -187,6 +187,62 @@
   --table-row-hover: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
 }
 
+/* ===== Marketing — warm residential palette ============================ */
+:root {
+  /* Paper-and-ink palette for the public-facing pages */
+  --paper:        #F7F4EE;   /* page background */
+  --paper-deep:   #EFE9DD;   /* alternating section bg */
+  --paper-soft:   #F0EBDF;   /* hover / striped placeholder */
+  --rule-warm:    #E5DFD2;   /* hairlines + card borders on paper */
+
+  --ink:          #0E1A2B;   /* headings */
+  --ink-soft:     #3A4759;   /* body */
+  --ink-mute:     #6B7585;   /* captions, mono labels */
+
+  --accent-clay:  #B8472E;   /* editorial accent for italic moments */
+
+  /* Editorial display font (loaded via <link> in app/layout.tsx) */
+  --font-serif:  "Instrument Serif", Georgia, "Times New Roman", serif;
+}
+
+/* Optional Tailwind v4 @theme bridge so you can write
+   `bg-paper`, `text-ink`, `border-rule-warm`, etc. */
+@theme inline {
+  --color-paper:       var(--paper);
+  --color-paper-deep:  var(--paper-deep);
+  --color-paper-soft:  var(--paper-soft);
+  --color-rule-warm:   var(--rule-warm);
+  --color-ink:         var(--ink);
+  --color-ink-soft:    var(--ink-soft);
+  --color-ink-mute:    var(--ink-mute);
+  --color-clay:        var(--accent-clay);
+  --font-serif:        var(--font-serif);
+}
+
+/* Reusable editorial bits */
+.font-serif-display { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
+.text-eyebrow {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+.bg-paper-grid {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(14,26,43,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,26,43,.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.stripe-warm {
+  background:
+    repeating-linear-gradient(135deg,
+      var(--paper-soft) 0 12px,
+      var(--paper-deep) 12px 24px);
+}
+
 /* ===== shadcn token mapping ===== */
 :root {
   --background: var(--color-bg);

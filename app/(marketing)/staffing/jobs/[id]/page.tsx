@@ -1,3 +1,7 @@
+/* =============================================================
+   app/(marketing)/staffing/jobs/[id]/page.tsx — warm redesign
+   Same data fetches; restyles the chrome around them.
+   ============================================================= */
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -5,12 +9,9 @@ import { getJobPostById } from '@/server/services/job-posts.service';
 import { getPublishedListing } from '@/server/services/listings.service';
 import { getAuthUser } from '@/server/auth/get-auth-user';
 import { getProfile } from '@/server/services/profiles.service';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { JobApplyButton } from '@/components/jobs/job-apply-button';
-import { MapPin, DollarSign, Calendar, Building2, Home, ArrowLeft, BedDouble } from 'lucide-react';
+import { Building2, Home, ArrowLeft, BedDouble, BadgeCheck } from 'lucide-react';
 import { getAppListingUrl } from '@/lib/app-url';
 import { MARKETING_SITE_URL } from '@/lib/marketing-site';
 
@@ -27,24 +28,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const job = await getJobPostById(id);
-  if (!job || job.status !== 'published') {
-    return { title: 'Job' };
-  }
+  if (!job || job.status !== 'published') return { title: 'Job' };
   const location = job.facility_name || job.location || '401 Corridor';
   const description = metaDescriptionFromJob(job.description, job.title, location);
   const ogTitle = `${job.title} | ScrubHub`;
   return {
     title: job.title,
     description,
-    openGraph: {
-      url: `${MARKETING_SITE_URL}/staffing/jobs/${id}`,
-      title: ogTitle,
-      description,
-    },
-    twitter: {
-      title: ogTitle,
-      description,
-    },
+    openGraph: { url: `${MARKETING_SITE_URL}/staffing/jobs/${id}`, title: ogTitle, description },
+    twitter:   { title: ogTitle, description },
   };
 }
 
@@ -54,11 +46,7 @@ export default async function StaffingJobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [job, user] = await Promise.all([
-    getJobPostById(id),
-    getAuthUser(),
-  ]);
-
+  const [job, user] = await Promise.all([getJobPostById(id), getAuthUser()]);
   if (!job || job.status !== 'published') notFound();
 
   const profile = user ? await getProfile(user.id) : null;
@@ -74,137 +62,150 @@ export default async function StaffingJobDetailPage({
         : null;
 
   const applyUser = user && profile
-    ? {
-        id: user.id,
-        email: user.email ?? undefined,
-        phone: profile.phone_number ?? undefined,
-        role: profile.role,
-      }
+    ? { id: user.id, email: user.email ?? undefined, phone: profile.phone_number ?? undefined, role: profile.role }
     : null;
 
+  // Sidebar facts
+  const facts: Array<[string, string | null]> = [
+    ['Pay',      payRange],
+    ['Type',     job.contract_type ?? null],
+    ['Length',   job.contract_length ?? null],
+    ['Role',     job.role_type ?? null],
+    ['Start',    job.start_date ? new Date(job.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : null],
+    ['Location', job.location ?? null],
+  ];
+
   return (
-    <div
-      className="flex-1"
-      style={{
-        background: '#f0f4fa',
-        backgroundImage:
-          'linear-gradient(rgba(0,31,63,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,31,63,0.04) 1px,transparent 1px)',
-        backgroundSize: '28px 28px',
-      }}
-    >
-      <main className="mx-auto max-w-3xl w-full px-6 py-10">
+    <div className="flex-1 bg-[#F7F4EE] text-[#0E1A2B]">
+      <main className="mx-auto max-w-[1180px] w-full px-6 sm:px-8 py-12">
         <Link
           href="/staffing"
-          className="mb-4 inline-flex items-center gap-1 text-sm text-[#4a5568] hover:text-[#0F172A]"
+          className="mb-8 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] hover:text-[#0E1A2B] transition-colors"
         >
           <ArrowLeft className="size-3.5" />
-          Back to Open Positions
+          Back to open positions
         </Link>
 
-        <div className="rounded-2xl border border-[#d0d9e8] bg-white p-8 shadow-sm">
-          <div className="space-y-6">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-semibold text-[#0F172A]">{job.title}</h1>
-                {job.housing_included && (
-                  <Badge className="gap-1 bg-primary/10 text-primary border-primary/30">
-                    <Home className="size-3" /> Housing Included
-                  </Badge>
-                )}
-              </div>
-              {job.facility_name && (
-                <p className="mt-1 flex items-center gap-1 text-[#4a5568]">
-                  <Building2 className="size-4" /> {job.facility_name}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-4 text-sm text-[#4a5568]">
-              {job.location && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="size-3.5" /> {job.location}
-                </span>
-              )}
-              {payRange && (
-                <span className="inline-flex items-center gap-1">
-                  <DollarSign className="size-3.5" /> {payRange}
-                </span>
-              )}
-              {job.start_date && (
-                <span className="inline-flex items-center gap-1">
-                  <Calendar className="size-3.5" /> Starts {new Date(job.start_date).toLocaleDateString()}
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {job.role_type && (
-                <Badge variant="outline" className="border-[#d0d9e8]">
-                  {job.role_type}
-                </Badge>
-              )}
-              {job.contract_type && (
-                <Badge variant="outline" className="border-[#d0d9e8]">
-                  {job.contract_type}
-                </Badge>
-              )}
-              {job.contract_length && (
-                <Badge variant="outline" className="border-[#d0d9e8]">
-                  {job.contract_length}
-                </Badge>
-              )}
-            </div>
-
-            <Separator className="border-[#eef2f7]" />
-
-            <div>
-              <h2 className="text-lg font-semibold text-[#0F172A] mb-2">Description</h2>
-              <p className="whitespace-pre-wrap text-[#4a5568]">{job.description}</p>
-            </div>
-
-            {linkedListing && (
-              <>
-                <Separator className="border-[#eef2f7]" />
-                <div className="space-y-3">
-                  <h2 className="flex items-center gap-2 text-lg font-semibold text-[#0F172A]">
-                    <Home className="size-5" /> Included Housing
-                  </h2>
-                  <Card className="border-[#d0d9e8]">
-                    <CardContent className="flex items-center justify-between gap-4 pt-4">
-                      <div>
-                        <p className="font-medium text-[#0F172A]">{linkedListing.title}</p>
-                        <p className="text-sm text-[#4a5568]">{linkedListing.address}</p>
-                        <div className="mt-1 flex items-center gap-3 text-xs text-[#4a5568]">
-                          {linkedListing.bedrooms != null && (
-                            <span className="flex items-center gap-1">
-                              <BedDouble className="size-3" /> {linkedListing.bedrooms} bed
-                            </span>
-                          )}
-                          {linkedListing.price_cents != null && (
-                            <span>${Math.round(linkedListing.price_cents / 100)}/mo</span>
-                          )}
-                        </div>
-                      </div>
-                      <Button asChild size="sm" variant="outline">
-                        <Link href={getAppListingUrl(linkedListing.id)}>View Listing</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              </>
-            )}
-
-            <Separator className="border-[#eef2f7]" />
-
-            <div>
-              <JobApplyButton
-                jobId={job.id}
-                redirectTo={`/staffing/jobs/${job.id}`}
-                user={applyUser}
-                loginUrl="/login"
-              />
-            </div>
+        {/* Editorial header */}
+        <header className="border-b border-[#E5DFD2] pb-10 mb-10">
+          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] font-medium mb-4">
+            <span className="inline-flex items-center gap-2">
+              <span className="size-1.5 rounded-full bg-[#B8472E]" />
+              {job.contract_type ?? 'Open position'}
+              {job.role_type && <span className="text-[#3A4759]">· {job.role_type}</span>}
+            </span>
           </div>
+
+          <h1
+            className="m-0 font-medium tracking-[-0.04em] leading-[0.96] max-w-[20ch]"
+            style={{ fontSize: 'clamp(40px, 5.6vw, 76px)' }}
+          >
+            {job.title}
+          </h1>
+
+          {job.facility_name && (
+            <p className="mt-5 inline-flex items-center gap-2 text-[17px] text-[#3A4759] m-0">
+              <Building2 className="size-4 text-[#6B7585]" />
+              <span>{job.facility_name}</span>
+              {job.location && <span className="text-[#6B7585]">· {job.location}</span>}
+            </p>
+          )}
+
+          {job.housing_included && (
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#B8472E]/40 bg-[#B8472E]/8 px-3.5 py-1.5">
+              <Home className="size-3.5 text-[#B8472E]" />
+              <span className="font-mono text-[11px] tracking-[0.16em] uppercase font-semibold text-[#B8472E]">
+                Housing included
+              </span>
+            </div>
+          )}
+        </header>
+
+        {/* Two-column body */}
+        <div className="grid lg:grid-cols-[1fr_360px] gap-12">
+          {/* Description */}
+          <article className="min-w-0">
+            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] font-medium mb-4">
+              About the role
+            </div>
+            <div className="text-[16px] leading-[1.7] text-[#3A4759] whitespace-pre-wrap">
+              {job.description}
+            </div>
+
+            {/* Linked housing */}
+            {linkedListing && (
+              <div className="mt-12 pt-10 border-t border-[#E5DFD2]">
+                <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] font-medium mb-4">
+                  Included housing
+                </div>
+                <Link
+                  href={getAppListingUrl(linkedListing.id)}
+                  className="group flex items-center gap-5 rounded-2xl border border-[#E5DFD2] bg-white p-5 hover:border-[#0E1A2B] transition"
+                >
+                  <div
+                    className="shrink-0 size-20 rounded-xl bg-[#EFE9DD] grid place-items-center"
+                    style={{ background: 'repeating-linear-gradient(135deg,#F0EBDF 0 10px,#EFE9DD 10px 20px)' }}
+                  >
+                    <Home className="size-6 text-[#3A4759]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold tracking-[-0.01em] text-[16px] m-0 truncate">
+                      {linkedListing.title}
+                    </p>
+                    <p className="text-[13px] text-[#6B7585] m-0 mt-1 truncate">{linkedListing.address}</p>
+                    <div className="mt-2 flex items-center gap-3 font-mono text-[10px] tracking-[0.14em] uppercase text-[#6B7585]">
+                      {linkedListing.bedrooms != null && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <BedDouble className="size-3.5" /> {linkedListing.bedrooms} bed
+                        </span>
+                      )}
+                      {linkedListing.price_cents != null && (
+                        <span>${Math.round(linkedListing.price_cents / 100)}/mo</span>
+                      )}
+                    </div>
+                  </div>
+                  <Button asChild size="sm" variant="outline" className="rounded-full border-[#E5DFD2]">
+                    <span>View listing</span>
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </article>
+
+          {/* Sticky apply card */}
+          <aside className="lg:sticky lg:top-24 self-start">
+            <div className="rounded-3xl border border-[#E5DFD2] bg-white p-6 shadow-[0_2px_8px_rgba(14,26,43,0.04)]">
+              {payRange && (
+                <div className="pb-5 border-b border-[#E5DFD2] mb-5">
+                  <div className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#6B7585] mb-1.5">Compensation</div>
+                  <div className="font-medium tracking-[-0.03em] text-[#0E1A2B] text-[34px] leading-none">{payRange}</div>
+                </div>
+              )}
+
+              <dl className="m-0 grid grid-cols-2 gap-x-4 gap-y-4">
+                {facts.filter(([, v]) => !!v).map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#6B7585] mb-1">{k}</dt>
+                    <dd className="text-[14px] font-semibold text-[#0E1A2B] m-0">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="mt-6 pt-5 border-t border-[#E5DFD2]">
+                <JobApplyButton
+                  jobId={job.id}
+                  redirectTo={`/staffing/jobs/${job.id}`}
+                  user={applyUser}
+                  loginUrl="/login"
+                />
+              </div>
+
+              <div className="mt-5 flex items-start gap-2 text-[12px] text-[#6B7585]">
+                <BadgeCheck className="size-3.5 mt-0.5 shrink-0 text-primary" />
+                <span>Vetted facility · License check, e-sign, and deposit handled in one flow.</span>
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
     </div>

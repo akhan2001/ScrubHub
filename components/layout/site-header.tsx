@@ -1,3 +1,7 @@
+/* =============================================================
+   components/layout/site-header.tsx — warm residential header
+   Drop-in replacement. Keeps mobile menu, auth states, ScrubHubLogo.
+   ============================================================= */
 'use client';
 
 import { useState } from 'react';
@@ -10,9 +14,9 @@ import { cn } from '@/lib/utils';
 import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 const NAV_LINKS = [
-  { href: '/facility-map', label: 'Listings' },
-  { href: '/staffing', label: 'Staffing' },
-  { href: '/plans', label: 'Pricing' },
+  { href: '/facility-map', label: 'Stays' },
+  { href: '/staffing',     label: 'Staffing' },
+  { href: '/plans',        label: 'Pricing' },
 ] as const;
 
 type NavLabel = (typeof NAV_LINKS)[number]['label'];
@@ -36,26 +40,20 @@ export function SiteHeader({ user }: { user?: User | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b border-border/60 bg-white/95 backdrop-blur-md shadow-sm">
-      <nav className="mx-auto flex w-full max-w-[88rem] items-center justify-between gap-4 px-4 py-0 sm:px-6">
-        <Link
-          href="/"
-          className="flex select-none shrink-0 items-center transition-opacity hover:opacity-90"
-          aria-label="ScrubHub Home"
-        >
-          <ScrubHubLogo variant="light" priority className="h-9 w-auto max-w-[200px] object-contain object-left" />
+    <header className="sticky top-0 z-40 flex h-[72px] shrink-0 items-center border-b border-[#E5DFD2] bg-[#F7F4EE]/92 backdrop-blur-md">
+      <nav className="mx-auto flex w-full max-w-[1320px] items-center justify-between gap-4 px-6 sm:px-8">
+        <Link href="/" className="flex select-none shrink-0 items-center transition-opacity hover:opacity-90" aria-label="ScrubHub Home">
+          <ScrubHubLogo variant="light" priority className="h-8 w-auto max-w-[180px] object-contain object-left" />
         </Link>
 
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-7">
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               className={cn(
-                'relative px-4 py-2 text-sm font-semibold rounded-lg transition-colors duration-200',
-                activeLabel === label
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                'text-[14px] font-medium transition-colors',
+                activeLabel === label ? 'text-[#0E1A2B]' : 'text-[#3A4759] hover:text-[#0E1A2B]'
               )}
             >
               {label}
@@ -63,45 +61,33 @@ export function SiteHeader({ user }: { user?: User | null }) {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            className="lg:hidden p-2 rounded-lg hover:bg-muted/60 text-muted-foreground"
+            className="lg:hidden p-2 rounded-lg hover:bg-[#EFE9DD] text-[#3A4759]"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
           {user ? (
             <>
-              <Link
-                href={getAppDashboardUrl()}
-                className="text-sm font-semibold text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted/60 transition-colors hidden sm:inline-block"
-              >
+              <Link href={getAppDashboardUrl()} className="hidden sm:inline-block text-[14px] font-medium text-[#3A4759] hover:text-[#0E1A2B] px-3 py-2 transition-colors">
                 Dashboard
               </Link>
               <form action="/api/auth/signout" method="post">
-                <button
-                  type="submit"
-                  className="rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold px-5 py-2.5 transition-all duration-200 shadow-sm hover:shadow"
-                >
+                <button type="submit" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-[14px] font-semibold px-5 h-10 transition">
                   Logout
                 </button>
               </form>
             </>
           ) : (
             <>
-              <Link
-                href={getAppLoginUrl()}
-                className="text-sm font-semibold text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg hover:bg-muted/60 transition-colors"
-              >
-                Log In
+              <Link href={getAppLoginUrl()} className="text-[14px] font-medium text-[#3A4759] hover:text-[#0E1A2B] px-3 py-2 transition-colors">
+                Sign in
               </Link>
-              <Link
-                href={getAppSignupUrl()}
-                className="rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold px-5 py-2.5 transition-all duration-200 shadow-sm hover:shadow"
-              >
-                Sign Up
+              <Link href={getAppSignupUrl()} className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-[14px] font-semibold px-5 h-10 inline-flex items-center transition">
+                List a unit
               </Link>
             </>
           )}
@@ -109,18 +95,16 @@ export function SiteHeader({ user }: { user?: User | null }) {
       </nav>
 
       {mobileOpen && (
-        <div className="lg:hidden border-t border-border/60 bg-white">
-          <div className="mx-auto max-w-[88rem] px-4 py-4 flex flex-col gap-1">
+        <div className="lg:hidden border-t border-[#E5DFD2] bg-[#F7F4EE] absolute top-full inset-x-0">
+          <div className="mx-auto max-w-[1320px] px-6 py-4 flex flex-col gap-1">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  'px-4 py-3 rounded-lg text-sm font-semibold transition-colors',
-                  activeLabel === label
-                    ? 'text-primary bg-primary/10'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                  'px-3 py-3 text-[15px] font-medium transition-colors border-b border-[#E5DFD2] last:border-0',
+                  activeLabel === label ? 'text-[#0E1A2B]' : 'text-[#3A4759]'
                 )}
               >
                 {label}
