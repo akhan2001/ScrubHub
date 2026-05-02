@@ -71,7 +71,7 @@ export function DashboardHeader({
   const initials = getInitials(user.fullName, role);
 
   return (
-    <header className="sticky top-0 z-[1100] flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-8">
+    <header className="sticky top-0 z-[1100] flex h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-md md:px-8">
       <div className="flex items-center gap-3">
         <Sheet>
           <SheetTrigger asChild>
@@ -116,7 +116,7 @@ export function DashboardHeader({
             </SheetTrigger>
             {notificationCount > 0 ? (
               <span
-                className="pointer-events-none absolute -right-0.5 -top-0.5 min-h-[10px] min-w-[10px] rounded-full border-2 border-card bg-destructive"
+                className="pointer-events-none absolute -right-0.5 -top-0.5 min-h-[10px] min-w-[10px] rounded-full border-2 border-background bg-destructive"
                 aria-hidden
               />
             ) : null}

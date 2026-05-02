@@ -212,7 +212,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
           <Input id="title" {...register('title')} placeholder="Stylish 2BR in downtown" />
           {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
           <div className="space-y-2">
             <Label htmlFor="bedrooms">Bedrooms</Label>
             <Input id="bedrooms" type="number" min={0} step={1} {...register('bedrooms', { valueAsNumber: true })} />
@@ -340,7 +340,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
             <select
               id="status"
               {...register('status')}
-              className="flex h-[var(--input-height)] w-full rounded-[var(--input-radius)] border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none"
+              className="flex h-[var(--input-height)] w-full rounded-[var(--input-radius)] border border-input bg-paper-soft/55 px-3 py-1 text-sm shadow-xs outline-none hover:bg-paper-soft/75 focus-visible:border-ring focus-visible:bg-white focus-visible:ring-[3px] focus-visible:ring-ring/50"
             >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
@@ -387,7 +387,7 @@ export function ListingForm({ initialData, onSuccess, onCancel }: ListingFormPro
         </div>
       </section>
 
-      <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
+      <div className="sticky bottom-0 z-[1] mt-8 flex items-center justify-end gap-3 border-t border-border bg-card/95 py-5 shadow-[0_-8px_24px_rgba(14,26,43,0.05)] backdrop-blur-sm supports-[backdrop-filter]:bg-card/90">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel

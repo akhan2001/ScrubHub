@@ -89,8 +89,8 @@ export function DashboardSidebar({
   const pathname = usePathname();
   const sections = NAV_BY_ROLE[role];
   return (
-    <aside className={cn("h-full border-r border-border bg-card", className)}>
-      <div className="flex h-16 items-center border-b border-border px-4">
+    <aside className={cn("h-full border-r border-border bg-background", className)}>
+      <div className="flex h-16 items-center border-b border-border bg-background/95 px-4 backdrop-blur-md">
         <Link href="/dashboard" onClick={onNavigate} className="block py-1">
           <ScrubHubLogo variant="light" className="h-7 w-auto max-w-[160px] object-contain object-left" />
         </Link>

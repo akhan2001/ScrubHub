@@ -104,10 +104,10 @@
   --radius-pill: 9999px;
 
   /* Elevation primitives — clinical SaaS: subtle only, no heavy shadows */
-  --shadow-1: 0 1px 2px rgb(15 23 42 / 6%);
-  --shadow-2: 0 1px 3px rgb(15 23 42 / 8%);
-  --shadow-3: 0 4px 12px rgb(15 23 42 / 10%);
-  --shadow-focus: 0 0 0 3px rgb(37 99 235 / 25%);
+  --shadow-1: 0 1px 2px rgb(14 26 43 / 6%);
+  --shadow-2: 0 1px 3px rgb(14 26 43 / 8%);
+  --shadow-3: 0 4px 12px rgb(14 26 43 / 10%);
+  --shadow-focus: 0 0 0 3px rgb(22 99 212 / 28%);
 
   /* Typography primitives */
   --font-base: var(--font-inter), "Segoe UI", sans-serif;
@@ -126,31 +126,38 @@
   --content-max: 64rem;
 }
 
-/* ===== Semantic aliases: Light theme — clinical SaaS palette ===== */
+/* ===== Warm paper + ink (app-wide: marketing, auth, dashboard) ===== */
 :root {
-  /* Clinical blue — primary CTA, links, focus (contrasts with paper + ink headings) */
+  --paper:        #F7F4EE;
+  --paper-deep:   #EFE9DD;
+  --paper-soft:   #F0EBDF;
+  --rule-warm:    #E5DFD2;
+  --ink:          #0E1A2B;
+  --ink-soft:     #3A4759;
+  --ink-mute:     #6B7585;
+  --accent-clay:  #B8472E;
+  --font-serif:  "Instrument Serif", Georgia, "Times New Roman", serif;
+}
+
+/* ===== Semantic aliases: Light theme (aligned with marketing) ===== */
+:root {
+  /* Clinical blue — primary CTA, links, focus */
   --color-primary: #1663d4;
-  /* Inactive nav, secondary text */
   --color-secondary: #374151;
   --color-success: #16a34a;
   --color-warning: var(--amber-700);
   --color-error: var(--red-700);
-  /* Charts / secondary info — softer blue, related to primary */
   --color-info: #5a7eb8;
 
-  /* Page: soft blue-grey (#f0f4f8). Nav + title strip + cards: white. */
-  --color-bg: #f0f4f8;
-  --color-content-bg: #f0f4f8;
+  /* Page + content: warm paper; elevated surfaces stay white */
+  --color-bg: var(--paper);
+  --color-content-bg: var(--paper);
   --color-surface: #ffffff;
   --color-surface-elevated: #ffffff;
-  /* Headings — near black */
-  --color-text: #0f172a;
-  /* Body / subtext */
-  --color-text-muted: #64748b;
-  /* Labels (small caps, etc.) */
-  --color-text-label: #94a3b8;
-  /* Card border, nav border, outline buttons */
-  --color-border: #e2e8f0;
+  --color-text: var(--ink);
+  --color-text-muted: var(--ink-soft);
+  --color-text-label: var(--ink-mute);
+  --color-border: var(--rule-warm);
 
   --color-primary-hover: #1358be;
   --color-primary-active: #0f4699;
@@ -161,15 +168,12 @@
   --on-warning: #ffffff;
   --on-error: #ffffff;
   --on-info: #ffffff;
-  --on-surface: #0f172a;
+  --on-surface: var(--ink);
 
-  /* Badge / tint fills */
   --color-badge-primary-bg: #e8eefc;
   --color-badge-success-bg: #f0fdf4;
-  /* Card image placeholder blue-grey */
-  --color-placeholder: #dce8f5;
+  --color-placeholder: #e8e4dc;
 
-  /* No heavy gradients — flat clinical look */
   --gradient-hero: none;
   --gradient-cta: none;
 }
@@ -186,24 +190,6 @@
   --modal-radius: var(--radius-xl);
   --modal-shadow: var(--shadow-2);
   --table-row-hover: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
-}
-
-/* ===== Marketing — warm residential palette ============================ */
-:root {
-  /* Paper-and-ink palette for the public-facing pages */
-  --paper:        #F7F4EE;   /* page background */
-  --paper-deep:   #EFE9DD;   /* alternating section bg */
-  --paper-soft:   #F0EBDF;   /* hover / striped placeholder */
-  --rule-warm:    #E5DFD2;   /* hairlines + card borders on paper */
-
-  --ink:          #0E1A2B;   /* headings */
-  --ink-soft:     #3A4759;   /* body */
-  --ink-mute:     #6B7585;   /* captions, mono labels */
-
-  --accent-clay:  #B8472E;   /* editorial accent for italic moments */
-
-  /* Editorial display font (loaded via <link> in app/layout.tsx) */
-  --font-serif:  "Instrument Serif", Georgia, "Times New Roman", serif;
 }
 
 /* Optional Tailwind v4 @theme bridge so you can write
@@ -256,9 +242,9 @@
   --primary-foreground: var(--on-primary);
   --secondary: var(--color-secondary);
   --secondary-foreground: var(--on-secondary);
-  --muted: #f8fafc;
+  --muted: var(--paper-soft);
   --muted-foreground: var(--color-text-muted);
-  --accent: #f1f5f9;
+  --accent: var(--paper-deep);
   --accent-foreground: var(--color-text);
   --destructive: var(--color-error);
   --border: var(--color-border);
@@ -304,8 +290,8 @@
 .bg-blobs {
   background-color: var(--color-bg);
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(14, 26, 43, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 26, 43, 0.04) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 

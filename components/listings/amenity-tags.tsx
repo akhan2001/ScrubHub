@@ -18,7 +18,7 @@ export function AmenityTags({ value, onChange }: AmenityTagsProps) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2.5">
       {AMENITY_OPTIONS.map((amenity) => {
         const selected = value.includes(amenity);
         return (
@@ -27,10 +27,10 @@ export function AmenityTags({ value, onChange }: AmenityTagsProps) {
             type="button"
             onClick={() => toggle(amenity)}
             className={cn(
-              'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+              'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
               selected
                 ? 'border-primary bg-primary/10 text-primary'
-                : 'border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground',
+                : 'border-border bg-paper-soft/60 text-muted-foreground hover:border-primary/40 hover:bg-paper-soft hover:text-foreground',
             )}
           >
             {amenity}
