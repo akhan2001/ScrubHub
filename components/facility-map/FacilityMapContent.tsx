@@ -107,7 +107,7 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
         className={
           isDashboard
             ? 'relative z-10 shrink-0 border-b border-border bg-card px-4 py-6 md:px-8 md:py-8'
-            : 'relative z-[500] shrink-0 border-b border-[#d8e4f0] bg-white px-6 py-4'
+            : 'relative z-[500] shrink-0 border-b border-[#E5DFD2] bg-white px-6 py-5'
         }
       >
         {isDashboard ? (
@@ -153,19 +153,25 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
           </div>
         ) : (
           <>
-            <p className="mb-0.5 text-xs text-[#6b7280]">
-              <Link href="/" className="text-primary hover:underline">
+            <div className="mb-2 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585]">
+              <span className="size-1.5 rounded-full bg-[#B8472E]" />
+              <Link href="/" className="font-medium hover:text-[#0E1A2B] transition-colors">
                 Home
               </Link>
-              <span className="mx-1.5">›</span>
-              Listings
-            </p>
-            <h1 className="text-2xl font-extrabold tracking-tight text-[#0F172A]">
-              401 Corridor — Healthcare Listings
+              <span className="opacity-50">·</span>
+              <span className="font-medium text-[#0E1A2B]">Listings</span>
+            </div>
+            <h1 className="m-0 font-medium tracking-[-0.03em] leading-[1.02] text-[#0E1A2B] text-[26px] md:text-[32px]">
+              Healthcare facilities,
+              <span
+                className="ml-2 italic font-normal text-primary"
+                style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
+              >
+                mapped.
+              </span>
             </h1>
-            <p className="mb-4 text-sm text-[#6b7280]">
-              {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to view
-              details and book a space.
+            <p className="mt-1.5 mb-4 max-w-[64ch] text-[13px] leading-[1.55] text-[#3A4759]">
+              {FACILITIES.length}+ hospitals, clinics, and healthcare facilities across Ontario. Click any pin to view details and book a space.
             </p>
             <FacilitySearch
               facilities={FACILITIES}
