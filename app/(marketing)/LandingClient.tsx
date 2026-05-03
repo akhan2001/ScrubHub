@@ -247,11 +247,16 @@ function CorridorSection() {
           </div>
 
           <div className="relative rounded-3xl overflow-hidden bg-white border border-[#E5DFD2] shadow-[0_30px_60px_rgba(14,26,43,0.10)]" style={{ aspectRatio: '4/3' }}>
-            <CorridorMapStylized />
-            <div className="absolute top-4 left-5 font-mono text-[10px] tracking-[0.18em] uppercase text-[#6B7585]">
+            <img
+              src="https://images.unsplash.com/photo-1697266901967-540144c797d1?w=1600&q=85&auto=format&fit=crop"
+              alt="Cars parked in front of a residential home"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/15 pointer-events-none" />
+            <div className="absolute top-4 left-5 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-2.5 py-1 font-mono text-[10px] tracking-[0.18em] uppercase text-[#6B7585]">
               Fig. 02 · 401 Corridor
             </div>
-            <div className="absolute bottom-4 right-5 flex gap-3.5 items-center">
+            <div className="absolute bottom-4 right-5 inline-flex gap-3.5 items-center rounded-full bg-white/90 backdrop-blur px-3 py-1.5">
               <span className="inline-flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-[#0E1A2B]" />
                 <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#3A4759]">Hospitals</span>
@@ -265,44 +270,6 @@ function CorridorSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function CorridorMapStylized() {
-  const cities = [
-    { x: 8, y: 70, n: 'Windsor' }, { x: 22, y: 64, n: 'London' }, { x: 34, y: 58, n: 'Kitchener' },
-    { x: 46, y: 52, n: 'Hamilton' }, { x: 58, y: 44, n: 'Mississauga' }, { x: 68, y: 38, n: 'Toronto' },
-    { x: 82, y: 32, n: 'Oshawa' }, { x: 94, y: 24, n: 'Kingston' },
-  ];
-  const stays: [number, number][] = [
-    [60,50],[63,35],[70,42],[71,30],[72,46],[55,38],[33,64],[24,70],[12,73],[83,27],[86,36],[47,56],[39,50],[51,60],[78,30],[65,28],[36,47],[27,58],
-  ];
-  return (
-    <svg viewBox="0 0 100 70" preserveAspectRatio="none" className="w-full h-full block">
-      <defs>
-        <pattern id="grid" width="3" height="3" patternUnits="userSpaceOnUse">
-          <path d="M 3 0 L 0 0 0 3" fill="none" stroke="#E5DFD2" strokeWidth="0.1" />
-        </pattern>
-        <linearGradient id="land" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#EFE9DD" />
-          <stop offset="100%" stopColor="#F7F4EE" />
-        </linearGradient>
-      </defs>
-      <rect width="100" height="70" fill="url(#land)" />
-      <rect width="100" height="70" fill="url(#grid)" />
-      <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(37,99,235,0.10)" />
-      <path d="M 6 72 Q 30 58 50 50 T 96 22" fill="none" stroke="#0E1A2B" strokeWidth="0.6" strokeDasharray="0.8 0.8" opacity="0.5" />
-      {stays.map((s, i) => (
-        <circle key={i} cx={s[0]} cy={s[1]} r="0.55" fill="none" stroke="#1E5BBE" strokeWidth="0.25" />
-      ))}
-      {cities.map(c => (
-        <g key={c.n}>
-          <circle cx={c.x} cy={c.y} r="1.4" fill="#0E1A2B" />
-          <circle cx={c.x} cy={c.y} r="2.6" fill="#0E1A2B" opacity="0.15" />
-          <text x={c.x + 2.2} y={c.y + 0.6} fontSize="2.2" fill="#3A4759" fontFamily="ui-monospace, monospace">{c.n.toUpperCase()}</text>
-        </g>
-      ))}
-    </svg>
   );
 }
 
