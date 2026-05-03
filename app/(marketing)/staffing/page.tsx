@@ -41,7 +41,7 @@ export default async function StaffingPage() {
           <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10 items-end">
             <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(44px, 6.4vw, 88px)' }}>
               Roles that match<br />
-              <span className="italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 your scrubs.
               </span>
             </h1>
@@ -102,7 +102,7 @@ export default async function StaffingPage() {
                 scheduling, and housing — you handle patient care.
               </p>
               <div className="flex gap-3 mt-7 flex-wrap">
-                <Link href={getAppSignupUrl()} className="inline-flex items-center gap-2 h-13 px-7 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition" style={{ height: 52 }}>
+                <Link href={getAppSignupUrl()} className="inline-flex items-center gap-2 h-13 px-7 rounded-full bg-[#0E1A2B] hover:bg-[#1a2a3f] text-white font-semibold transition" style={{ height: 52 }}>
                   Post a role <ArrowRight className="size-4" />
                 </Link>
                 <Link href={getAppLoginUrl()} className="inline-flex items-center h-13 px-7 rounded-full border border-[#0E1A2B]/20 text-[#0E1A2B] font-semibold hover:border-[#0E1A2B] transition" style={{ height: 52 }}>

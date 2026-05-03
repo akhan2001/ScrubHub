@@ -201,7 +201,7 @@ export default async function StaffingJobDetailPage({
               </div>
 
               <div className="mt-5 flex items-start gap-2 text-[12px] text-[#6B7585]">
-                <BadgeCheck className="size-3.5 mt-0.5 shrink-0 text-primary" />
+                <BadgeCheck className="size-3.5 mt-0.5 shrink-0 text-[#0E1A2B]" />
                 <span>Vetted facility · License check, e-sign, and deposit handled in one flow.</span>
               </div>
             </div>

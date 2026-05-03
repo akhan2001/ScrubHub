@@ -31,7 +31,7 @@ export default function FacilityMapLayout({ children }: { children: React.ReactN
           <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10 items-end">
             <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(40px, 5.6vw, 76px)' }}>
               Find a stay within<br />
-              <span className="italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 walking distance.
               </span>
             </h1>

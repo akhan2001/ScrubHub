@@ -131,7 +131,7 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
             >
               {mode === 'login' ? 'Sign in' : 'Sign up'}
               <span
-                className="italic font-normal text-primary ml-2"
+                className="italic font-normal text-[#0E1A2B] ml-2"
                 style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
               >
                 .
@@ -152,14 +152,14 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
             {mode === 'login' ? (
               <>
                 New to ScrubHub?{' '}
-                <Link href="/signup" className="font-semibold text-[#0E1A2B] hover:text-primary transition-colors underline-offset-4 hover:underline">
+                <Link href="/signup" className="font-semibold text-[#0E1A2B] hover:text-[#0E1A2B] transition-colors underline-offset-4 hover:underline">
                   Create an account
                 </Link>
               </>
             ) : (
               <>
                 Already a member?{' '}
-                <Link href="/login" className="font-semibold text-[#0E1A2B] hover:text-primary transition-colors underline-offset-4 hover:underline">
+                <Link href="/login" className="font-semibold text-[#0E1A2B] hover:text-[#0E1A2B] transition-colors underline-offset-4 hover:underline">
                   Sign in
                 </Link>
               </>

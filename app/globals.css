@@ -128,13 +128,14 @@
 
 /* ===== Semantic aliases: Light theme — clinical SaaS palette ===== */
 :root {
-  /* Brand blue — active pill, primary CTA, nav active, badges. #2563eb (blue-600) */
-  --color-primary: #2563eb;
+  /* Brand ink — active pill, primary CTA, nav active, badges. Editorial dark navy. */
+  --color-primary: #0E1A2B;
   /* Inactive nav, secondary text */
   --color-secondary: #374151;
   --color-success: #16a34a;
   --color-warning: var(--amber-700);
   --color-error: var(--red-700);
+  /* Info messaging keeps blue accent so alerts stay distinct from CTAs */
   --color-info: #2563eb;
 
   /* Page: soft blue-grey (#f0f4f8). Nav + title strip + cards: white. */
@@ -151,8 +152,8 @@
   /* Card border, nav border, outline buttons */
   --color-border: #e2e8f0;
 
-  --color-primary-hover: #1d4ed8;
-  --color-primary-active: #1e40af;
+  --color-primary-hover: #1a2a3f;
+  --color-primary-active: #050a14;
 
   --on-primary: #ffffff;
   --on-secondary: #ffffff;

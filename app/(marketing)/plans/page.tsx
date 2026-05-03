@@ -26,7 +26,7 @@ export default function PlansPage() {
           </div>
           <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96] mx-auto max-w-[16ch]" style={{ fontSize: 'clamp(48px, 7vw, 96px)' }}>
             Honest plans.<br />
-            <span className="italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+            <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
               No hidden fees.
             </span>
           </h1>
@@ -50,7 +50,7 @@ export default function PlansPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="size-11 rounded-xl bg-white border border-[#E5DFD2] grid place-items-center">
-                      <Icon className="size-5 text-primary" />
+                      <Icon className="size-5 text-[#0E1A2B]" />
                     </div>
                     <ArrowRight className="size-4 text-[#6B7585] transition group-hover:translate-x-1 group-hover:text-[#0E1A2B]" />
                   </div>
@@ -83,7 +83,7 @@ export default function PlansPage() {
             {TRUST.map(({ icon: Icon, label, sub }) => (
               <div key={label} className="rounded-2xl border border-[#E5DFD2] bg-white p-6">
                 <div className="flex items-center justify-center size-10 rounded-xl bg-[#EFE9DD] mb-4">
-                  <Icon className="size-5 text-primary" />
+                  <Icon className="size-5 text-[#0E1A2B]" />
                 </div>
                 <p className="font-semibold text-[15px] m-0 mb-1.5 tracking-[-0.01em]">{label}</p>
                 <p className="text-[13px] text-[#6B7585] m-0 leading-[1.5]">{sub}</p>
@@ -94,7 +94,7 @@ export default function PlansPage() {
       </section>
 
       {/* LIAISON CTA */}
-      <section className="bg-primary text-primary-foreground">
+      <section className="bg-[#0E1A2B] text-white">
         <div className="mx-auto max-w-[1320px] px-8 py-20">
           <div className="grid lg:grid-cols-[1.4fr_1fr] gap-12 items-center max-w-5xl mx-auto">
             <div>
@@ -113,7 +113,7 @@ export default function PlansPage() {
                 <Link href="/signup" className="inline-flex items-center gap-2 h-13 px-7 rounded-full bg-[#F7F4EE] text-[#0E1A2B] font-semibold transition hover:-translate-y-0.5" style={{ height: 52 }}>
                   Start free trial <ArrowRight className="size-4" />
                 </Link>
-                <Link href="mailto:enterprise@scrubhub.ca" className="inline-flex items-center h-13 px-7 rounded-full border border-white/30 text-primary-foreground font-semibold hover:border-white/60 transition" style={{ height: 52 }}>
+                <Link href="mailto:enterprise@scrubhub.ca" className="inline-flex items-center h-13 px-7 rounded-full border border-white/30 text-white font-semibold hover:border-white/60 transition" style={{ height: 52 }}>
                   Talk to sales
                 </Link>
               </div>

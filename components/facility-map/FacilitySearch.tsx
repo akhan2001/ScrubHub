@@ -168,7 +168,7 @@ export function FacilitySearch({
                       <span
                         className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                           item.data.type === 'hospital'
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-[#EFE9DD] text-[#0E1A2B]'
                             : 'bg-slate-100 text-slate-700'
                         }`}
                       >
@@ -178,7 +178,7 @@ export function FacilitySearch({
                         className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                           item.data.status === 'urgent'
                             ? 'bg-red-100 text-red-800'
-                            : 'bg-blue-50 text-blue-700'
+                            : 'bg-[#F0EBDF] text-[#0E1A2B]'
                         }`}
                       >
                         {item.data.status === 'urgent' ? 'Urgent' : 'Live'}

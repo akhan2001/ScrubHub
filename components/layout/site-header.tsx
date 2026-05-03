@@ -76,7 +76,7 @@ export function SiteHeader({ user }: { user?: User | null }) {
                 Dashboard
               </Link>
               <form action="/api/auth/signout" method="post">
-                <button type="submit" className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-[14px] font-semibold px-5 h-10 transition">
+                <button type="submit" className="rounded-full bg-[#0E1A2B] hover:bg-[#1a2a3f] text-white text-[14px] font-semibold px-5 h-10 transition">
                   Logout
                 </button>
               </form>
@@ -86,7 +86,7 @@ export function SiteHeader({ user }: { user?: User | null }) {
               <Link href={getAppLoginUrl()} className="text-[14px] font-medium text-[#3A4759] hover:text-[#0E1A2B] px-3 py-2 transition-colors">
                 Sign in
               </Link>
-              <Link href={getAppSignupUrl()} className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-[14px] font-semibold px-5 h-10 inline-flex items-center transition">
+              <Link href={getAppSignupUrl()} className="rounded-full bg-[#0E1A2B] hover:bg-[#1a2a3f] text-white text-[14px] font-semibold px-5 h-10 inline-flex items-center transition">
                 List a unit
               </Link>
             </>

@@ -4,7 +4,7 @@ export function FacilityMapLegend() {
       <p className="font-bold text-foreground mb-2 text-sm">Map Legend</p>
       <div className="space-y-1.5">
         {[
-          { col: '#2563eb', label: 'Hospital' },
+          { col: '#0E1A2B', label: 'Hospital' },
           { col: '#475569', label: 'Clinic' },
           { col: '#EF4444', label: 'Urgent Staffing Needed' },
           { col: '#0f172a', label: 'Listings (price)' },
@@ -20,7 +20,7 @@ export function FacilityMapLegend() {
         <hr className="my-2 border-[#eee]" />
         <p className="font-semibold text-muted-foreground mb-1">Clusters</p>
         {[
-          { col: '#2563eb', label: '< 20 facilities' },
+          { col: '#0E1A2B', label: '< 20 facilities' },
           { col: '#F59E0B', label: '20–50 facilities' },
           { col: '#EF4444', label: '50+ facilities' },
         ].map(({ col, label }) => (

@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.scrubhub.ca"),
   manifest: "/images/logo/site.webmanifest",
-  themeColor: "#2563eb",
+  themeColor: "#0E1A2B",
   icons: {
     icon: [{ url: "/images/logo/favicon.svg", type: "image/svg+xml" }],
     shortcut: "/images/logo/favicon.svg",
