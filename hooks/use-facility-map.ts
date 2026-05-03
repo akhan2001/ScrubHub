@@ -88,7 +88,7 @@ export function useFacilityMap(
         maxClusterRadius: 60,
         iconCreateFunction: (cluster: any) => {
           const count = cluster.getChildCount();
-          const col = count > 50 ? '#EF4444' : count > 20 ? '#F59E0B' : '#1663D4';
+          const col = count > 50 ? '#EF4444' : count > 20 ? '#F59E0B' : '#0E1A2B';
           const size = count > 50 ? 48 : count > 20 ? 40 : 34;
           return L.divIcon({
             html: `<div style="
@@ -109,7 +109,7 @@ export function useFacilityMap(
       facilities.forEach((f) => {
         const isUrgent = f.status === 'urgent';
         const isHospital = f.type === 'hospital';
-        const col = isUrgent ? '#EF4444' : isHospital ? '#1663D4' : '#475569';
+        const col = isUrgent ? '#EF4444' : isHospital ? '#0E1A2B' : '#475569';
         const icon = L.divIcon({
           html: `<div style="
             background:${col};color:white;
@@ -124,7 +124,7 @@ export function useFacilityMap(
 
         const statusBadge = isUrgent
           ? `<span style="display:inline-block;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;">Urgent</span>`
-          : `<span style="display:inline-block;background:#E8EEFC;color:#0E3A7A;border:1px solid #C5D4F0;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;">Live</span>`;
+          : `<span style="display:inline-block;background:#F7F4EE;color:#1a2a3f;border:1px solid #BFDBFE;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;">Live</span>`;
 
         const popup = `
           <div style="font-family:Inter,sans-serif;min-width:200px;padding:4px 2px;">
@@ -134,7 +134,7 @@ export function useFacilityMap(
               ${f.type === 'hospital' ? '🏥' : '🩺'} ${f.type.charAt(0).toUpperCase() + f.type.slice(1)}
             </p>
             <a href="/signup" style="
-              display:block;text-align:center;background:#1663D4;color:white;
+              display:block;text-align:center;background:#0E1A2B;color:white;
               border-radius:8px;padding:8px 0;font-size:13px;font-weight:700;
               text-decoration:none;
             ">View Availability →</a>

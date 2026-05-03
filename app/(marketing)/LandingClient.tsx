@@ -66,7 +66,7 @@ function HeroSearch() {
           </Eyebrow>
           <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96] text-[#0E1A2B]" style={{ fontSize: 'clamp(44px, 7.6vw, 104px)' }}>
             Find your next post.<br />
-            <span className="font-serif italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+            <span className="font-serif italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
               Move in by Sunday.
             </span>
           </h1>
@@ -78,7 +78,7 @@ function HeroSearch() {
 
         {/* Hero photo + overlap search */}
         <div className="relative">
-          <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-primary to-[#0d4a9e]" style={{ aspectRatio: '21/9', minHeight: 420, maxHeight: 560 }}>
+          <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0E1A2B] to-[#1a3a5c]" style={{ aspectRatio: '21/9', minHeight: 420, maxHeight: 560 }}>
             <img
               src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2200&q=85"
               alt=""
@@ -101,7 +101,60 @@ function HeroSearch() {
             </div>
           </div>
 
-          <HeroSearchCard />
+          {/* Search bar — overlaps photo */}
+          <div className="relative mx-auto -mt-11 max-w-[1100px] rounded-3xl border border-[#E5DFD2] bg-[#F7F4EE] p-3.5 shadow-[0_30px_80px_rgba(14,26,43,0.14),0_4px_12px_rgba(14,26,43,0.06)]">
+            {/* Tabs */}
+            <div className="flex gap-1.5 mb-3 px-1.5 items-center">
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  className={`inline-flex items-center gap-2 h-11 px-5 rounded-full text-sm font-semibold transition ${
+                    tab === t.id
+                      ? 'bg-white text-[#0E1A2B] shadow-[0_6px_18px_rgba(14,26,43,0.08),0_1px_2px_rgba(14,26,43,0.04)]'
+                      : 'bg-transparent text-[#6B7585] hover:text-[#0E1A2B]'
+                  }`}
+                >
+                  <t.Icon className="size-4" />
+                  <span>{t.label}</span>
+                </button>
+              ))}
+              <div className="flex-1" />
+              <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-[#6B7585] pr-2.5">
+                {tabs.find(t => t.id === tab)?.sub}
+              </span>
+            </div>
+
+            {/* Fields */}
+            <div className="flex items-stretch bg-white rounded-2xl border border-[#E5DFD2] overflow-hidden">
+              {fields[tab].map(([label, value], i, a) => (
+                <div key={label}
+                  className={`flex-1 flex flex-col px-4 py-2.5 cursor-pointer hover:bg-[#F0EBDF] transition ${i < a.length - 1 ? 'border-r border-[#E5DFD2]' : ''}`}
+                >
+                  <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#6B7585] font-medium mb-0.5">{label}</span>
+                  <span className="text-[15px] font-medium text-[#0E1A2B]">{value}</span>
+                </div>
+              ))}
+              <div className="flex items-center p-2">
+                <button className="inline-flex items-center justify-center gap-2 h-15 px-7 rounded-xl bg-[#0E1A2B] hover:bg-[#1a2a3f] text-white font-semibold text-sm transition" style={{ height: 60 }}>
+                  <Search className="size-[18px]" />
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {/* Quick chips */}
+            <div className="flex gap-2 px-1.5 pt-3.5 pb-1 flex-wrap items-center">
+              <Chip>Furnished</Chip>
+              <Chip>Pet friendly</Chip>
+              <Chip>Walk to hospital</Chip>
+              <Chip>≤ $3,000/mo</Chip>
+              <Chip>Parking incl.</Chip>
+              <Chip>13-week stays</Chip>
+              <span className="flex-1" />
+              <Link href="/facility-map" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[13px] font-semibold text-[#0E1A2B] hover:gap-2 transition-all">
+                More filters <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Trust strip */}
@@ -213,7 +266,7 @@ function CorridorSection() {
             <Eyebrow className="mb-4">Med-Map™ · Live</Eyebrow>
             <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
               Every hospital on<br />
-              <span className="italic font-normal text-primary" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 one corridor.
               </span>
             </h2>
@@ -229,7 +282,7 @@ function CorridorSection() {
                 ['Verified inventory', 'Every host meets ScrubHub housing protocol'],
               ].map(([h, s]) => (
                 <div key={h} className="flex gap-3.5 pb-3.5 border-b border-[#E5DFD2]">
-                  <div className="size-8 rounded-full bg-white border border-[#E5DFD2] grid place-items-center shrink-0 text-primary">
+                  <div className="size-8 rounded-full bg-white border border-[#E5DFD2] grid place-items-center shrink-0 text-[#0E1A2B]">
                     <BadgeCheck className="size-4" />
                   </div>
                   <div>
@@ -240,7 +293,7 @@ function CorridorSection() {
               ))}
             </div>
 
-            <Link href="/facility-map" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition">
+            <Link href="/facility-map" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-[#0E1A2B] hover:bg-[#1a2a3f] text-white font-semibold transition">
               Open Med-Map <ArrowRight className="size-4" />
             </Link>
           </div>
@@ -252,7 +305,7 @@ function CorridorSection() {
             </div>
             <div className="absolute bottom-4 right-5 flex gap-3.5 items-center">
               <span className="inline-flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-primary" />
+                <span className="size-2 rounded-full bg-[#0E1A2B]" />
                 <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#3A4759]">Hospitals</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
@@ -289,15 +342,15 @@ function CorridorMapStylized() {
       </defs>
       <rect width="100" height="70" fill="url(#land)" />
       <rect width="100" height="70" fill="url(#grid)" />
-      <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(22,99,212,0.12)" />
-      <path d="M 6 72 Q 30 58 50 50 T 96 22" fill="none" stroke="var(--color-primary)" strokeWidth="0.6" strokeDasharray="0.8 0.8" opacity="0.5" />
+      <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(37,99,235,0.10)" />
+      <path d="M 6 72 Q 30 58 50 50 T 96 22" fill="none" stroke="#0E1A2B" strokeWidth="0.6" strokeDasharray="0.8 0.8" opacity="0.5" />
       {stays.map((s, i) => (
         <circle key={i} cx={s[0]} cy={s[1]} r="0.55" fill="none" stroke="#B8472E" strokeWidth="0.25" />
       ))}
       {cities.map(c => (
         <g key={c.n}>
-          <circle cx={c.x} cy={c.y} r="1.4" fill="var(--color-primary)" />
-          <circle cx={c.x} cy={c.y} r="2.6" fill="var(--color-primary)" opacity="0.15" />
+          <circle cx={c.x} cy={c.y} r="1.4" fill="#0E1A2B" />
+          <circle cx={c.x} cy={c.y} r="2.6" fill="#0E1A2B" opacity="0.15" />
           <text x={c.x + 2.2} y={c.y + 0.6} fontSize="2.2" fill="#3A4759" fontFamily="ui-monospace, monospace">{c.n.toUpperCase()}</text>
         </g>
       ))}
@@ -428,6 +481,36 @@ function HostsCTA() {
         </div>
       </div>
     </section>
+  );
+}
+
+// =====================================================================
+// LIAISON concierge bubble (kept from previous landing)
+// =====================================================================
+function LiaisonConcierge() {
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <button onClick={() => setOpen(true)}
+        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2.5 rounded-full bg-[#0E1A2B] text-white px-5 py-3 shadow-lg hover:scale-105 transition border border-white/10"
+      >
+        <span className="size-2 rounded-full bg-[#B8472E]" />
+        <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON</span>
+      </button>
+    );
+  }
+  return (
+    <div className="fixed bottom-6 right-6 z-50 w-[340px] rounded-2xl bg-white shadow-[0_24px_60px_rgba(14,26,43,0.22)] border border-[#E5DFD2] overflow-hidden">
+      <div className="bg-[#0E1A2B] text-white px-5 py-3.5 flex items-center justify-between">
+        <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON · Concierge</span>
+        <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white">×</button>
+      </div>
+      <div className="p-5 bg-[#F7F4EE]">
+        <div className="bg-white border border-[#E5DFD2] rounded-xl p-3.5 text-sm text-[#3A4759]">
+          Hi — looking for a stay near a specific hospital, or a locum role this rotation?
+        </div>
+      </div>
+    </div>
   );
 }
 

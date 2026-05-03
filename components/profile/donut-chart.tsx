@@ -31,7 +31,7 @@ export function DonutChart({ percent }: { percent: number }) {
           cy={SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke={isComplete ? '#16a34a' : '#1663D4'}
+          stroke={isComplete ? '#16a34a' : '#0E1A2B'}
           strokeWidth={STROKE}
           strokeLinecap="round"
           strokeDasharray={CIRCUMFERENCE}

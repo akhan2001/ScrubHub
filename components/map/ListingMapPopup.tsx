@@ -64,9 +64,9 @@ function formatDistance(km: number): string {
 
 function statusBadgeHtml(status?: ListingStatusBadge): string {
   const badges: Record<ListingStatusBadge, { bg: string; color: string; text: string }> = {
-    instant_book: { bg: '#E8EEFC', color: '#0E3A7A', text: 'Instant Book' },
+    instant_book: { bg: '#F7F4EE', color: '#1a2a3f', text: 'Instant Book' },
     verified: { bg: '#F0FDF4', color: '#16a34a', text: 'Verified' },
-    available: { bg: '#E8EEFC', color: '#0E3A7A', text: 'Available' },
+    available: { bg: '#F7F4EE', color: '#1a2a3f', text: 'Available' },
     under_review: { bg: '#FEFCE8', color: '#ca8a04', text: 'Under Review' },
   };
   const b = status ? badges[status] : badges.available;
@@ -136,7 +136,7 @@ export function createListingPopupHTML(options: CreateListingPopupOptions): stri
     ${distanceHtml}
     ${availableHtml}
     <button type="button" ${onclick} style="
-      display:block;width:100%;text-align:center;background:#1663D4;color:white;
+      display:block;width:100%;text-align:center;background:#0E1A2B;color:white;
       border-radius:8px;padding:8px 0;font-size:12px;font-weight:600;
       border:none;cursor:pointer;margin-top:10px;
     ">View Listing →</button>
@@ -158,7 +158,7 @@ export function createPricePinHTML(
   const scale = isHighlight ? 'transform:scale(1.05);' : '';
 
   const statusColors: Record<ListingStatusBadge, { border: string; bg: string; color: string }> = {
-    instant_book: { border: '#1663D4', bg: '#E8EEFC', color: '#0E3A7A' },
+    instant_book: { border: '#0E1A2B', bg: '#F7F4EE', color: '#1a2a3f' },
     verified: { border: '#16a34a', bg: '#F0FDF4', color: '#15803d' },
     available: { border: '#0f172a', bg: '#fff', color: '#0f172a' },
     under_review: { border: '#ca8a04', bg: '#FEFCE8', color: '#a16207' },
