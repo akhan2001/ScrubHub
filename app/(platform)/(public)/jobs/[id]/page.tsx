@@ -122,7 +122,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
                     </div>
                   </div>
                   <Button asChild size="sm" variant="outline">
-                    <Link href={`/listings/${linkedListing.id}`}>View Listing</Link>
+                    <Link href={`/facility-map?listing=${linkedListing.id}`}>View Listing</Link>
                   </Button>
                 </CardContent>
               </Card>
