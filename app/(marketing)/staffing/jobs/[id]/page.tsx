@@ -90,7 +90,7 @@ export default async function StaffingJobDetailPage({
         <header className="border-b border-[#E5DFD2] pb-10 mb-10">
           <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] font-medium mb-4">
             <span className="inline-flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-[#B8472E]" />
+              <span className="size-1.5 rounded-full bg-[#1E5BBE]" />
               {job.contract_type ?? 'Open position'}
               {job.role_type && <span className="text-[#3A4759]">· {job.role_type}</span>}
             </span>
@@ -112,9 +112,9 @@ export default async function StaffingJobDetailPage({
           )}
 
           {job.housing_included && (
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#B8472E]/40 bg-[#B8472E]/8 px-3.5 py-1.5">
-              <Home className="size-3.5 text-[#B8472E]" />
-              <span className="font-mono text-[11px] tracking-[0.16em] uppercase font-semibold text-[#B8472E]">
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#1E5BBE]/40 bg-[#1E5BBE]/8 px-3.5 py-1.5">
+              <Home className="size-3.5 text-[#1E5BBE]" />
+              <span className="font-mono text-[11px] tracking-[0.16em] uppercase font-semibold text-[#1E5BBE]">
                 Housing included
               </span>
             </div>

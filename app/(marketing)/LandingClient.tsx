@@ -60,13 +60,13 @@ function HeroSearch() {
         <div className="max-w-[920px] mb-9">
           <Eyebrow className="mb-4">
             <span className="inline-flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-[#B8472E]" />
+              <span className="size-1.5 rounded-full bg-[#1E5BBE]" />
               Ontario · 401 Healthcare Corridor
             </span>
           </Eyebrow>
           <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96] text-[#0E1A2B]" style={{ fontSize: 'clamp(44px, 7.6vw, 104px)' }}>
             Find your next post.<br />
-            <span className="font-serif italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+            <span className="font-serif italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
               Move in by Sunday.
             </span>
           </h1>
@@ -102,59 +102,7 @@ function HeroSearch() {
           </div>
 
           {/* Search bar — overlaps photo */}
-          <div className="relative mx-auto -mt-11 max-w-[1100px] rounded-3xl border border-[#E5DFD2] bg-[#F7F4EE] p-3.5 shadow-[0_30px_80px_rgba(14,26,43,0.14),0_4px_12px_rgba(14,26,43,0.06)]">
-            {/* Tabs */}
-            <div className="flex gap-1.5 mb-3 px-1.5 items-center">
-              {tabs.map(t => (
-                <button key={t.id} onClick={() => setTab(t.id)}
-                  className={`inline-flex items-center gap-2 h-11 px-5 rounded-full text-sm font-semibold transition ${
-                    tab === t.id
-                      ? 'bg-white text-[#0E1A2B] shadow-[0_6px_18px_rgba(14,26,43,0.08),0_1px_2px_rgba(14,26,43,0.04)]'
-                      : 'bg-transparent text-[#6B7585] hover:text-[#0E1A2B]'
-                  }`}
-                >
-                  <t.Icon className="size-4" />
-                  <span>{t.label}</span>
-                </button>
-              ))}
-              <div className="flex-1" />
-              <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-[#6B7585] pr-2.5">
-                {tabs.find(t => t.id === tab)?.sub}
-              </span>
-            </div>
-
-            {/* Fields */}
-            <div className="flex items-stretch bg-white rounded-2xl border border-[#E5DFD2] overflow-hidden">
-              {fields[tab].map(([label, value], i, a) => (
-                <div key={label}
-                  className={`flex-1 flex flex-col px-4 py-2.5 cursor-pointer hover:bg-[#F0EBDF] transition ${i < a.length - 1 ? 'border-r border-[#E5DFD2]' : ''}`}
-                >
-                  <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#6B7585] font-medium mb-0.5">{label}</span>
-                  <span className="text-[15px] font-medium text-[#0E1A2B]">{value}</span>
-                </div>
-              ))}
-              <div className="flex items-center p-2">
-                <button className="inline-flex items-center justify-center gap-2 h-15 px-7 rounded-xl bg-[#0E1A2B] hover:bg-[#1a2a3f] text-white font-semibold text-sm transition" style={{ height: 60 }}>
-                  <Search className="size-[18px]" />
-                  Search
-                </button>
-              </div>
-            </div>
-
-            {/* Quick chips */}
-            <div className="flex gap-2 px-1.5 pt-3.5 pb-1 flex-wrap items-center">
-              <Chip>Furnished</Chip>
-              <Chip>Pet friendly</Chip>
-              <Chip>Walk to hospital</Chip>
-              <Chip>≤ $3,000/mo</Chip>
-              <Chip>Parking incl.</Chip>
-              <Chip>13-week stays</Chip>
-              <span className="flex-1" />
-              <Link href="/facility-map" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[13px] font-semibold text-[#0E1A2B] hover:gap-2 transition-all">
-                More filters <ArrowRight className="size-3.5" />
-              </Link>
-            </div>
-          </div>
+          <HeroSearchCard />
         </div>
 
         {/* Trust strip */}
@@ -193,7 +141,7 @@ function FeaturedStays() {
             <Eyebrow className="mb-3.5">This week · 401 Corridor</Eyebrow>
             <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
               Hand-picked stays<br />
-              <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 near every shift.
               </span>
             </h2>
@@ -226,7 +174,7 @@ function FeaturedStays() {
                   {l.tag}
                 </span>
                 <button onClick={() => toggle(l.id)}
-                  className={`absolute top-3 right-3 size-9 rounded-full bg-white/95 grid place-items-center transition hover:scale-110 ${saved.has(l.id) ? 'text-[#B8472E]' : 'text-[#0E1A2B]'}`}
+                  className={`absolute top-3 right-3 size-9 rounded-full bg-white/95 grid place-items-center transition hover:scale-110 ${saved.has(l.id) ? 'text-[#1E5BBE]' : 'text-[#0E1A2B]'}`}
                 >
                   <Heart className="size-4" fill={saved.has(l.id) ? 'currentColor' : 'none'} />
                 </button>
@@ -266,7 +214,7 @@ function CorridorSection() {
             <Eyebrow className="mb-4">Med-Map™ · Live</Eyebrow>
             <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
               Every hospital on<br />
-              <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 one corridor.
               </span>
             </h2>
@@ -309,7 +257,7 @@ function CorridorSection() {
                 <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#3A4759]">Hospitals</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="size-2 rounded-full border-2 border-[#B8472E]" />
+                <span className="size-2 rounded-full border-2 border-[#1E5BBE]" />
                 <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-[#3A4759]">Stays</span>
               </span>
             </div>
@@ -345,7 +293,7 @@ function CorridorMapStylized() {
       <path d="M 30 70 Q 50 56 80 60 L 100 64 L 100 70 Z" fill="rgba(37,99,235,0.10)" />
       <path d="M 6 72 Q 30 58 50 50 T 96 22" fill="none" stroke="#0E1A2B" strokeWidth="0.6" strokeDasharray="0.8 0.8" opacity="0.5" />
       {stays.map((s, i) => (
-        <circle key={i} cx={s[0]} cy={s[1]} r="0.55" fill="none" stroke="#B8472E" strokeWidth="0.25" />
+        <circle key={i} cx={s[0]} cy={s[1]} r="0.55" fill="none" stroke="#1E5BBE" strokeWidth="0.25" />
       ))}
       {cities.map(c => (
         <g key={c.n}>
@@ -375,7 +323,7 @@ function HowItWorks() {
             <Eyebrow className="mb-4">How ScrubHub works</Eyebrow>
             <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(36px, 4.6vw, 56px)' }}>
               Three steps from<br />
-              <span className="italic font-normal" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 offer to occupancy.
               </span>
             </h2>
@@ -390,7 +338,7 @@ function HowItWorks() {
           {steps.map(([n, t, d]) => (
             <div key={n} className="bg-[#F7F4EE] p-9 flex flex-col gap-4 min-h-[280px]">
               <div className="font-mono text-xs tracking-[0.18em] text-[#6B7585]">{n}</div>
-              <h3 className="m-0 italic font-normal text-[34px] leading-[1.05] tracking-[-0.01em]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>{t}</h3>
+              <h3 className="m-0 italic font-normal text-[34px] leading-[1.05] tracking-[-0.01em] text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>{t}</h3>
               <p className="m-0 text-[15px] leading-[1.6] text-[#3A4759]">{d}</p>
             </div>
           ))}
@@ -412,7 +360,7 @@ function Neighborhoods() {
             <Eyebrow className="mb-3.5">By region</Eyebrow>
             <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(32px, 3.8vw, 44px)' }}>
               Where to land<br />
-              <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 this rotation.
               </span>
             </h2>
@@ -494,7 +442,7 @@ function LiaisonConcierge() {
       <button onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2.5 rounded-full bg-[#0E1A2B] text-white px-5 py-3 shadow-lg hover:scale-105 transition border border-white/10"
       >
-        <span className="size-2 rounded-full bg-[#B8472E]" />
+        <span className="size-2 rounded-full bg-[#1E5BBE]" />
         <span className="font-mono text-[11px] tracking-[0.18em] uppercase font-semibold">LIAISON</span>
       </button>
     );

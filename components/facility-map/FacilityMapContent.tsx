@@ -8,7 +8,10 @@ import { FACILITIES } from '@/lib/map/facilities';
 import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
 import { useFacilityMap } from '@/hooks/use-facility-map';
 import { FacilitySearch } from '@/components/facility-map/FacilitySearch';
+import { FacilityMapFilterRail } from '@/components/facility-map/FacilityMapFilterRail';
 import { FacilityMapLegend } from '@/components/facility-map/FacilityMapLegend';
+import { FacilityMapListPane } from '@/components/facility-map/FacilityMapListPane';
+import { FacilityMapMarketingHeader } from '@/components/facility-map/FacilityMapMarketingHeader';
 import { ListingDetailPanel } from '@/components/facility-map/ListingDetailPanel';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { getTenantApplicationContext } from '@/actions/tenant-application';
@@ -103,14 +106,8 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
   return (
     <div className="flex flex-1 flex-col">
       {/* Header */}
-      <div
-        className={
-          isDashboard
-            ? 'relative z-10 shrink-0 border-b border-border bg-card px-4 py-6 md:px-8 md:py-8'
-            : 'relative z-[500] shrink-0 border-b border-[#E5DFD2] bg-white px-6 py-5'
-        }
-      >
-        {isDashboard ? (
+      {isDashboard ? (
+        <div className="relative z-10 shrink-0 border-b border-border bg-card px-4 py-6 md:px-8 md:py-8">
           <div className="mx-auto flex w-full max-w-[var(--container-max)] flex-col gap-4">
             <nav aria-label="Breadcrumb" className="text-sm">
               <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
@@ -151,28 +148,11 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
               </div>
             </div>
           </div>
-        ) : (
-          <>
-            <div className="mb-2 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585]">
-              <span className="size-1.5 rounded-full bg-[#B8472E]" />
-              <Link href="/" className="font-medium hover:text-[#0E1A2B] transition-colors">
-                Home
-              </Link>
-              <span className="opacity-50">·</span>
-              <span className="font-medium text-[#0E1A2B]">Listings</span>
-            </div>
-            <h1 className="m-0 font-medium tracking-[-0.03em] leading-[1.02] text-[#0E1A2B] text-[26px] md:text-[32px]">
-              Healthcare facilities,
-              <span
-                className="ml-2 italic font-normal text-primary"
-                style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
-              >
-                mapped.
-              </span>
-            </h1>
-            <p className="mt-1.5 mb-4 max-w-[64ch] text-[13px] leading-[1.55] text-[#3A4759]">
-              {FACILITIES.length}+ hospitals, clinics, and healthcare facilities across Ontario. Click any pin to view details and book a space.
-            </p>
+        </div>
+      ) : (
+        <FacilityMapMarketingHeader
+          facilityCount={FACILITIES.length}
+          searchSlot={
             <FacilitySearch
               facilities={FACILITIES}
               listings={listings}
@@ -180,21 +160,49 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
               onSelectListing={handleSelectListing}
               mapReady={mapReady}
             />
-          </>
-        )}
-      </div>
+          }
+        />
+      )}
 
-      {/* Map */}
-      <div className="relative z-0 flex min-h-[600px] flex-1 overflow-hidden">
-        <div ref={mapElRef} className="absolute inset-0 h-full w-full bg-muted/30" />
-        {!mapReady && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/50">
-            <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <p className="text-sm font-medium text-muted-foreground">Loading map...</p>
+      {/* Sticky filter rail (marketing only) */}
+      {!isDashboard && <FacilityMapFilterRail activeView="map" />}
+
+      {/* Split: list (left) ↔ map (right) */}
+      {isDashboard ? (
+        <div className="relative z-0 flex min-h-[600px] flex-1 overflow-hidden">
+          <div ref={mapElRef} className="absolute inset-0 h-full w-full bg-muted/30" />
+          {!mapReady && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/50">
+              <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <p className="text-sm font-medium text-muted-foreground">Loading map...</p>
+            </div>
+          )}
+          <FacilityMapLegend />
+        </div>
+      ) : (
+        <div className="grid flex-1 grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          {/* List pane (left) */}
+          <div className="border-b border-[#E5DFD2] bg-[#F7F4EE] lg:max-h-[calc(100vh-72px-58px)] lg:border-r lg:border-b-0">
+            <FacilityMapListPane
+              listings={listings}
+              selectedId={selectedListing?.id ?? null}
+              onSelect={handleSelectListing}
+            />
           </div>
-        )}
-        <FacilityMapLegend />
-      </div>
+
+          {/* Map pane (right) */}
+          <div className="relative min-h-[60vh] lg:sticky lg:top-[calc(72px+58px)] lg:h-[calc(100vh-72px-58px)] lg:min-h-0">
+            <div ref={mapElRef} className="absolute inset-0 h-full w-full bg-muted/30" />
+            {!mapReady && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/50">
+                <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <p className="text-sm font-medium text-muted-foreground">Loading map...</p>
+              </div>
+            )}
+            <FacilityMapLegend />
+          </div>
+        </div>
+      )}
 
       {/* Listing detail sheet */}
       <Sheet

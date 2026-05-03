@@ -75,7 +75,7 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
           <div className="mb-8">
             <div className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[#6B7585]">
               <span className="inline-flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-[#B8472E]" />
+                <span className="size-1.5 rounded-full bg-[#1E5BBE]" />
                 {eyebrow}
               </span>
             </div>
@@ -87,7 +87,7 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
                 <>
                   Sign in
                   <span
-                    className="ml-2 font-normal italic text-primary"
+                    className="ml-2 font-normal italic text-[#1E5BBE]"
                     style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
                   >
                     to continue
@@ -97,7 +97,7 @@ export function AuthPanel({ mode, children }: AuthPanelProps) {
                 <>
                   Sign up
                   <span
-                    className="ml-2 font-normal italic text-primary"
+                    className="ml-2 font-normal italic text-[#1E5BBE]"
                     style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
                   >
                     .

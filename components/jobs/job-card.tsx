@@ -41,7 +41,7 @@ export function JobCard({ job, variant = 'full', href }: JobCardProps) {
               </span>
             )}
             {job.housing_included && (
-              <span className="font-mono text-[10px] tracking-[0.14em] uppercase font-semibold rounded-full border border-[#B8472E]/40 text-[#B8472E] px-2.5 py-1">
+              <span className="font-mono text-[10px] tracking-[0.14em] uppercase font-semibold rounded-full border border-[#1E5BBE]/40 text-[#1E5BBE] px-2.5 py-1">
                 Housing incl.
               </span>
             )}

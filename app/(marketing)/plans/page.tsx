@@ -21,12 +21,12 @@ export default function PlansPage() {
       <section className="border-b border-[#E5DFD2]">
         <div className="mx-auto max-w-[1320px] px-8 pt-20 pb-16 text-center">
           <div className="inline-flex items-center gap-2 mb-6 font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585]">
-            <span className="size-1.5 rounded-full bg-[#B8472E]" />
+            <span className="size-1.5 rounded-full bg-[#1E5BBE]" />
             Transparent pricing
           </div>
           <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96] mx-auto max-w-[16ch]" style={{ fontSize: 'clamp(48px, 7vw, 96px)' }}>
             Honest plans.<br />
-            <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+            <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
               No hidden fees.
             </span>
           </h1>
@@ -76,7 +76,7 @@ export default function PlansPage() {
             Built for clinical work
           </div>
           <h2 className="m-0 text-center font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(34px, 4vw, 52px)' }}>
-            Every plan, the same <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>standards.</span>
+            Every plan, the same <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>standards.</span>
           </h2>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">

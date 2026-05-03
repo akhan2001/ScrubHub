@@ -41,14 +41,14 @@ export default async function ListingsPage() {
       <section className="mx-auto max-w-[1480px] px-8 pt-9 pb-7">
         <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585] font-medium mb-3.5">
           <span className="inline-flex items-center gap-2">
-            <span className="size-1.5 rounded-full bg-[#B8472E]" />
+            <span className="size-1.5 rounded-full bg-[#1E5BBE]" />
             {all.length} stays · 401 Corridor · Updated daily
           </span>
         </div>
         <div className="flex items-end justify-between gap-8 flex-wrap">
           <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(40px, 5.4vw, 76px)' }}>
             Stays this rotation,<br />
-            <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif', fontSize: '1.02em' }}>
+            <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif', fontSize: '1.02em' }}>
               curated.
             </span>
           </h1>

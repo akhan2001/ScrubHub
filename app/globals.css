@@ -135,7 +135,7 @@
   --ink:          #0E1A2B;
   --ink-soft:     #3A4759;
   --ink-mute:     #6B7585;
-  --accent-clay:  #B8472E;
+  --accent-blue:  #1E5BBE;
   --font-serif:  "Instrument Serif", Georgia, "Times New Roman", serif;
 }
 
@@ -204,7 +204,7 @@
   --color-ink:         var(--ink);
   --color-ink-soft:    var(--ink-soft);
   --color-ink-mute:    var(--ink-mute);
-  --color-clay:        var(--accent-clay);
+  --color-blue:        var(--accent-blue);
   --font-serif:        var(--font-serif);
 }
 

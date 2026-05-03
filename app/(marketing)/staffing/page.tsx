@@ -35,13 +35,13 @@ export default async function StaffingPage() {
       <section className="border-b border-[#E5DFD2] bg-[#EFE9DD]">
         <div className="mx-auto max-w-[1320px] px-8 pt-16 pb-12">
           <div className="flex items-center gap-2 mb-5 font-mono text-[11px] tracking-[0.18em] uppercase text-[#6B7585]">
-            <span className="size-1.5 rounded-full bg-[#B8472E]" />
+            <span className="size-1.5 rounded-full bg-[#1E5BBE]" />
             Open positions · Updated daily
           </div>
           <div className="grid lg:grid-cols-[1.6fr_1fr] gap-10 items-end">
             <h1 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(44px, 6.4vw, 88px)' }}>
               Roles that match<br />
-              <span className="italic font-normal text-[#0E1A2B]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+              <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                 your scrubs.
               </span>
             </h1>
@@ -93,7 +93,7 @@ export default async function StaffingPage() {
               </div>
               <h2 className="m-0 font-medium tracking-[-0.04em] leading-[0.96]" style={{ fontSize: 'clamp(34px, 4.4vw, 56px)' }}>
                 Post a position.<br />
-                <span className="italic font-normal text-[#B8472E]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
+                <span className="italic font-normal text-[#1E5BBE]" style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}>
                   Cover the shift by Sunday.
                 </span>
               </h2>
