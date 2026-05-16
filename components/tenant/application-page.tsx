@@ -123,7 +123,7 @@ export function ApplicationPage({
         messageToLandlord: data.message,
       });
       toast.success('Application submitted');
-      router.push('/dashboard/bookings');
+      router.push('/dashboard/tenant/bookings');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to submit application');
     }
@@ -132,11 +132,11 @@ export function ApplicationPage({
   return (
     <div className="mx-auto max-w-[1080px] px-6 py-8">
       <Link
-        href="/dashboard/listings"
+        href={`/listings/${listing.id}`}
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
-        Back to listings
+        Back to listing
       </Link>
 
       <header className="mb-8">

@@ -67,7 +67,6 @@ export async function middleware(request: NextRequest) {
     pathname === '/auth/callback';
 
   const isDashboardPath = pathname.startsWith('/dashboard');
-  const isListingsPath = pathname.startsWith('/listings');
 
   if (isApp) {
     // Redirect root to dashboard
@@ -92,18 +91,13 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isWww) {
-    // Redirect app-specific paths to App domain
-    if (isDashboardPath || isListingsPath) {
+    // Only dashboard paths get sent to the app subdomain. /listings and
+    // /listings/[id] and /listings/[id]/apply all live in (marketing) and
+    // should resolve naturally on www so tenants can browse + apply
+    // without leaving the marketing surface.
+    if (isDashboardPath) {
       const target = new URL(APP_URL);
-      if (pathname === '/listings') {
-        target.pathname = '/facility-map';
-      } else if (pathname.startsWith('/listings/')) {
-        const id = pathname.replace(/^\/listings\//, '').replace(/\/$/, '');
-        target.pathname = '/facility-map';
-        target.searchParams.set('listing', id);
-      } else {
-        target.pathname = pathname;
-      }
+      target.pathname = pathname;
 
       request.nextUrl.searchParams.forEach((v, k) => {
         if (k !== 'host') target.searchParams.set(k, v);

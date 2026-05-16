@@ -95,7 +95,8 @@ export async function sendApplicationSubmittedEmails(opts: {
   const tenantName = tenant?.full_name ?? 'a tenant';
   const landlordName = landlord?.full_name ?? 'there';
   const tenantFirstName = (tenant?.full_name ?? '').split(' ')[0] || 'there';
-  const dashboardUrl = `${APP_BASE_URL}/dashboard/bookings`;
+  const tenantTrackUrl = `${APP_BASE_URL}/dashboard/tenant/bookings`;
+  const landlordReviewUrl = `${APP_BASE_URL}/dashboard/landlord/approvals`;
 
   if (tenant?.email) {
     await sendAndLog(
@@ -109,12 +110,12 @@ export async function sendApplicationSubmittedEmails(opts: {
           `Hi ${tenantFirstName},\n\n` +
           `Your application for "${title}" has been submitted. ` +
           `We'll email you again as soon as the landlord responds.\n\n` +
-          `Track your applications: ${dashboardUrl}\n\n— ScrubHub`,
+          `Track your applications: ${tenantTrackUrl}\n\n— ScrubHub`,
         html:
           `<p>Hi ${escapeHtml(tenantFirstName)},</p>` +
           `<p>Your application for <strong>${escapeHtml(title)}</strong> has been submitted. ` +
           `We'll email you again as soon as the landlord responds.</p>` +
-          `<p><a href="${escapeHtml(dashboardUrl)}">Track your applications</a></p>` +
+          `<p><a href="${escapeHtml(tenantTrackUrl)}">Track your applications</a></p>` +
           `<p>— ScrubHub</p>`,
       },
     );
@@ -132,11 +133,11 @@ export async function sendApplicationSubmittedEmails(opts: {
           `Hi ${landlordName.split(' ')[0] || 'there'},\n\n` +
           `${tenantName} just submitted an application for "${title}". ` +
           `Open your dashboard to review the details and respond.\n\n` +
-          `${dashboardUrl}\n\n— ScrubHub`,
+          `${landlordReviewUrl}\n\n— ScrubHub`,
         html:
           `<p>Hi ${escapeHtml(landlordName.split(' ')[0] || 'there')},</p>` +
           `<p><strong>${escapeHtml(tenantName)}</strong> just submitted an application for <strong>${escapeHtml(title)}</strong>.</p>` +
-          `<p><a href="${escapeHtml(dashboardUrl)}">Review and respond</a></p>` +
+          `<p><a href="${escapeHtml(landlordReviewUrl)}">Review and respond</a></p>` +
           `<p>— ScrubHub</p>`,
       },
     );
@@ -160,7 +161,7 @@ export async function sendBookingDecisionEmail(opts: {
 
   const title = listing?.title ?? 'your application';
   const firstName = (tenant.full_name ?? '').split(' ')[0] || 'there';
-  const dashboardUrl = `${APP_BASE_URL}/dashboard/bookings`;
+  const dashboardUrl = `${APP_BASE_URL}/dashboard/tenant/bookings`;
   const approved = opts.decision === 'approved';
 
   await sendAndLog(

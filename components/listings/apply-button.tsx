@@ -18,7 +18,7 @@ interface ApplyButtonProps {
 
 /**
  * Apply CTA shown on a listing card / facility-map detail. The actual form lives at
- * /dashboard/apply/[listingId] — this is just the entry point + profile-readiness hint.
+ * /listings/[listingId]/apply (marketing) — this is just the entry point + profile-readiness hint.
  */
 export function ApplyButton({ listingId, completeness }: ApplyButtonProps) {
   const missingItems = [
@@ -30,7 +30,7 @@ export function ApplyButton({ listingId, completeness }: ApplyButtonProps) {
   return (
     <div className="space-y-3">
       <Button asChild className="w-full" size="lg">
-        <Link href={`/dashboard/apply/${listingId}`}>Apply for this listing</Link>
+        <Link href={`/listings/${listingId}/apply`}>Apply for this listing</Link>
       </Button>
 
       {!allMet && (
