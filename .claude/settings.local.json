@@ -5,7 +5,8 @@
       "Bash(git add *)",
       "WebFetch(domain:unsplash.com)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git push *)"
     ]
   }
 }
