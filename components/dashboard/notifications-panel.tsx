@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { SlidersHorizontal } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -87,7 +88,7 @@ type RowProps = {
   role: AppRole;
 };
 
-function NotificationRow({ log, role }: RowProps) {
+function NotificationRow({ log, role, mounted }: RowProps & { mounted: boolean }) {
   const { title, body } = getMetadataTitleBody(log);
   const href = resolveNotificationHref(log.template_key, role);
   const initials = title.slice(0, 2).toUpperCase();
@@ -110,7 +111,11 @@ function NotificationRow({ log, role }: RowProps) {
           )}{' '}
           {body}
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(log.created_at)}</p>
+        {/* Time strings are computed against the client clock — render only
+            after mount so SSR text matches the first client render. */}
+        <p className="mt-1 text-xs text-muted-foreground" suppressHydrationWarning>
+          {mounted ? formatRelativeTime(log.created_at) : ' '}
+        </p>
       </div>
     </div>
   );
@@ -120,10 +125,12 @@ function Section({
   heading,
   logs,
   role,
+  mounted,
 }: {
   heading: string;
   logs: NotificationLog[];
   role: AppRole;
+  mounted: boolean;
 }) {
   if (logs.length === 0) return null;
   return (
@@ -131,7 +138,7 @@ function Section({
       <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{heading}</h3>
       <div className="space-y-0.5">
         {logs.map((log) => (
-          <NotificationRow key={log.id} log={log} role={role} />
+          <NotificationRow key={log.id} log={log} role={role} mounted={mounted} />
         ))}
       </div>
     </div>
@@ -145,7 +152,16 @@ export function NotificationsPanel({
   role: AppRole;
   notificationLogs: NotificationLog[];
 }) {
-  const { today, thisWeek, older } = partitionByRecency(notificationLogs);
+  // SSR and client clocks differ, so partitioning by "today / this week" at
+  // render time triggers React #418. Defer the partition + relative-time strings
+  // until after first mount; on the server we render every log under one
+  // neutral heading.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const { today, thisWeek, older } = mounted
+    ? partitionByRecency(notificationLogs)
+    : { today: [] as NotificationLog[], thisWeek: [] as NotificationLog[], older: notificationLogs };
   const totalToday = today.length;
   const hasAny = notificationLogs.length > 0;
 
@@ -186,13 +202,13 @@ export function NotificationsPanel({
           </p>
         ) : (
           <>
-            <Section heading="Today" logs={today} role={role} />
+            <Section heading="Today" logs={today} role={role} mounted={mounted} />
             <div className="border-t border-border">
-              <Section heading="This week" logs={thisWeek} role={role} />
+              <Section heading="This week" logs={thisWeek} role={role} mounted={mounted} />
             </div>
             {older.length > 0 ? (
               <div className="border-t border-border">
-                <Section heading="Earlier" logs={older} role={role} />
+                <Section heading={mounted ? 'Earlier' : 'Recent'} logs={older} role={role} mounted={mounted} />
               </div>
             ) : null}
           </>
