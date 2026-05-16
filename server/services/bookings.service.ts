@@ -17,6 +17,10 @@ import { sendSms } from '@/lib/integrations/twilio';
 import { logAuditEvent } from '@/server/services/audit.service';
 import { evaluateApplication } from '@/server/services/screening.service';
 import { tryCreateLeaseFromApproval } from '@/server/services/leases.service';
+import {
+  sendApplicationSubmittedEmails,
+  sendBookingDecisionEmail,
+} from '@/server/services/email.service';
 import { insertNotificationLog } from '@/server/repositories/notification-logs.repository';
 import type { BookingStatus } from '@/types/database';
 
@@ -77,6 +81,15 @@ export async function createBookingForTenant(input: {
     // Screening evaluation failures should not block booking creation
   }
 
+  // Email both sides. Service swallows errors internally so a misconfigured
+  // Resend key can never roll back the booking.
+  await sendApplicationSubmittedEmails({
+    bookingId: booking.id,
+    listingId: input.listingId,
+    tenantUserId: input.tenantUserId,
+    landlordUserId: listing.user_id,
+  });
+
   return booking;
 }
 
@@ -113,6 +126,12 @@ export async function setBookingStatus(input: {
             ? 'Your booking request was approved.'
             : 'Your booking request was declined.',
         metadata: { bookingId: input.bookingId, listingId: booking.listing_id },
+      });
+      await sendBookingDecisionEmail({
+        bookingId: input.bookingId,
+        listingId: booking.listing_id,
+        tenantUserId: booking.tenant_user_id,
+        decision: input.nextStatus,
       });
     } else if (input.nextStatus === 'withdrawn' && booking.tenant_user_id === input.actorUserId) {
       await insertNotificationLog({

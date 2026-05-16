@@ -26,6 +26,24 @@ export async function insertNotificationLog(input: {
   if (error) throw error;
 }
 
+export async function insertEmailNotificationLog(input: {
+  user_id: string;
+  event_type: string;
+  status: 'sent' | 'failed';
+  metadata?: Record<string, unknown>;
+}): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase.from('notification_logs').insert({
+    user_id: input.user_id,
+    channel: 'email',
+    template_key: input.event_type,
+    status: input.status,
+    metadata: input.metadata ?? {},
+  });
+
+  if (error) throw error;
+}
+
 export async function fetchNotificationLogsForUser(
   userId: string,
   limit = 50,

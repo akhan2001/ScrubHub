@@ -55,12 +55,6 @@ export const orgInfoSchema = z.object({
   domain: z.string().optional(),
 });
 
-export const paymentSchema = z.object({
-  cardNumber: z.string().min(1, 'Card number is required'),
-  expiryDate: z.string().min(1, 'Expiry date is required'),
-  cvc: z.string().min(3, 'CVC is required'),
-});
-
 export type PersonalInfoData = z.infer<typeof personalInfoSchema>;
 export type CredentialsData = z.infer<typeof credentialsSchema>;
 export type HousingData = z.infer<typeof housingSchema>;
@@ -68,4 +62,3 @@ export type IdentityData = z.infer<typeof identitySchema>;
 export type BusinessData = z.infer<typeof businessSchema>;
 export type LandlordIdentityData = z.infer<typeof landlordIdentitySchema>;
 export type OrgInfoData = z.infer<typeof orgInfoSchema>;
-export type PaymentData = z.infer<typeof paymentSchema>;

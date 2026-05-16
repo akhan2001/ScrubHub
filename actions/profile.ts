@@ -10,7 +10,6 @@ import {
   businessSchema,
   landlordIdentitySchema,
   orgInfoSchema,
-  paymentSchema,
 } from '@/lib/validations/profile';
 import {
   updateProfile,
@@ -28,6 +27,16 @@ async function getAuthUserId(): Promise<string> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Unauthorized');
   return user.id;
+}
+
+export async function savePayStubPath(path: unknown) {
+  const userId = await getAuthUserId();
+  if (typeof path !== 'string' || !path.trim()) {
+    throw new Error('Invalid pay stub path');
+  }
+  await upsertWorkerProfile(userId, { pay_stub_url: path });
+  revalidatePath('/dashboard/profile');
+  return { success: true };
 }
 
 export async function savePersonalInfo(data: unknown) {
@@ -145,27 +154,3 @@ export async function saveOrgInfo(data: unknown) {
   return { success: true };
 }
 
-export async function savePaymentMethod(data: unknown) {
-  const userId = await getAuthUserId();
-  const profile = await getProfile(userId);
-  if (profile?.role !== 'tenant' && profile?.role !== 'landlord') {
-    revalidatePath('/dashboard/profile');
-    return { success: true };
-  }
-
-  const parsed = paymentSchema.parse(data);
-  const digits = parsed.cardNumber.replace(/\D/g, '');
-  const last4 = digits.slice(-4);
-  if (last4.length !== 4) {
-    throw new Error('Enter a valid card number');
-  }
-
-  if (profile.role === 'tenant') {
-    await upsertWorkerProfile(userId, { payment_method_last4: last4 });
-  } else {
-    await upsertLandlordProfile(userId, { payout_method_last4: last4 });
-  }
-
-  revalidatePath('/dashboard/profile');
-  return { success: true };
-}

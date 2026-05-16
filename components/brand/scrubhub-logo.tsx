@@ -7,7 +7,7 @@ type ScrubHubLogoProps = {
   priority?: boolean;
 };
 
-const LOGO_SRC = '/images/scrubhub-logo-transparent.png';
+const LOGO_SRC = '/images/scrubhub-logo-transparent.v2.png';
 
 /**
  * Brand wordmark + icon (asset includes “SCRUB HUB” text — do not add a second title next to it).

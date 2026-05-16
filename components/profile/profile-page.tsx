@@ -11,7 +11,6 @@ import { PersonalInfoForm } from './sections/personal-info-form';
 import { CredentialsForm } from './sections/credentials-form';
 import { HousingForm } from './sections/housing-form';
 import { IdentityForm } from './sections/identity-form';
-import { PaymentForm } from './sections/payment-form';
 import { BusinessForm } from './sections/business-form';
 import { LandlordIdentityForm } from './sections/landlord-identity-form';
 import { OrgForm } from './sections/org-form';
@@ -85,14 +84,6 @@ export function ProfilePage({
           return <LandlordIdentityForm landlordProfile={landlordProfile} onSaved={handleSaved} />;
         }
         return <IdentityForm workerProfile={workerProfile} onSaved={handleSaved} />;
-      case 'payment':
-        return (
-          <PaymentForm
-            workerProfile={workerProfile}
-            landlordProfile={landlordProfile}
-            onSaved={handleSaved}
-          />
-        );
       case 'business':
         return <BusinessForm landlordProfile={landlordProfile} onSaved={handleSaved} />;
       case 'organization':

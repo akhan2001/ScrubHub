@@ -17,14 +17,14 @@ export function SiteFooter() {
               <ScrubHubLogo variant="light" className="h-8 w-auto max-w-[180px] object-contain object-left" />
             </Link>
             <p className="mt-4 text-[14px] leading-[1.6] text-[#6B7585] m-0 max-w-[300px]">
-              Furnished housing, clinical suites and locum staffing along Ontario&rsquo;s 401 healthcare corridor.
+              Furnished housing, clinical suites and locum staffing along Ontario, Canada.
             </p>
           </div>
 
           {[
-            ['Stay',    [['Browse listings', '/facility-map'], ['Med-Map™', '/facility-map'], ['How it works', '/']]],
-            ['Staff',   [['Open roles', '/staffing'], ['For new grads', '/staffing'], ['Locum board', '/staffing']]],
-            ['Company', [['Pricing', '/plans'], ['Sign in', getAppLoginUrl()], ['Privacy', '/privacy'], ['Terms', '/terms']]],
+            ['Stay',    [['Browse listings', '/facility-map']]],
+            ['Staff',   [['Open roles', '/staffing']]],
+            ['Company', [['Pricing', '/plans'], ['Privacy', '/privacy'], ['Terms', '/terms']]],
           ].map(([h, items]) => (
             <div key={h as string}>
               <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#6B7585] mb-4 font-medium">{h as string}</div>
@@ -42,7 +42,7 @@ export function SiteFooter() {
         </div>
 
         <div className="pt-6 border-t border-[#E5DFD2] flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[#6B7585]">
-          <p className="m-0">© {new Date().getFullYear()} SCRUBHUB INC. · Toronto, ON · PIPEDA-compliant</p>
+          <p className="m-0">© {new Date().getFullYear()} SCRUBHUB INC. · Ontario, Canada</p>
           <div className="flex flex-wrap gap-5">
             <Link href="/privacy" className="hover:text-[#0E1A2B] transition-colors">Privacy</Link>
             <Link href="/terms"   className="hover:text-[#0E1A2B] transition-colors">Terms</Link>
