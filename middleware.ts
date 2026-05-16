@@ -91,32 +91,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isWww) {
-    // Only dashboard paths get sent to the app subdomain. /listings and
-    // /listings/[id] and /listings/[id]/apply all live in (marketing) and
-    // should resolve naturally on www so tenants can browse + apply
-    // without leaving the marketing surface.
-    if (isDashboardPath) {
-      const target = new URL(APP_URL);
-      target.pathname = pathname;
-
-      request.nextUrl.searchParams.forEach((v, k) => {
-        if (k !== 'host') target.searchParams.set(k, v);
-      });
-
-      // Same origin (typical local dev): add ?host=app once; avoid redirect loop when already ?host=app
-      if (target.host === request.nextUrl.host) {
-        target.searchParams.set('host', 'app');
-        if (request.nextUrl.searchParams.get('host') === 'app') {
-          return response;
-        }
-      } else if (!process.env.NEXT_PUBLIC_APP_URL) {
-        target.searchParams.set('host', 'app');
-      }
-
-      return withSupabaseCookies(response, NextResponse.redirect(target));
+    // Everything lives on www now — listings, applications, AND the
+    // tracking dashboard. The only thing the middleware enforces here is
+    // that protected /dashboard routes require a signed-in user.
+    if (isDashboardPath && !user) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectTo', pathname);
+      return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
     }
 
-    // Allow all other routes to resolve naturally
     return response;
   }
 

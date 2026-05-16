@@ -6,8 +6,7 @@ import { getAppUrl } from '@/lib/app-url';
 /**
  * OAuth callback handler. Supabase redirects here after Google sign-in.
  * Add these to Supabase Dashboard → Auth → URL Configuration → Redirect URLs:
- *   - https://app.scrubhub.ca/auth/callback
- *   - https://www.scrubhub.ca/auth/callback (if login from www)
+ *   - https://www.scrubhub.ca/auth/callback
  *   - http://localhost:3000/auth/callback (dev)
  */
 export async function GET(request: NextRequest) {

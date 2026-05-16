@@ -3,7 +3,12 @@ import { getProfile } from '@/server/services/profiles.service';
 import { fetchListingById } from '@/server/repositories/listings.repository';
 import { insertEmailNotificationLog } from '@/server/repositories/notification-logs.repository';
 
-const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.scrubhub.ca';
+// Tenant-facing flow lives on www. Prefer NEXT_PUBLIC_WWW_URL; fall back to
+// the marketing site constant. Dashboard tracking lives at www/dashboard/*.
+const APP_BASE_URL =
+  process.env.NEXT_PUBLIC_WWW_URL ??
+  process.env.NEXT_PUBLIC_APP_URL ??
+  'https://www.scrubhub.ca';
 
 function escapeHtml(value: string): string {
   return value
