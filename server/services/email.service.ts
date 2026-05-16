@@ -3,12 +3,15 @@ import { getProfile } from '@/server/services/profiles.service';
 import { fetchListingById } from '@/server/repositories/listings.repository';
 import { insertEmailNotificationLog } from '@/server/repositories/notification-logs.repository';
 
-// Tenant-facing flow lives on www. Prefer NEXT_PUBLIC_WWW_URL; fall back to
-// the marketing site constant. Dashboard tracking lives at www/dashboard/*.
+// Tenant-facing flow lives on www in production. In dev we keep links on
+// http://localhost:3000 so testing the email flow doesn't bounce you to
+// the live site mid-loop.
 const APP_BASE_URL =
-  process.env.NEXT_PUBLIC_WWW_URL ??
-  process.env.NEXT_PUBLIC_APP_URL ??
-  'https://www.scrubhub.ca';
+  process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_WWW_URL ??
+      process.env.NEXT_PUBLIC_APP_URL ??
+      'https://www.scrubhub.ca'
+    : 'http://localhost:3000';
 
 function escapeHtml(value: string): string {
   return value

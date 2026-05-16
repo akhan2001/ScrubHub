@@ -1,19 +1,23 @@
 /**
  * Base URL for the canonical site. Everything lives on www now — marketing,
- * listings, applications, AND the tracking dashboard. Prefer NEXT_PUBLIC_WWW_URL;
- * fall back to NEXT_PUBLIC_APP_URL for legacy envs; otherwise return '' so
- * helpers produce relative paths that work in dev.
+ * listings, applications, AND the tracking dashboard.
+ *
+ * In dev (NODE_ENV !== 'production') we always return '' so helpers produce
+ * relative paths and links stay on http://localhost:3000 even if the user
+ * has NEXT_PUBLIC_WWW_URL set in .env.local for some other purpose. In prod
+ * we prefer NEXT_PUBLIC_WWW_URL with NEXT_PUBLIC_APP_URL as a legacy fallback.
  */
 export function getAppUrl(): string {
+  if (process.env.NODE_ENV !== 'production') return '';
   return process.env.NEXT_PUBLIC_WWW_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? '';
 }
 
 /**
- * Base URL for the www subdomain (www.scrubhub.ca).
- * In production: set NEXT_PUBLIC_WWW_URL=https://www.scrubhub.ca
- * In dev: unset; uses same origin with ?host=www for subdomain simulation.
+ * Base URL for the www subdomain. Dev returns '' for the same reason as
+ * getAppUrl. In prod, reads NEXT_PUBLIC_WWW_URL.
  */
 export function getWwwUrl(): string {
+  if (process.env.NODE_ENV !== 'production') return '';
   return process.env.NEXT_PUBLIC_WWW_URL ?? '';
 }
 
