@@ -38,25 +38,22 @@ export function FacilityMapFilterRail({
   const [activeQuick, setActiveQuick] = useState<Set<string>>(() => new Set());
 
   const toggleQuick = (label: string) => {
-    setActiveQuick((prev) => {
-      const next = new Set(prev);
-      if (next.has(label)) next.delete(label);
-      else next.add(label);
+    const next = new Set(activeQuick);
+    if (next.has(label)) next.delete(label);
+    else next.add(label);
 
-      // Build and emit filter state
-      if (onFiltersChange) {
-        const filters: FilterState = {};
-        if (next.has("$2k–3k")) {
-          filters.minPrice = 2000;
-          filters.maxPrice = 3000;
-        }
-        if (next.has("Furnished")) filters.isFurnished = true;
-        if (next.has("Pet OK")) filters.arePetsAllowed = true;
-        onFiltersChange(filters);
+    setActiveQuick(next);
+
+    if (onFiltersChange) {
+      const filters: FilterState = {};
+      if (next.has("$2k–3k")) {
+        filters.minPrice = 2000;
+        filters.maxPrice = 3000;
       }
-
-      return next;
-    });
+      if (next.has("Furnished")) filters.isFurnished = true;
+      if (next.has("Pet OK")) filters.arePetsAllowed = true;
+      onFiltersChange(filters);
+    }
   };
 
   return (

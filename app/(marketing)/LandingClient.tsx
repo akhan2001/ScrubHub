@@ -103,7 +103,7 @@ function HeroSearch() {
             style={{ aspectRatio: "21/9", minHeight: 420, maxHeight: 560 }}
           >
             <img
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2200&q=85"
+              src="https://images.unsplash.com/photo-1605276373954-0c4a0dac5b12?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               onError={(e) => {
@@ -112,28 +112,6 @@ function HeroSearch() {
             />
 
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/55 pointer-events-none" />
-
-            <div
-              className="absolute top-6 left-7 text-white"
-              style={{ mixBlendMode: "difference" }}
-            >
-              <span className="font-mono text-[11px] tracking-[0.16em] uppercase opacity-85">
-                Fig. 01 — Maple Walk, Cabbagetown
-              </span>
-            </div>
-
-            <div className="absolute bottom-7 left-7 text-white">
-              <p
-                className="m-0 italic max-w-[520px] leading-[1.25] text-2xl"
-                style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
-              >
-                “Walked to my first shift in seven minutes.”
-              </p>
-
-              <p className="font-mono text-[11px] tracking-[0.16em] uppercase mt-2.5 opacity-85">
-                Priya N. — RN, Locum, 12-week placement
-              </p>
-            </div>
           </div>
 
           {/* Search bar — overlaps photo */}
