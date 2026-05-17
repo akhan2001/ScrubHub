@@ -1,18 +1,23 @@
 /**
- * Base URL for the app subdomain (app.scrubhub.ca).
- * In production: set NEXT_PUBLIC_APP_URL=https://app.scrubhub.ca
- * In dev: unset; uses same origin with ?host=app for subdomain simulation.
+ * Base URL for the canonical site. Everything lives on www now — marketing,
+ * listings, applications, AND the tracking dashboard.
+ *
+ * In dev (NODE_ENV !== 'production') we always return '' so helpers produce
+ * relative paths and links stay on http://localhost:3000 even if the user
+ * has NEXT_PUBLIC_WWW_URL set in .env.local for some other purpose. In prod
+ * we prefer NEXT_PUBLIC_WWW_URL with NEXT_PUBLIC_APP_URL as a legacy fallback.
  */
 export function getAppUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL ?? '';
+  if (process.env.NODE_ENV !== 'production') return '';
+  return process.env.NEXT_PUBLIC_WWW_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? '';
 }
 
 /**
- * Base URL for the www subdomain (www.scrubhub.ca).
- * In production: set NEXT_PUBLIC_WWW_URL=https://www.scrubhub.ca
- * In dev: unset; uses same origin with ?host=www for subdomain simulation.
+ * Base URL for the www subdomain. Dev returns '' for the same reason as
+ * getAppUrl. In prod, reads NEXT_PUBLIC_WWW_URL.
  */
 export function getWwwUrl(): string {
+  if (process.env.NODE_ENV !== 'production') return '';
   return process.env.NEXT_PUBLIC_WWW_URL ?? '';
 }
 
@@ -30,26 +35,23 @@ export function getWwwSignupUrl(): string {
 
 export function getAppLoginUrl(): string {
   const base = getAppUrl();
-  if (base) return `${base}/login`;
-  return '/login?host=app';
+  return base ? `${base}/login` : '/login';
 }
 
 export function getAppSignupUrl(): string {
   const base = getAppUrl();
-  if (base) return `${base}/signup`;
-  return '/signup?host=app';
+  return base ? `${base}/signup` : '/signup';
 }
 
 export function getAppDashboardUrl(): string {
   const base = getAppUrl();
-  if (base) return `${base}/dashboard`;
-  return '/dashboard?host=app';
+  return base ? `${base}/dashboard` : '/dashboard';
 }
 
 /**
  * Full URL for the OAuth callback. Used as redirectTo for signInWithOAuth.
- * Uses app domain in production so the session is established on app.scrubhub.ca
- * (where the dashboard lives). On localhost, uses current origin.
+ * Resolves to www.scrubhub.ca/auth/callback in prod (everything lives on www now).
+ * On localhost, uses current origin.
  * Must be in Supabase Dashboard → Auth → URL Configuration → Redirect URLs.
  */
 export function getAppAuthCallbackUrl(): string {
@@ -66,20 +68,17 @@ export function getAppAuthCallbackUrl(): string {
 
 export function getAppListingsUrl(): string {
   const base = getAppUrl();
-  if (base) return `${base}/facility-map`;
-  return '/facility-map';
+  return base ? `${base}/listings` : '/listings';
 }
 
 export function getAppListingUrl(id: string): string {
   const base = getAppUrl();
-  if (base) return `${base}/facility-map?listing=${id}`;
-  return `/facility-map?listing=${id}`;
+  return base ? `${base}/listings/${id}` : `/listings/${id}`;
 }
 
 export function getAppJobUrl(id: string): string {
   const base = getAppUrl();
-  if (base) return `${base}/jobs/${id}`;
-  return `/jobs/${id}?host=app`;
+  return base ? `${base}/jobs/${id}` : `/jobs/${id}`;
 }
 
 export function getStaffingJobUrl(id: string): string {

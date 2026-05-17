@@ -112,9 +112,8 @@ export function computeTenantSections(profile: Profile, wp: WorkerProfile | null
   const credentialsComplete = !!(wp?.healthcare_role && wp?.license_number && wp?.license_state);
   const housingComplete = !!(wp?.move_in_date && wp?.budget_min != null && wp?.budget_max != null);
   const identityComplete = !!(wp?.id_document_url && wp?.background_check_consent);
-  const paymentComplete = !!wp?.payment_method_last4;
 
-  const statuses: boolean[] = [personalComplete, credentialsComplete, housingComplete, identityComplete, paymentComplete];
+  const statuses: boolean[] = [personalComplete, credentialsComplete, housingComplete, identityComplete];
 
   function getStatus(index: number): 'completed' | 'incomplete' {
     return statuses[index] ? 'completed' : 'incomplete';
@@ -163,24 +162,12 @@ export function computeTenantSections(profile: Profile, wp: WorkerProfile | null
     {
       id: 'identity',
       label: 'Identity Verification',
-      weight: 25,
+      weight: 35,
       status: getStatus(3),
       fields: [
         { label: 'Government ID', value: wp?.id_document_url ? 'Uploaded' : null },
         { label: 'SSN (last 4)', value: wp?.ssn_last_4 ? `••••${wp.ssn_last_4}` : null },
         { label: 'Background Check', value: wp?.background_check_consent ? 'Consented' : null },
-      ],
-    },
-    {
-      id: 'payment',
-      label: 'Payment Method',
-      weight: 10,
-      status: getStatus(4),
-      fields: [
-        {
-          label: 'Payment Method',
-          value: wp?.payment_method_last4 ? `Card ending in ${wp.payment_method_last4}` : null,
-        },
       ],
     },
   ];
@@ -194,9 +181,8 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
   const personalComplete = !!(profile.full_name && profile.phone_number && profile.date_of_birth);
   const businessComplete = !!(lp?.entity_type && lp?.business_name);
   const identityComplete = !!(lp?.identity_document_url);
-  const payoutComplete = !!lp?.payout_method_last4;
 
-  const statuses: boolean[] = [personalComplete, businessComplete, identityComplete, payoutComplete];
+  const statuses: boolean[] = [personalComplete, businessComplete, identityComplete];
 
   function getStatus(index: number): 'completed' | 'incomplete' {
     return statuses[index] ? 'completed' : 'incomplete';
@@ -206,7 +192,7 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
     {
       id: 'personal',
       label: 'Personal Info',
-      weight: 25,
+      weight: 30,
       status: getStatus(0),
       fields: [
         { label: 'Full Name', value: profile.full_name },
@@ -217,7 +203,7 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
     {
       id: 'business',
       label: 'Business Details',
-      weight: 30,
+      weight: 35,
       status: getStatus(1),
       fields: [
         { label: 'Entity Type', value: lp?.entity_type ?? null },
@@ -229,22 +215,10 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
     {
       id: 'identity',
       label: 'Identity Verification',
-      weight: 30,
+      weight: 35,
       status: getStatus(2),
       fields: [
         { label: 'Identity Document', value: lp?.identity_document_url ? 'Uploaded' : null },
-      ],
-    },
-    {
-      id: 'payment',
-      label: 'Payout Method',
-      weight: 15,
-      status: getStatus(3),
-      fields: [
-        {
-          label: 'Payout Method',
-          value: lp?.payout_method_last4 ? `Card ending in ${lp.payout_method_last4}` : null,
-        },
       ],
     },
   ];
@@ -257,9 +231,8 @@ export function computeLandlordSections(profile: Profile, lp: LandlordProfile | 
 export function computeEnterpriseSections(profile: Profile, org: Organization | null) {
   const adminComplete = !!(profile.full_name && profile.phone_number);
   const orgComplete = !!(org?.name);
-  const billingComplete = true; // Billing is optional / handled separately; show as complete
 
-  const statuses: boolean[] = [adminComplete, orgComplete, billingComplete];
+  const statuses: boolean[] = [adminComplete, orgComplete];
 
   function getStatus(index: number): 'completed' | 'incomplete' {
     return statuses[index] ? 'completed' : 'incomplete';
@@ -269,7 +242,7 @@ export function computeEnterpriseSections(profile: Profile, org: Organization | 
     {
       id: 'personal',
       label: 'Admin Profile',
-      weight: 35,
+      weight: 40,
       status: getStatus(0),
       fields: [
         { label: 'Full Name', value: profile.full_name },
@@ -280,21 +253,12 @@ export function computeEnterpriseSections(profile: Profile, org: Organization | 
     {
       id: 'organization',
       label: 'Organization Info',
-      weight: 40,
+      weight: 60,
       status: getStatus(1),
       fields: [
         { label: 'Organization', value: org?.name ?? null },
         { label: 'Domain', value: org?.domain ?? null },
         { label: 'Status', value: org?.verification_state ?? null },
-      ],
-    },
-    {
-      id: 'payment',
-      label: 'Billing',
-      weight: 25,
-      status: getStatus(2),
-      fields: [
-        { label: 'Billing Method', value: 'Default plan' },
       ],
     },
   ];

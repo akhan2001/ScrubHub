@@ -100,7 +100,7 @@ export default async function ListingsPage() {
         {/* Featured spread: hero + 2 side cards */}
         {hero && (
           <div className="grid lg:grid-cols-[1.5fr_1fr] gap-6 mb-12">
-            <Link href={`/facility-map?listing=${hero.id}`} className="relative block rounded-3xl overflow-hidden bg-gradient-to-br from-[#0E1A2B] to-[#1a2a3f]" style={{ aspectRatio: '5/4', minHeight: 480 }}>
+            <Link href={`/listings/${hero.id}`} className="relative block rounded-3xl overflow-hidden bg-gradient-to-br from-[#0E1A2B] to-[#1a2a3f]" style={{ aspectRatio: '5/4', minHeight: 480 }}>
               {hero.images?.[0] && (
                 <img src={hero.images[0]} alt="" className="absolute inset-0 w-full h-full object-cover" />
               )}
@@ -121,7 +121,7 @@ export default async function ListingsPage() {
 
             <div className="grid grid-rows-2 gap-6">
               {sides.map((s) => (
-                <Link key={s.id} href={`/facility-map?listing=${s.id}`} className="relative block rounded-2xl overflow-hidden" style={{ background: 'repeating-linear-gradient(135deg,#F0EBDF 0 12px,#EFE9DD 12px 24px)' }}>
+                <Link key={s.id} href={`/listings/${s.id}`} className="relative block rounded-2xl overflow-hidden" style={{ background: 'repeating-linear-gradient(135deg,#F0EBDF 0 12px,#EFE9DD 12px 24px)' }}>
                   <span className="absolute top-4 left-4 bg-white text-[#0E1A2B] font-mono text-[9px] tracking-[0.14em] uppercase font-semibold px-2.5 py-1 rounded">Verified</span>
                   <div className="absolute left-5 right-5 bottom-5 flex justify-between items-end gap-3">
                     <div>
@@ -150,7 +150,7 @@ export default async function ListingsPage() {
             return (
               <Link
                 key={s.id}
-                href={`/facility-map?listing=${s.id}`}
+                href={`/listings/${s.id}`}
                 className={`group flex flex-col gap-3.5 ${wide ? 'lg:col-span-2' : ''}`}
               >
                 <div className={`relative rounded-[18px] overflow-hidden bg-[#EFE9DD] transition group-hover:-translate-y-1 ${wide ? 'aspect-[8/5]' : 'aspect-[4/5]'}`}>

@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ApplicationForm } from '@/components/listings/application-form';
 
 export interface ProfileCompleteness {
-  hasPaymentMethod: boolean;
+  /** Reserved for future payment-method requirement; kept for callers that still pass it. */
+  hasPaymentMethod?: boolean;
   hasBackgroundConsent: boolean;
   hasIdDocument: boolean;
 }
@@ -17,42 +16,27 @@ interface ApplyButtonProps {
   completeness: ProfileCompleteness;
 }
 
+/**
+ * Apply CTA shown on a listing card / facility-map detail. The actual form lives at
+ * /listings/[listingId]/apply (marketing) — this is just the entry point + profile-readiness hint.
+ */
 export function ApplyButton({ listingId, completeness }: ApplyButtonProps) {
-  const [showForm, setShowForm] = useState(false);
-
-  const missingItems: { label: string; met: boolean }[] = [
-    { label: 'Payment method', met: completeness.hasPaymentMethod },
+  const missingItems = [
     { label: 'Background check consent', met: completeness.hasBackgroundConsent },
     { label: 'ID verification', met: completeness.hasIdDocument },
   ];
-
   const allMet = missingItems.every((i) => i.met);
-
-  if (showForm && allMet) {
-    return (
-      <ApplicationForm
-        listingId={listingId}
-        onCancel={() => setShowForm(false)}
-        onSuccess={() => setShowForm(false)}
-      />
-    );
-  }
 
   return (
     <div className="space-y-3">
-      <Button
-        onClick={() => allMet && setShowForm(true)}
-        disabled={!allMet}
-        className="w-full"
-        size="lg"
-      >
-        Apply for this listing
+      <Button asChild className="w-full" size="lg">
+        <Link href={`/listings/${listingId}/apply`}>Apply for this listing</Link>
       </Button>
 
       {!allMet && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+        <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-sm font-medium text-amber-800">
-            Complete your profile to apply
+            You can start the application — finish these on the next page or in your profile:
           </p>
           <ul className="space-y-1">
             {missingItems.map((item) => (
@@ -63,7 +47,7 @@ export function ApplyButton({ listingId, completeness }: ApplyButtonProps) {
                   <AlertTriangle className="size-3.5 text-amber-600" />
                 )}
                 <span className={item.met ? 'text-green-800' : 'text-amber-800'}>
-                  {item.met ? item.label : `Add ${item.label.toLowerCase()} to apply`}
+                  {item.met ? item.label : `Add ${item.label.toLowerCase()}`}
                 </span>
               </li>
             ))}
@@ -72,7 +56,7 @@ export function ApplyButton({ listingId, completeness }: ApplyButtonProps) {
             href="/dashboard/profile"
             className="inline-block text-xs font-medium text-primary hover:underline"
           >
-            Go to Profile
+            Go to profile
           </Link>
         </div>
       )}

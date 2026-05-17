@@ -14,9 +14,9 @@ import { cn } from '@/lib/utils';
 import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 const NAV_LINKS = [
-  { href: '/facility-map', label: 'Stays' },
-  { href: '/staffing',     label: 'Staffing' },
-  { href: '/plans',        label: 'Pricing' },
+  { href: '/facility-map', label: 'Listings' },
+  // { href: '/staffing',     label: 'Staffing' },
+  // { href: '/plans',        label: 'Pricing' },
 ] as const;
 
 type NavLabel = (typeof NAV_LINKS)[number]['label'];
@@ -30,7 +30,7 @@ function getActiveLabel(pathname: string): NavLabel | undefined {
   for (const { href, label } of NAV_LINKS) {
     if (isActivePath(pathname, href)) return label;
   }
-  if (pathname.startsWith('/jobs')) return 'Staffing';
+  if (pathname.startsWith('/facility-map')) return 'Listings';
   return undefined;
 }
 

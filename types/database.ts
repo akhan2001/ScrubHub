@@ -76,6 +76,8 @@ export interface WorkerProfile {
   ssn_last_4: string | null;
   /** Last four digits of the saved card (hint only; no full PAN stored). */
   payment_method_last4: string | null;
+  /** Storage path in the private `pay-stubs` bucket. Most recent upload only. */
+  pay_stub_url: string | null;
   created_at: string;
   updated_at: string;
 }

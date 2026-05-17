@@ -23,7 +23,6 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { NotificationsPanel } from '@/components/dashboard/notifications-panel';
 import { IconButton } from '@/components/ui/icon-button';
-import { ScrubHubLogo } from '@/components/brand/scrubhub-logo';
 
 const ROLE_LABELS: Record<AppRole, string> = {
   tenant: 'Tenant',
@@ -84,26 +83,21 @@ export function DashboardHeader({
             <DashboardSidebar role={role} />
           </SheetContent>
         </Sheet>
-        <div className="flex items-center gap-2.5">
-          <div className="shrink-0" aria-hidden>
-            <ScrubHubLogo variant="light" className="h-8 w-auto max-w-[140px] object-contain object-left" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              {ROLE_SHORT[role]} Workspace
-            </p>
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="capitalize">{pageTitle}</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <span className="text-muted-foreground">Dashboard</span>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            {ROLE_SHORT[role]} Workspace
+          </p>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="capitalize">{pageTitle}</BreadcrumbPage>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <span className="text-muted-foreground">Dashboard</span>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </div>
       <div className="flex items-center gap-2">

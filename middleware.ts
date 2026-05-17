@@ -67,7 +67,6 @@ export async function middleware(request: NextRequest) {
     pathname === '/auth/callback';
 
   const isDashboardPath = pathname.startsWith('/dashboard');
-  const isListingsPath = pathname.startsWith('/listings');
 
   if (isApp) {
     // Redirect root to dashboard
@@ -92,37 +91,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isWww) {
-    // Redirect app-specific paths to App domain
-    if (isDashboardPath || isListingsPath) {
-      const target = new URL(APP_URL);
-      if (pathname === '/listings') {
-        target.pathname = '/facility-map';
-      } else if (pathname.startsWith('/listings/')) {
-        const id = pathname.replace(/^\/listings\//, '').replace(/\/$/, '');
-        target.pathname = '/facility-map';
-        target.searchParams.set('listing', id);
-      } else {
-        target.pathname = pathname;
-      }
-
-      request.nextUrl.searchParams.forEach((v, k) => {
-        if (k !== 'host') target.searchParams.set(k, v);
-      });
-
-      // Same origin (typical local dev): add ?host=app once; avoid redirect loop when already ?host=app
-      if (target.host === request.nextUrl.host) {
-        target.searchParams.set('host', 'app');
-        if (request.nextUrl.searchParams.get('host') === 'app') {
-          return response;
-        }
-      } else if (!process.env.NEXT_PUBLIC_APP_URL) {
-        target.searchParams.set('host', 'app');
-      }
-
-      return withSupabaseCookies(response, NextResponse.redirect(target));
+    // Everything lives on www now — listings, applications, AND the
+    // tracking dashboard. The only thing the middleware enforces here is
+    // that protected /dashboard routes require a signed-in user.
+    if (isDashboardPath && !user) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectTo', pathname);
+      return withSupabaseCookies(response, NextResponse.redirect(loginUrl));
     }
 
-    // Allow all other routes to resolve naturally
     return response;
   }
 
