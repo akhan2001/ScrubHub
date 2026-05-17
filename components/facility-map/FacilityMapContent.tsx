@@ -1,20 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import type { Facility } from '@/lib/map/facilities';
-import { FACILITIES } from '@/lib/map/facilities';
-import type { ListingWithCoordinates } from '@/lib/map/mock-coordinates';
-import { useFacilityMap } from '@/hooks/use-facility-map';
-import { FacilitySearch } from '@/components/facility-map/FacilitySearch';
-import { FacilityMapFilterRail } from '@/components/facility-map/FacilityMapFilterRail';
-import { FacilityMapLegend } from '@/components/facility-map/FacilityMapLegend';
-import { FacilityMapListPane } from '@/components/facility-map/FacilityMapListPane';
-import { FacilityMapMarketingHeader } from '@/components/facility-map/FacilityMapMarketingHeader';
-import { ListingDetailPanel } from '@/components/facility-map/ListingDetailPanel';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { getTenantApplicationContext } from '@/actions/tenant-application';
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import type { Facility } from "@/lib/map/facilities";
+import { FACILITIES } from "@/lib/map/facilities";
+import type { ListingWithCoordinates } from "@/lib/map/mock-coordinates";
+import { useFacilityMap } from "@/hooks/use-facility-map";
+import { FacilitySearch } from "@/components/facility-map/FacilitySearch";
+import {
+  FacilityMapFilterRail,
+  type FilterState,
+} from "@/components/facility-map/FacilityMapFilterRail";
+import { FacilityMapLegend } from "@/components/facility-map/FacilityMapLegend";
+import { FacilityMapListPane } from "@/components/facility-map/FacilityMapListPane";
+import { FacilityMapMarketingHeader } from "@/components/facility-map/FacilityMapMarketingHeader";
+import { ListingDetailPanel } from "@/components/facility-map/ListingDetailPanel";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { getTenantApplicationContext } from "@/actions/tenant-application";
 
 /** 401 corridor bounds: Southern Ontario */
 const INITIAL_BOUNDS = {
@@ -31,14 +34,18 @@ declare global {
 }
 
 type FacilityMapContentProps = {
-  variant?: 'marketing' | 'dashboard';
+  variant?: "marketing" | "dashboard";
 };
 
-export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContentProps) {
+export function FacilityMapContent({
+  variant = "marketing",
+}: FacilityMapContentProps) {
   const mapElRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const [listings, setListings] = useState<ListingWithCoordinates[]>([]);
-  const [selectedListing, setSelectedListing] = useState<ListingWithCoordinates | null>(null);
+  const [selectedListing, setSelectedListing] =
+    useState<ListingWithCoordinates | null>(null);
+  const [filters, setFilters] = useState<FilterState>({});
   const [appContext, setAppContext] = useState<
     Awaited<ReturnType<typeof getTenantApplicationContext>> | undefined
   >(undefined);
@@ -54,21 +61,30 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
       east: String(INITIAL_BOUNDS.east),
       west: String(INITIAL_BOUNDS.west),
     });
+    if (filters.minPrice != null)
+      params.set("minPrice", String(filters.minPrice));
+    if (filters.maxPrice != null)
+      params.set("maxPrice", String(filters.maxPrice));
+    if (filters.isFurnished) params.set("isFurnished", "true");
+    if (filters.arePetsAllowed) params.set("arePetsAllowed", "true");
+
     fetch(`/api/listings/map?${params.toString()}`)
       .then((res) => (res.ok ? res.json() : { listings: [] }))
       .then((data) => {
-        const list = (data.listings ?? []).map((l: Record<string, unknown>) => ({
-          ...l,
-          latitude: l.latitude as number,
-          longitude: l.longitude as number,
-        }));
+        const list = (data.listings ?? []).map(
+          (l: Record<string, unknown>) => ({
+            ...l,
+            latitude: l.latitude as number,
+            longitude: l.longitude as number,
+          }),
+        );
         setListings(list);
       })
       .catch(() => setListings([]));
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
-    const listingId = searchParams.get('listing');
+    const listingId = searchParams.get("listing");
     if (listingId && listings.length > 0) {
       const match = listings.find((l) => l.id === listingId);
       if (match) setSelectedListing(match);
@@ -88,7 +104,7 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
   const { mapRef, markersByFacilityIdRef, mapReady } = useFacilityMap(
     mapElRef,
     FACILITIES,
-    listings
+    listings,
   );
 
   const handleSearchSelect = (facility: Facility) => {
@@ -101,7 +117,7 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
     setSelectedListing(listing);
   };
 
-  const isDashboard = variant === 'dashboard';
+  const isDashboard = variant === "dashboard";
 
   return (
     <div className="flex flex-1 flex-col">
@@ -119,7 +135,10 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
                     Dashboard
                   </Link>
                 </li>
-                <li aria-hidden className="select-none text-muted-foreground/80">
+                <li
+                  aria-hidden
+                  className="select-none text-muted-foreground/80"
+                >
                   &gt;
                 </li>
                 <li>
@@ -133,8 +152,8 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
                   Listings
                 </h1>
                 <p className="max-w-3xl text-base text-muted-foreground md:text-lg">
-                  {FACILITIES.length}+ hospitals, clinics, and healthcare facilities. Click any pin to
-                  view details and book a space.
+                  {FACILITIES.length}+ hospitals, clinics, and healthcare
+                  facilities. Click any pin to view details and book a space.
                 </p>
               </div>
               <div className="w-full shrink-0 md:w-80">
@@ -165,16 +184,23 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
       )}
 
       {/* Sticky filter rail (marketing only) */}
-      {!isDashboard && <FacilityMapFilterRail activeView="map" />}
+      {!isDashboard && (
+        <FacilityMapFilterRail activeView="map" onFiltersChange={setFilters} />
+      )}
 
       {/* Split: list (left) ↔ map (right) */}
       {isDashboard ? (
         <div className="relative z-0 flex min-h-[600px] flex-1 overflow-hidden">
-          <div ref={mapElRef} className="absolute inset-0 h-full w-full bg-muted/30" />
+          <div
+            ref={mapElRef}
+            className="absolute inset-0 h-full w-full bg-muted/30"
+          />
           {!mapReady && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/50">
               <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-sm font-medium text-muted-foreground">Loading map...</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                Loading map...
+              </p>
             </div>
           )}
           <FacilityMapLegend />
@@ -192,11 +218,16 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
 
           {/* Map pane (right) */}
           <div className="relative min-h-[60vh] lg:sticky lg:top-[calc(72px+58px)] lg:h-[calc(100vh-72px-58px)] lg:min-h-0">
-            <div ref={mapElRef} className="absolute inset-0 h-full w-full bg-muted/30" />
+            <div
+              ref={mapElRef}
+              className="absolute inset-0 h-full w-full bg-muted/30"
+            />
             {!mapReady && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/50">
                 <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                <p className="text-sm font-medium text-muted-foreground">Loading map...</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Loading map...
+                </p>
               </div>
             )}
             <FacilityMapLegend />
@@ -219,8 +250,10 @@ export function FacilityMapContent({ variant = 'marketing' }: FacilityMapContent
               listing={selectedListing}
               onClose={() => setSelectedListing(null)}
               variant="sheet"
-              showApplyFlow={appContext?.role === 'tenant'}
-              redirectPath={isDashboard ? '/dashboard/facility-map' : '/facility-map'}
+              showApplyFlow={appContext?.role === "tenant"}
+              redirectPath={
+                isDashboard ? "/dashboard/facility-map" : "/facility-map"
+              }
             />
           )}
         </SheetContent>

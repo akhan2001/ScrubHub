@@ -1,36 +1,40 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { LayoutGrid, Map as MapIcon } from 'lucide-react';
+import Link from "next/link";
+import { useState } from "react";
+import { LayoutGrid, Map as MapIcon } from "lucide-react";
 
 type HospitalChip = { label: string; count: number | null };
 
 const HOSPITAL_CHIPS: HospitalChip[] = [
-  { label: 'All hospitals', count: null },
-  { label: 'Toronto General', count: 42 },
-  { label: 'Mt Sinai', count: 28 },
-  { label: 'Trillium Health', count: 19 },
-  { label: 'Sunnybrook', count: 23 },
+  { label: "All hospitals", count: null },
+  { label: "Toronto General", count: 42 },
+  { label: "Mt Sinai", count: 28 },
+  { label: "Trillium Health", count: 19 },
+  { label: "Sunnybrook", count: 23 },
 ];
 
-const QUICK_FILTERS = ['≤ 10 min walk', '$2k–3k', 'Furnished', 'Pet OK'] as const;
+export type FilterState = {
+  minPrice?: number;
+  maxPrice?: number;
+  isFurnished?: boolean;
+  arePetsAllowed?: boolean;
+};
 
 type FacilityMapFilterRailProps = {
-  /** Which view is active in the toggle. Defaults to 'map' on /facility-map. */
-  activeView?: 'grid' | 'map';
-  /** Where the Grid button links. */
+  activeView?: "grid" | "map";
   gridHref?: string;
-  /** Where the Map button links. */
   mapHref?: string;
+  onFiltersChange?: (filters: FilterState) => void;
 };
 
 export function FacilityMapFilterRail({
-  activeView = 'map',
-  gridHref = '/listings',
-  mapHref = '/facility-map',
+  activeView = "map",
+  gridHref = "/listings",
+  mapHref = "/facility-map",
+  onFiltersChange,
 }: FacilityMapFilterRailProps) {
-  const [activeChip, setActiveChip] = useState<string>('All hospitals');
+  const [activeChip, setActiveChip] = useState<string>("All hospitals");
   const [activeQuick, setActiveQuick] = useState<Set<string>>(() => new Set());
 
   const toggleQuick = (label: string) => {
@@ -38,6 +42,19 @@ export function FacilityMapFilterRail({
       const next = new Set(prev);
       if (next.has(label)) next.delete(label);
       else next.add(label);
+
+      // Build and emit filter state
+      if (onFiltersChange) {
+        const filters: FilterState = {};
+        if (next.has("$2k–3k")) {
+          filters.minPrice = 2000;
+          filters.maxPrice = 3000;
+        }
+        if (next.has("Furnished")) filters.isFurnished = true;
+        if (next.has("Pet OK")) filters.arePetsAllowed = true;
+        onFiltersChange(filters);
+      }
+
       return next;
     });
   };
@@ -54,15 +71,17 @@ export function FacilityMapFilterRail({
               onClick={() => setActiveChip(c.label)}
               className={`inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition ${
                 active
-                  ? 'border-[#0E1A2B] bg-[#0E1A2B] text-white'
-                  : 'border-[#E5DFD2] bg-transparent text-[#3A4759] hover:border-[#0E1A2B] hover:text-[#0E1A2B]'
+                  ? "border-[#0E1A2B] bg-[#0E1A2B] text-white"
+                  : "border-[#E5DFD2] bg-transparent text-[#3A4759] hover:border-[#0E1A2B] hover:text-[#0E1A2B]"
               }`}
             >
               {c.label}
               {c.count != null && (
                 <span
                   className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${
-                    active ? 'bg-white/20 text-white' : 'bg-[#EFE9DD] text-[#6B7585]'
+                    active
+                      ? "bg-white/20 text-white"
+                      : "bg-[#EFE9DD] text-[#6B7585]"
                   }`}
                 >
                   {c.count}
@@ -74,26 +93,28 @@ export function FacilityMapFilterRail({
 
         <span className="mx-1 h-5 w-px bg-[#E5DFD2]" />
 
-        {QUICK_FILTERS.map((label) => {
-          const active = activeQuick.has(label);
-          return (
-            <button
-              key={label}
-              type="button"
-              onClick={() => toggleQuick(label)}
-              className={`h-9 rounded-full border px-3.5 text-[13px] font-medium transition ${
-                active
-                  ? 'border-[#0E1A2B] bg-[#EFE9DD] text-[#0E1A2B]'
-                  : 'border-[#E5DFD2] text-[#3A4759] hover:border-[#0E1A2B] hover:text-[#0E1A2B]'
-              }`}
-            >
-              {label}
-            </button>
-          );
-        })}
+        {(["≤ 10 min walk", "$2k–3k", "Furnished", "Pet OK"] as const).map(
+          (label) => {
+            const active = activeQuick.has(label);
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => toggleQuick(label)}
+                className={`h-9 rounded-full border px-3.5 text-[13px] font-medium transition ${
+                  active
+                    ? "border-[#0E1A2B] bg-[#EFE9DD] text-[#0E1A2B]"
+                    : "border-[#E5DFD2] text-[#3A4759] hover:border-[#0E1A2B] hover:text-[#0E1A2B]"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          },
+        )}
 
         <div className="ml-auto inline-flex rounded-full bg-[#EFE9DD] p-[3px]">
-          {activeView === 'grid' ? (
+          {activeView === "grid" ? (
             <button
               type="button"
               className="inline-flex h-[30px] items-center gap-1.5 rounded-full bg-white px-3.5 text-[12px] font-semibold text-[#0E1A2B] shadow-sm"
@@ -108,7 +129,7 @@ export function FacilityMapFilterRail({
               <LayoutGrid className="size-3.5" /> Grid
             </Link>
           )}
-          {activeView === 'map' ? (
+          {activeView === "map" ? (
             <button
               type="button"
               className="inline-flex h-[30px] items-center gap-1.5 rounded-full bg-white px-3.5 text-[12px] font-semibold text-[#0E1A2B] shadow-sm"

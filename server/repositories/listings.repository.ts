@@ -1,17 +1,17 @@
-import { createClient } from '@/lib/supabase/server';
-import type { Listing, ListingStatus } from '@/types/database';
+import { createClient } from "@/lib/supabase/server";
+import type { Listing, ListingStatus } from "@/types/database";
 
 export type ListingRow = Listing;
 
 export async function fetchListingsByUser(
-  userId: string
-): Promise<Pick<Listing, 'id' | 'title' | 'status' | 'created_at'>[]> {
+  userId: string,
+): Promise<Pick<Listing, "id" | "title" | "status" | "created_at">[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('listings')
-    .select('id, title, status, created_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .from("listings")
+    .select("id, title, status, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
   return data ?? [];
@@ -20,9 +20,9 @@ export async function fetchListingsByUser(
 export async function countListingsByUser(userId: string): Promise<number> {
   const supabase = await createClient();
   const { count, error } = await supabase
-    .from('listings')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId);
+    .from("listings")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
 
   if (error) throw error;
   return count ?? 0;
@@ -31,45 +31,45 @@ export async function countListingsByUser(userId: string): Promise<number> {
 export async function fetchPublishedListings(): Promise<ListingRow[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('listings')
-    .select('*')
-    .eq('status', 'published')
-    .order('created_at', { ascending: false });
+    .from("listings")
+    .select("*")
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
   return data ?? [];
 }
 
 export async function fetchPublishedListingById(
-  id: string
+  id: string,
 ): Promise<ListingRow | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('listings')
-    .select('*')
-    .eq('id', id)
-    .eq('status', 'published')
+    .from("listings")
+    .select("*")
+    .eq("id", id)
+    .eq("status", "published")
     .single();
 
   if (error) {
-    if (error.code === 'PGRST116') return null;
+    if (error.code === "PGRST116") return null;
     throw error;
   }
   return data;
 }
 
 export async function fetchListingOwnerById(
-  id: string
-): Promise<Pick<Listing, 'id' | 'user_id' | 'status'> | null> {
+  id: string,
+): Promise<Pick<Listing, "id" | "user_id" | "status"> | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('listings')
-    .select('id, user_id, status')
-    .eq('id', id)
+    .from("listings")
+    .select("id, user_id, status")
+    .eq("id", id)
     .single();
 
   if (error) {
-    if (error.code === 'PGRST116') return null;
+    if (error.code === "PGRST116") return null;
     throw error;
   }
   return data;
@@ -99,13 +99,13 @@ export type InsertListingInput = {
 
 export async function insertListing(input: InsertListingInput): Promise<void> {
   const supabase = await createClient();
-  const { error } = await supabase.from('listings').insert({
+  const { error } = await supabase.from("listings").insert({
     user_id: input.user_id,
     title: input.title,
     description: input.description ?? null,
     address: input.address ?? null,
     price_cents: input.price_cents ?? null,
-    status: input.status ?? 'draft',
+    status: input.status ?? "draft",
     unit_number: input.unit_number ?? null,
     bedrooms: input.bedrooms ?? null,
     bathrooms: input.bathrooms ?? null,
@@ -127,14 +127,14 @@ export async function insertListing(input: InsertListingInput): Promise<void> {
 export async function updateListingById(
   listingId: string,
   userId: string,
-  fields: Partial<Omit<InsertListingInput, 'user_id'>>
+  fields: Partial<Omit<InsertListingInput, "user_id">>,
 ): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase
-    .from('listings')
+    .from("listings")
     .update(fields)
-    .eq('id', listingId)
-    .eq('user_id', userId);
+    .eq("id", listingId)
+    .eq("user_id", userId);
 
   if (error) throw error;
 }
@@ -153,37 +153,53 @@ export interface MapBoundsFilter {
 
 export type MapListingRow = Pick<
   Listing,
-  'id' | 'title' | 'description' | 'address' | 'price_cents' | 'status' | 'created_at' |
-  'latitude' | 'longitude' | 'bedrooms' | 'bathrooms' | 'square_footage' |
-  'is_furnished' | 'are_pets_allowed' | 'images' | 'lease_terms' | 'available_date'
+  | "id"
+  | "title"
+  | "description"
+  | "address"
+  | "price_cents"
+  | "status"
+  | "created_at"
+  | "latitude"
+  | "longitude"
+  | "bedrooms"
+  | "bathrooms"
+  | "square_footage"
+  | "is_furnished"
+  | "are_pets_allowed"
+  | "images"
+  | "lease_terms"
+  | "available_date"
 >;
 
 export async function fetchPublishedListingsInBounds(
-  filters: MapBoundsFilter
+  filters: MapBoundsFilter,
 ): Promise<MapListingRow[]> {
   const supabase = await createClient();
   let query = supabase
-    .from('listings')
-    .select('id, title, description, address, price_cents, status, created_at, latitude, longitude, bedrooms, bathrooms, square_footage, is_furnished, are_pets_allowed, images, lease_terms, available_date')
-    .eq('status', 'published')
-    .not('latitude', 'is', null)
-    .not('longitude', 'is', null)
-    .gte('latitude', filters.south)
-    .lte('latitude', filters.north)
-    .gte('longitude', filters.west)
-    .lte('longitude', filters.east);
+    .from("listings")
+    .select(
+      "id, title, description, address, price_cents, status, created_at, latitude, longitude, bedrooms, bathrooms, square_footage, is_furnished, are_pets_allowed, images, lease_terms, available_date",
+    )
+    .eq("status", "published")
+    .not("latitude", "is", null)
+    .not("longitude", "is", null)
+    .gte("latitude", filters.south)
+    .lte("latitude", filters.north)
+    .gte("longitude", filters.west)
+    .lte("longitude", filters.east);
 
   if (filters.minPrice != null) {
-    query = query.gte('price_cents', filters.minPrice * 100);
+    query = query.gte("price_cents", filters.minPrice * 100);
   }
   if (filters.maxPrice != null) {
-    query = query.lte('price_cents', filters.maxPrice * 100);
+    query = query.lte("price_cents", filters.maxPrice * 100);
   }
   if (filters.isFurnished != null) {
-    query = query.eq('is_furnished', filters.isFurnished);
+    query = query.eq("is_furnished", filters.isFurnished);
   }
   if (filters.arePetsAllowed != null) {
-    query = query.eq('are_pets_allowed', filters.arePetsAllowed);
+    query = query.eq("are_pets_allowed", filters.arePetsAllowed);
   }
 
   const { data, error } = await query.limit(200);
@@ -192,17 +208,17 @@ export async function fetchPublishedListingsInBounds(
 }
 
 export async function fetchListingById(
-  listingId: string
+  listingId: string,
 ): Promise<Listing | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('listings')
-    .select('*')
-    .eq('id', listingId)
+    .from("listings")
+    .select("*")
+    .eq("id", listingId)
     .single();
 
   if (error) {
-    if (error.code === 'PGRST116') return null;
+    if (error.code === "PGRST116") return null;
     throw error;
   }
   return data;
@@ -210,27 +226,42 @@ export async function fetchListingById(
 
 export async function deleteListingById(
   listingId: string,
-  userId: string
+  userId: string,
 ): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase
-    .from('listings')
+    .from("listings")
     .delete()
-    .eq('id', listingId)
-    .eq('user_id', userId);
+    .eq("id", listingId)
+    .eq("user_id", userId);
 
   if (error) throw error;
 }
 
 export async function fetchListingsByUserWithDetails(
-  userId: string
+  userId: string,
 ): Promise<Listing[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('listings')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .from("listings")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function fetchNewestPublishedListings(
+  limit = 6,
+): Promise<Listing[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("listings")
+    .select("*")
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(limit);
 
   if (error) throw error;
   return data ?? [];

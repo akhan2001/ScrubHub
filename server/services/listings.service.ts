@@ -10,9 +10,10 @@ import {
   deleteListingById,
   fetchPublishedListingsInBounds as fetchInBoundsRepo,
   fetchListingsByUserWithDetails,
+  fetchNewestPublishedListings,
   type InsertListingInput,
   type MapBoundsFilter,
-} from '@/server/repositories/listings.repository';
+} from "@/server/repositories/listings.repository";
 
 export async function getLandlordListings(userId: string) {
   return fetchListingsByUser(userId);
@@ -22,7 +23,9 @@ export async function getLandlordListingsWithDetails(userId: string) {
   return fetchListingsByUserWithDetails(userId);
 }
 
-export async function getLandlordListingsCount(userId: string): Promise<number> {
+export async function getLandlordListingsCount(
+  userId: string,
+): Promise<number> {
   return countListingsByUser(userId);
 }
 
@@ -40,7 +43,7 @@ export async function getListingOwnerById(id: string) {
 
 export async function createListing(
   userId: string,
-  input: Omit<InsertListingInput, 'user_id'>
+  input: Omit<InsertListingInput, "user_id">,
 ): Promise<void> {
   await insertListingRepo({ ...input, user_id: userId });
 }
@@ -48,7 +51,7 @@ export async function createListing(
 export async function updateListing(
   userId: string,
   listingId: string,
-  input: Partial<Omit<InsertListingInput, 'user_id'>>
+  input: Partial<Omit<InsertListingInput, "user_id">>,
 ): Promise<void> {
   await updateListingById(listingId, userId, input);
 }
@@ -61,14 +64,27 @@ export async function getListingById(id: string) {
   return fetchListingById(id);
 }
 
-export async function deleteListing(userId: string, listingId: string): Promise<void> {
+export async function deleteListing(
+  userId: string,
+  listingId: string,
+): Promise<void> {
   await deleteListingById(listingId, userId);
 }
 
-export async function archiveListing(userId: string, listingId: string): Promise<void> {
-  await updateListingById(listingId, userId, { status: 'archived' });
+export async function archiveListing(
+  userId: string,
+  listingId: string,
+): Promise<void> {
+  await updateListingById(listingId, userId, { status: "archived" });
 }
 
-export async function unpublishListing(userId: string, listingId: string): Promise<void> {
-  await updateListingById(listingId, userId, { status: 'draft' });
+export async function unpublishListing(
+  userId: string,
+  listingId: string,
+): Promise<void> {
+  await updateListingById(listingId, userId, { status: "draft" });
+}
+
+export async function getNewestPublishedListings(limit = 6) {
+  return fetchNewestPublishedListings(limit);
 }
